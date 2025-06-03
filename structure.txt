@@ -1,0 +1,30 @@
+.
+├── README.md
+├── Scene.jsx
+├── app
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components
+│   ├── Experience.tsx
+│   └── MyRoom.tsx
+├── eslint.config.mjs
+├── next-env.d.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── public
+│   ├── models
+│   │   └── Room_Portfolio_w_Material.glb
+│   └── textures
+│       └── room
+│           ├── misc_baking.hdr
+│           ├── rest_of_room_baking.hdr
+│           ├── room_baking.hdr
+│           └── working_space_baking.hdr
+├── structure.txt
+└── tsconfig.json
+
+7 directories, 21 files

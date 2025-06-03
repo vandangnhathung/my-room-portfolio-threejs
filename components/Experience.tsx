@@ -1,11 +1,16 @@
-import MyRoom from "@/components/MyRoom";
-import { OrbitControls } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
+import { MyRoom } from "./MyRoom";
 
 export const Experience = () => {
   return (
     <>
       <OrbitControls />
-     <MyRoom />
+      <group>
+      <Environment preset="sunset" />
+      <mesh>
+        <MyRoom />
+      </mesh>
+    </group>
     </>
   );
 };

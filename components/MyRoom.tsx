@@ -33,22 +33,35 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   const { nodes } = useGLTF('/models/Room_Portfolio.glb') as unknown as GLTFResult;
   const firstTexture = useTexture('/textures/room/FirstSetTexture.webp');
   firstTexture.flipY = false;
+  firstTexture.colorSpace = THREE.SRGBColorSpace;
+  firstTexture.minFilter = THREE.LinearFilter;
+  firstTexture.magFilter = THREE.LinearFilter;
   const firstMaterial = new THREE.MeshStandardMaterial({ map: firstTexture });
 
   const secondTexture = useTexture('/textures/room/SecondSetTexture.webp');
   secondTexture.flipY = false;
+  secondTexture.colorSpace = THREE.SRGBColorSpace;
+  secondTexture.minFilter = THREE.LinearFilter;
+  secondTexture.magFilter = THREE.LinearFilter;
   const secondMaterial = new THREE.MeshStandardMaterial({ map: secondTexture });
 
   const thirdTexture = useTexture('/textures/room/ThirdSetTexture.webp');
   thirdTexture.flipY = false;
+  thirdTexture.minFilter = THREE.LinearFilter;
+  thirdTexture.magFilter = THREE.LinearFilter;
   const thirdMaterial = new THREE.MeshStandardMaterial({ map: thirdTexture });
 
   const fourthTexture = useTexture('/textures/room/FourthSetTexture.webp');
   fourthTexture.flipY = false;
+  fourthTexture.minFilter = THREE.LinearFilter;
+  fourthTexture.magFilter = THREE.LinearFilter;
   const fourthMaterial = new THREE.MeshStandardMaterial({ map: fourthTexture });
 
   const worldTexture = useTexture('/textures/room/world_baking.webp');
   worldTexture.flipY = false;
+  worldTexture.colorSpace = THREE.SRGBColorSpace;
+  worldTexture.minFilter = THREE.LinearFilter;
+  worldTexture.magFilter = THREE.LinearFilter;
   const worldMaterial = new THREE.MeshStandardMaterial({ map: worldTexture });
 
   return (

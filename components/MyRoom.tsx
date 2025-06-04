@@ -25,6 +25,8 @@ type GLTFResult = GLTF & {
     workspace: THREE.Mesh
     sofa: THREE.Mesh
     cup_coaster: THREE.Mesh
+    ['Cushion_-Bottom']: THREE.Mesh
+
   }
   materials: {
     [key: string]: THREE.MeshStandardMaterial
@@ -76,6 +78,13 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   sofaTexture.minFilter = THREE.LinearFilter;
   sofaTexture.magFilter = THREE.LinearFilter;
   const sofaMaterial = new THREE.MeshStandardMaterial({ map: sofaTexture });
+
+  const chairTexture = useTexture('/textures/room/chair_baking.webp');
+  chairTexture.flipY = false;
+  chairTexture.colorSpace = THREE.SRGBColorSpace;
+  chairTexture.minFilter = THREE.LinearFilter;
+  chairTexture.magFilter = THREE.LinearFilter;
+  const chairMaterial = new THREE.MeshStandardMaterial({ map: chairTexture });
   return (
     <>
       <OrbitControls 
@@ -180,14 +189,6 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
             position={[1.123, 10.81, -1.984]}
           />
           <mesh
-            name="chair"
-            castShadow
-            receiveShadow
-            geometry={nodes.chair.geometry}
-            material={thirdMaterial}
-            position={[3.933, 1.619, 1.513]}
-          />
-          <mesh
             name="mouse"
             castShadow
             receiveShadow
@@ -219,6 +220,15 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
             material={thirdMaterial}
             position={[-0.223, 5.891, 4.068]}
           />
+           <mesh
+        castShadow
+        receiveShadow
+        geometry={nodes['Cushion_-Bottom'].geometry}
+        material={chairMaterial}
+        position={[2.252, 1.64, 1.299]}
+        rotation={[-Math.PI, 1.535, -Math.PI]}
+        scale={3.545}
+      />
           </group>
         </group>
     </>

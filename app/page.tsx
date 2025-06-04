@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 // Resize handler component that runs inside the Canvas
 function ResizeHandler() {
-  const { camera, gl, size } = useThree();
+  const { camera, gl } = useThree();
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,7 +31,6 @@ function ResizeHandler() {
     return () => window.removeEventListener("resize", handleResize);
   }, [camera, gl]);
 
-  console.log(camera)
   return null; // This component doesn't render anything
 }
 

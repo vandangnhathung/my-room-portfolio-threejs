@@ -80,8 +80,8 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
     <>
       <OrbitControls 
       makeDefault target={[4.149959777666874, 4.647045028235788, 1.2788151669711065]}
-      minDistance={5}
-      maxDistance={12}
+      minDistance={12}
+      maxDistance={20}
       minPolarAngle={0}
       maxPolarAngle={Math.PI / 2}
       minAzimuthAngle={Math.PI * -1}

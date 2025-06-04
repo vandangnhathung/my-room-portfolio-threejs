@@ -9,7 +9,7 @@ export const Experience = () => {
     <>
     <Suspense fallback={null}>
       <group>
-        <Environment preset="city"/>
+        <Environment preset="apartment" blur={0.8} environmentIntensity={0.8}/>
           <MyRoom />
       </group>
     </Suspense>

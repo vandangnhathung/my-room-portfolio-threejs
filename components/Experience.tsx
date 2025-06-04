@@ -9,7 +9,7 @@ export const Experience = () => {
     <>
     <Suspense fallback={null}>
       <group>
-        <Environment preset="sunset" />
+        <Environment preset="city"/>
           <MyRoom />
       </group>
     </Suspense>

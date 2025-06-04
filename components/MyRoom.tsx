@@ -83,11 +83,12 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
       <OrbitControls 
       makeDefault target={[4.149959777666874, 4.647045028235788, 1.2788151669711065]}
       minDistance={5}
-      maxDistance={15}
+      maxDistance={12}
       minPolarAngle={0}
       maxPolarAngle={Math.PI / 2}
       minAzimuthAngle={Math.PI * -1}
       maxAzimuthAngle={Math.PI * -1 / 2}
+      enablePan={false}
       />
       <group {...props} dispose={null}>
         <group name="Scene">
@@ -169,7 +170,8 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
             receiveShadow
             geometry={nodes.World.geometry}
             material={worldMaterial}
-            position={[4.708, 28.521, -1.236]}
+            position={[-16.286, 93.968, -28.224]}
+            scale={3.337}
           />
           <mesh
             name="bulb"

@@ -1,34 +1,8 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { Experience } from "@/components/Experience";
 import { Suspense } from "react";
-import { useThree } from "@react-three/fiber";
-import * as THREE from "three";
-
-function CameraLogger() {
-  const { camera } = useThree();
-  
-  useFrame(() => {
-    const isPerspectiveCamera = camera instanceof THREE.PerspectiveCamera;
-    console.log('Camera Details:', {
-      position: {
-        x: camera.position.x.toFixed(2),
-        y: camera.position.y.toFixed(2),
-        z: camera.position.z.toFixed(2)
-      },
-      rotation: {
-        x: camera.rotation.x.toFixed(2),
-        y: camera.rotation.y.toFixed(2),
-        z: camera.rotation.z.toFixed(2)
-      },
-      ...(isPerspectiveCamera && { fov: (camera as THREE.PerspectiveCamera).fov }),
-      zoom: camera.zoom
-    });
-  });
-
-  return null;
-}
 
 export default function Home() {
   return (

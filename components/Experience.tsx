@@ -1,4 +1,4 @@
-import { Environment, OrbitControls } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 import { MyRoom } from "./MyRoom";
 import { Suspense } from "react";
 

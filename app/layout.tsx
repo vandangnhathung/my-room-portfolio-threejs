@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { RoomQueryProvider } from '@/components/providers/query-provider';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -13,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning id='root' className="mdl-js">{children}</body>
+      <body suppressHydrationWarning id='root' className="mdl-js">
+        <RoomQueryProvider>
+          {children}
+        </RoomQueryProvider>
+      </body>
     </html>
   );
 }

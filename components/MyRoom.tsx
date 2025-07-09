@@ -40,7 +40,7 @@ const loadMaterialTextures = async () => {
     wood: '/textures/room/wood.png',
     fixedObject: '/textures/room/FixedObjectSet.png',
     raycasterObject: '/textures/room/RaycasterObjectSet.jpg',
-    plant: '/textures/room/plant.png'
+    plant: '/textures/room/Plant.png'
   }
 }
 
@@ -141,7 +141,7 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   })
 
   const plantMaterial = useOptimizedTexture({
-    path: materialPaths?.plant || '/textures/room/plant.png',
+    path: materialPaths?.plant || '/textures/room/Plant.png',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
     generateMipmaps: false

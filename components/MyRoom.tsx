@@ -9,7 +9,9 @@ import { InteractiveMeshWrapper } from "@/components/mesh/InteractiveMesh"
 import { StaticMesh } from "@/components/mesh/StaticMesh"
 import { meshConfig } from "@/utils/mesh.config"
 import { GLTFResult, MeshConfig } from "@/type.d"
-import { useMemo, useCallback, Suspense } from "react"
+import { useMemo, useCallback, Suspense, useEffect } from "react"
+// Import Easy Popup from npm package
+import "@viivue/easy-popup"
 
 // Query keys for TanStack Query
 const QUERY_KEYS = {
@@ -18,18 +20,82 @@ const QUERY_KEYS = {
   ROOM_DATA: ['roomData'],
 } as const
 
+// Declare EasyPopup global type for TypeScript
+declare global {
+  interface Window {
+    EasyPopup: {
+      init: (selector: string, options?: any) => void;
+      get: (id: string) => {
+        open: () => void;
+        close: () => void;
+        toggle: () => void;
+      };
+    };
+  }
+}
+
+// Updated mesh config to ensure screens have proper click handlers
+const enhancedMeshConfig = (originalConfig: MeshConfig[]): MeshConfig[] => {
+  return originalConfig.map(config => {
+    // Special handling for the executive chair
+    if (config.name === 'Executive_office_chair_raycaster') {
+      return {
+        ...config,
+        // Ensure the chair has an onClick handler for interaction
+        onClick: () => {
+          console.log('Chair clicked! You can add more interaction here.')
+        }
+      }
+    }
+    
+    // Handle screen raycaster objects
+    if (config.name === 'screen_raycaster') {
+      return {
+        ...config,
+        onClick: () => {
+          console.log('Screen clicked! Opening popup...')
+          // Check if EasyPopup is available
+          if (typeof window !== 'undefined' && window.EasyPopup) {
+            const popup = window.EasyPopup.get('screen-popup')
+            if (popup) {
+              popup.open()
+            }
+          }
+        }
+      }
+    }
+    
+    if (config.name === 'screen001_raycaster') {
+      return {
+        ...config,
+        onClick: () => {
+          console.log('Screen001 clicked! Opening popup...')
+          // Check if EasyPopup is available
+          if (typeof window !== 'undefined' && window.EasyPopup) {
+            const popup = window.EasyPopup.get('screen001-popup')
+            if (popup) {
+              popup.open()
+            }
+          }
+        }
+      }
+    }
+    
+    return config
+  })
+}
+
 // Data fetchers/processors
 const processMeshConfigs = async (): Promise<MeshConfig[]> => {
   // Simulate async processing or actual API call
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(
-        meshConfig.map((config: MeshConfig) => ({
-          ...config,
-          // Auto-detect interactive meshes based on "raycaster" in name
-          isInteractive: config.name.includes('raycaster')
-        }))
-      )
+      const processedConfigs = meshConfig.map((config: MeshConfig) => ({
+        ...config,
+        // Auto-detect interactive meshes based on "raycaster" in name
+        isInteractive: config.name.includes('raycaster')
+      }))
+      resolve(enhancedMeshConfig(processedConfigs))
     }, 0)
   })
 }
@@ -78,6 +144,27 @@ const RoomLoader = () => (
 
 export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   const { hoveredMesh, createHoverHandlers } = useHoverState()
+
+  // Initialize Easy Popup when component mounts
+  useEffect(() => {
+    // Wait for EasyPopup to be available
+    const initPopup = () => {
+      if (typeof window !== 'undefined' && window.EasyPopup) {
+        // Initialize popups if they haven't been initialized yet
+        try {
+          window.EasyPopup.init('[data-easy-popup]')
+          console.log('Easy Popup initialized successfully')
+        } catch (error) {
+          console.log('Easy Popup already initialized or error:', error)
+        }
+      } else {
+        // Retry after a short delay if EasyPopup isn't loaded yet
+        setTimeout(initPopup, 100)
+      }
+    }
+    
+    initPopup()
+  }, [])
 
   // TanStack Query for mesh configurations
   const {

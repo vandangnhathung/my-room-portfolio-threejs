@@ -1,57 +1,34 @@
-"use client";
+'use client'
 
-import { Canvas, useThree } from "@react-three/fiber";
-import { Experience } from "@/components/Experience";
-import { Suspense, useEffect } from "react";
-import * as THREE from "three";
-
-// Resize handler component that runs inside the Canvas
-function ResizeHandler() {
-  const { camera, gl } = useThree();
-
-  useEffect(() => {
-    const handleResize = () => {
-      // Update sizes
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      
-      // Update Camera
-      (camera as THREE.PerspectiveCamera).aspect = width / height;
-      camera.updateProjectionMatrix();
-      
-      // Update renderer
-      gl.setSize(width, height);
-      gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    };
-
-    // Add event listener
-    window.addEventListener("resize", handleResize);
-    
-    // Cleanup
-    return () => window.removeEventListener("resize", handleResize);
-  }, [camera, gl]);
-
-  return null; // This component doesn't render anything
-}
+import { Canvas } from '@react-three/fiber'
+import { Experience } from '@/components/Experience'
+import { PopupManager, PopupTestButtons } from '@/components/PopupManager'
 
 export default function Home() {
   return (
-    <Canvas 
-      className="canvas h-full w-full" 
-      camera={{ 
-        position: [-2.74, 9.25, -3.10], 
-        rotation: [-2.39, -0.82, -2.54], 
-        fov: 75, 
-        near: 0.1, 
-        far: 1000, 
-        zoom: 1 
-      }}
-    >
-      <color attach="background" args={["#ececec"]} />
-      <ResizeHandler />
-      <Suspense fallback={null}>
+    <>
+      {/* Main 3D Canvas */}
+      <Canvas
+        camera={{
+          fov: 75,
+          near: 0.1,
+          far: 1000,
+          position: [10, 10, 10]
+        }}
+        style={{
+          width: '100vw',
+          height: '100vh',
+          background: 'black'
+        }}
+      >
         <Experience />
-      </Suspense>
-    </Canvas>
-  );
+      </Canvas>
+
+      {/* Popup Manager - renders popup HTML outside Canvas */}
+      <PopupManager />
+
+      {/* Optional: Test buttons for development */}
+      {process.env.NODE_ENV === 'development' && <PopupTestButtons />}
+    </>
+  )
 }

@@ -23,6 +23,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.82.0
         version: 5.82.0(@tanstack/react-query@5.82.0(react@19.1.0))(react@19.1.0)
+      '@viivue/easy-popup':
+        specifier: ^1.3.0
+        version: 1.3.0
       gsap:
         specifier: ^3.13.0
         version: 3.13.0
@@ -375,6 +378,9 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@phucbm/os-util@0.0.5':
+    resolution: {integrity: sha512-Oj9HYjcIYHge+RLZENAjhIyTkDPlDuQ6cBoDjnj9gXzXEmwjgQOnCWusscAh7gGfyQQAzonZx5eG8abpKRGKgQ==}
 
   '@react-spring/animated@10.0.1':
     resolution: {integrity: sha512-BGL3hA66Y8Qm3KmRZUlfG/mFbDPYajgil2/jOP0VXf2+o2WPVmcDps/eEgdDqgf5Pv9eBbyj7LschLMuSjlW3Q==}
@@ -742,6 +748,9 @@ packages:
     resolution: {integrity: sha512-Yy19y6O2GJq8f7CHf7L0nxL8bf4PZCPaVOCgJrusOeFHY1LvHgYXnmnXg6N5iwAnbgbZCDjo60SiM6IPJi9C5g==}
     peerDependencies:
       react: '>= 16.8.0'
+
+  '@viivue/easy-popup@1.3.0':
+    resolution: {integrity: sha512-9mmYzNOBRJ9O8OELYJKqsnsSR8pjF+7CSnjRJr/60aYWWLH7KRd1UHMn8MTsYpoJ+hKEGcAjwI4uke4gMnsvLQ==}
 
   '@webgpu/types@0.1.60':
     resolution: {integrity: sha512-8B/tdfRFKdrnejqmvq95ogp8tf52oZ51p3f4QD5m5Paey/qlX4Rhhy5Y8tgFMi7Ms70HzcMMw3EQjH/jdhTwlA==}
@@ -1549,6 +1558,9 @@ packages:
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
+
+  match-media-screen@0.0.3:
+    resolution: {integrity: sha512-Fa9p5SGYmDWNv6rmXxGXEfZHV1i7cORiRBQWRQCgr+KSMArAg7Kbp7LNfCg5ZpLGWYKUyesCJj+A5O6xzz066g==}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -2370,6 +2382,8 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
+  '@phucbm/os-util@0.0.5': {}
+
   '@react-spring/animated@10.0.1(react@19.1.0)':
     dependencies:
       '@react-spring/shared': 10.0.1(react@19.1.0)
@@ -2738,6 +2752,11 @@ snapshots:
     dependencies:
       '@use-gesture/core': 10.3.1
       react: 19.1.0
+
+  '@viivue/easy-popup@1.3.0':
+    dependencies:
+      '@phucbm/os-util': 0.0.5
+      match-media-screen: 0.0.3
 
   '@webgpu/types@0.1.60': {}
 
@@ -3709,6 +3728,8 @@ snapshots:
   magic-string@0.30.17:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  match-media-screen@0.0.3: {}
 
   math-intrinsics@1.1.0: {}
 

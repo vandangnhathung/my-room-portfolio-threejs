@@ -1,5 +1,8 @@
+// For Next.js App Router, add to your layout.tsx
 import type { Metadata } from 'next';
 import './globals.css';
+// Import Easy Popup styles
+import "@viivue/easy-popup/dist/easy-popup.min.css"
 import { RoomQueryProvider } from '@/components/providers/query-provider';
 
 export const metadata: Metadata = {
@@ -9,9 +12,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning id='root' className="mdl-js">

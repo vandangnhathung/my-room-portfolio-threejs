@@ -20,19 +20,7 @@ const QUERY_KEYS = {
   ROOM_DATA: ['roomData'],
 } as const
 
-// Declare EasyPopup global type for TypeScript
-declare global {
-  interface Window {
-    EasyPopup: {
-      init: (selector: string, options?: any) => void;
-      get: (id: string) => {
-        open: () => void;
-        close: () => void;
-        toggle: () => void;
-      };
-    };
-  }
-}
+// EasyPopup types are declared in PopupManager.tsx
 
 // Updated mesh config to ensure screens have proper click handlers
 const enhancedMeshConfig = (originalConfig: MeshConfig[]): MeshConfig[] => {

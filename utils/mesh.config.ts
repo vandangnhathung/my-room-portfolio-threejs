@@ -1,3 +1,5 @@
+import { MeshConfig } from "@/type";
+
 export const meshConfig: MeshConfig[] = [
     // Static meshes
     { name: 'floor', position: [0.48, 1.669, -7.652], rotation: [0, Math.PI / 2, 0], scale: 1, isInteractive: false },

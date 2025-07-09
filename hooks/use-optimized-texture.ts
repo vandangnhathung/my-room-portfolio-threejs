@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
+import { TextureConfig } from "@/type"
 
 export const useOptimizedTexture = (config: TextureConfig): THREE.MeshStandardMaterial => {
     const texture = useTexture(config.path)

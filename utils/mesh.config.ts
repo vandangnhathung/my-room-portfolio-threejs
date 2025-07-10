@@ -1,4 +1,4 @@
-import { MeshConfig } from "@/type";
+import { MeshConfig } from "@/types/type";
 
 export const meshConfig: MeshConfig[] = [
     // Static meshes

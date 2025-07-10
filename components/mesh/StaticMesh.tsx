@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { MeshConfig } from "@/type.d"
+import { MeshConfig } from "@/types/type"
 
 export const StaticMesh: React.FC<{
     config: MeshConfig

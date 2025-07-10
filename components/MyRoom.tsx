@@ -1,3 +1,5 @@
+// In your components/MyRoom.tsx file, make these changes:
+
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
@@ -8,10 +10,8 @@ import { OrbitControls, useGLTF } from "@react-three/drei"
 import { InteractiveMeshWrapper } from "@/components/mesh/InteractiveMesh"
 import { StaticMesh } from "@/components/mesh/StaticMesh"
 import { meshConfig } from "@/utils/mesh.config"
-import { GLTFResult, MeshConfig } from "@/type.d"
+import { GLTFResult, MeshConfig } from "@/types/type"
 import { useMemo, useCallback, Suspense, useEffect } from "react"
-// Import Easy Popup from npm package
-import "@viivue/easy-popup"
 
 // Query keys for TanStack Query
 const QUERY_KEYS = {
@@ -73,14 +73,12 @@ const enhancedMeshConfig = (originalConfig: MeshConfig[]): MeshConfig[] => {
   })
 }
 
-// Data fetchers/processors
+// Rest of your existing code stays exactly the same...
 const processMeshConfigs = async (): Promise<MeshConfig[]> => {
-  // Simulate async processing or actual API call
   return new Promise((resolve) => {
     setTimeout(() => {
       const processedConfigs = meshConfig.map((config: MeshConfig) => ({
         ...config,
-        // Auto-detect interactive meshes based on "raycaster" in name
         isInteractive: config.name.includes('raycaster')
       }))
       resolve(enhancedMeshConfig(processedConfigs))
@@ -89,7 +87,6 @@ const processMeshConfigs = async (): Promise<MeshConfig[]> => {
 }
 
 const loadMaterialTextures = async () => {
-  // This could be extended to load textures from API or validate paths
   return {
     wood: '/textures/room/wood.png',
     fixedObject: '/textures/room/FixedObjectSet.png',
@@ -99,7 +96,6 @@ const loadMaterialTextures = async () => {
 }
 
 const getRoomConfiguration = async () => {
-  // This could fetch room configuration from an API
   return {
     modelPath: '/models/Room_ver2-v1 (2).glb',
     cameraConfig: {
@@ -114,7 +110,6 @@ const getRoomConfiguration = async () => {
   }
 }
 
-// Loading component
 const RoomLoader = () => (
   <mesh>
     <boxGeometry args={[1, 1, 1]} />
@@ -122,78 +117,70 @@ const RoomLoader = () => (
   </mesh>
 )
 
-// Error component
-// const RoomError = ({ error }: { error: Error }) => (
-//   <mesh>
-//     <boxGeometry args={[1, 1, 1]} />
-//     <meshBasicMaterial color="red" />
-//   </mesh>
-// )
-
 export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   const { hoveredMesh, createHoverHandlers } = useHoverState()
 
-  // Initialize Easy Popup when component mounts
+  // ADD THIS: Initialize Easy Popup when component mounts (client-side only)
   useEffect(() => {
-    // Wait for EasyPopup to be available
-    const initPopup = () => {
-      if (typeof window !== 'undefined' && window.EasyPopup) {
-        // Initialize popups if they haven't been initialized yet
+    // Dynamic import only on client side
+    const loadEasyPopup = async () => {
+      if (typeof window !== 'undefined') {
         try {
-          window.EasyPopup.init('[data-easy-popup]')
-          console.log('Easy Popup initialized successfully')
+          await import("@viivue/easy-popup")
+          
+          setTimeout(() => {
+            if (window.EasyPopup) {
+              try {
+                window.EasyPopup.init('[data-easy-popup]')
+                console.log('Easy Popup initialized successfully')
+              } catch (error) {
+                console.log('Easy Popup already initialized or error:', error)
+              }
+            }
+          }, 100)
         } catch (error) {
-          console.log('Easy Popup already initialized or error:', error)
+          console.error('Failed to load Easy Popup:', error)
         }
-      } else {
-        // Retry after a short delay if EasyPopup isn't loaded yet
-        setTimeout(initPopup, 100)
       }
     }
     
-    initPopup()
+    loadEasyPopup()
   }, [])
 
-  // TanStack Query for mesh configurations
+  // All your existing TanStack Query code stays the same...
   const {
     data: meshConfigs = [],
     isLoading: meshConfigsLoading,
-    // error: meshConfigsError
   } = useQuery({
     queryKey: QUERY_KEYS.MESH_CONFIGS,
     queryFn: processMeshConfigs,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   })
 
-  // TanStack Query for material paths
   const {
     data: materialPaths,
     isLoading: materialPathsLoading,
-    // error: materialPathsError
   } = useQuery({
     queryKey: QUERY_KEYS.MATERIALS,
     queryFn: loadMaterialTextures,
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 30,
   })
 
-  // TanStack Query for room configuration
   const {
     data: roomConfig,
     isLoading: roomConfigLoading,
-    // error: roomConfigError
   } = useQuery({
     queryKey: QUERY_KEYS.ROOM_DATA,
     queryFn: getRoomConfiguration,
-    staleTime: 1000 * 60 * 15, // 15 minutes
-    gcTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
   })
 
-  // Load GLTF model
+  // Rest of your component code stays exactly the same...
   const { nodes } = useGLTF(roomConfig?.modelPath || '/models/Room_ver2-v1 (2).glb') as unknown as GLTFResult
 
-  // Materials with conditional loading
   const woodMaterial = useOptimizedTexture({
     path: materialPaths?.wood || '/textures/room/wood.png',
     colorSpace: THREE.SRGBColorSpace,
@@ -222,7 +209,6 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
     generateMipmaps: false
   })
 
-  // Get material for mesh - memoized with dependency on materials
   const getMaterial = useCallback((meshName: string): THREE.Material => {
     if (meshName === 'floor') return woodMaterial
     if (meshName === 'Room') return fixedObjectMaterial
@@ -230,25 +216,16 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
     return raycasterObjectMaterial
   }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial])
 
-  // Memoized interactive and static mesh configs
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {
     const interactive = meshConfigs.filter(config => config.isInteractive)
     const staticMeshConfigs = meshConfigs.filter(config => !config.isInteractive)
     return { interactiveMeshConfigs: interactive, staticMeshConfigs: staticMeshConfigs }
   }, [meshConfigs])
 
-  // Error handling
-  // if (meshConfigsError || materialPathsError || roomConfigError) {
-  //   console.error('Room loading error:', { meshConfigsError, materialPathsError, roomConfigError })
-  //   return <RoomError error={meshConfigsError || materialPathsError || roomConfigError} />
-  // }
-
-  // Loading state
   if (meshConfigsLoading || materialPathsLoading || roomConfigLoading) {
     return <RoomLoader />
   }
 
-  // Render interactive meshes
   const renderInteractiveMeshes = () => {
     return interactiveMeshConfigs.map((config) => (
       <InteractiveMeshWrapper
@@ -262,7 +239,6 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
     ))
   }
 
-  // Render static meshes
   const renderStaticMeshes = () => {
     return staticMeshConfigs.map((config) => {
       const geometry = nodes[config.name as keyof typeof nodes]?.geometry
@@ -304,10 +280,8 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   )
 }
 
-// Preload GLTF
 useGLTF.preload('/models/Room_ver2-v1 (2).glb')
 
-// Additional query utilities for external use
 export const useRoomQueries = () => {
   const meshConfigsQuery = useQuery({
     queryKey: QUERY_KEYS.MESH_CONFIGS,

@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-// Import Easy Popup from npm package
-import "@viivue/easy-popup"
+// REMOVED: import "@viivue/easy-popup"
 
 // TypeScript declaration for EasyPopup
 declare global {
@@ -69,29 +68,45 @@ const popupConfigs = {
 // Popup Manager Component
 export const PopupManager = () => {
   useEffect(() => {
-    // Initialize popups when component mounts
-    const initializePopups = () => {
-      if (typeof window !== 'undefined' && window.EasyPopup) {
+    // ADDED: Dynamic import only on client side
+    const loadAndInitializePopups = async () => {
+      if (typeof window !== 'undefined') {
         try {
-          // Initialize all popups
-          window.EasyPopup.init('[data-easy-popup]', {
-            theme: 'right-side',
-            closeButtonInnerText: '✕',
-            clickOutsideToClose: true,
-            keyboard: true,
-            preventScroll: true
-          })
-          console.log('Popups initialized successfully')
+          // Load the library dynamically
+          await import("@viivue/easy-popup")
+          
+          // Initialize popups after library is loaded
+          const initializePopups = () => {
+            if (window.EasyPopup) {
+              try {
+                // Initialize all popups
+                window.EasyPopup.init('[data-easy-popup]', {
+                  theme: 'right-side',
+                  closeButtonInnerText: '✕',
+                  clickOutsideToClose: true,
+                  keyboard: true,
+                  preventScroll: true
+                })
+                console.log('Popups initialized successfully')
+              } catch (error) {
+                console.log('Popups already initialized or error:', error)
+              }
+            } else {
+              // Retry if EasyPopup isn't available yet
+              setTimeout(initializePopups, 100)
+            }
+          }
+          
+          // Small delay to ensure library is fully loaded
+          setTimeout(initializePopups, 100)
+          
         } catch (error) {
-          console.log('Popups already initialized or error:', error)
+          console.error('Failed to load Easy Popup:', error)
         }
-      } else {
-        // Retry if EasyPopup isn't loaded yet
-        setTimeout(initializePopups, 100)
       }
     }
 
-    initializePopups()
+    loadAndInitializePopups()
   }, [])
 
   return (

@@ -2,7 +2,7 @@
 
 import * as THREE from "three"
 import { animated } from "@react-spring/three"
-import { GLTFResult, MeshConfig } from "@/type.d"
+import { GLTFResult, MeshConfig } from "@/types/type"
 import { useHoverAnimation } from "@/hooks/use-hover-animation"
 import { useChairRotation } from "@/hooks/use-chair-rotation"
 

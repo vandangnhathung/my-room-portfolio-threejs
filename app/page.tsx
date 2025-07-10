@@ -2,7 +2,7 @@
 
 import { Canvas } from '@react-three/fiber'
 import { Experience } from '@/components/Experience'
-import { PopupManager, PopupTestButtons } from '@/components/PopupManager'
+import { PopupManager, PopupTestButtons } from '@/components/popup/PopupManager'
 
 export default function Home() {
   return (

@@ -1,14 +1,30 @@
+// ===== FILE: components/Experience.tsx (REPLACE EXISTING) =====
 'use client'
 
 import { Environment } from "@react-three/drei";
 import { MyRoom } from "./MyRoom";
 import { Suspense } from "react";
+import { ThreeEvent } from '@react-three/fiber'
 
-export const Experience = () => {
+// Define proper event handler types
+type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void
+
+interface HoverHandlers {
+  onPointerEnter: PointerEventHandler
+  onPointerLeave: PointerEventHandler
+  onPointerMove?: PointerEventHandler
+  style: { cursor: string }
+}
+
+interface ExperienceProps {
+  hoveredMesh: string | null
+  createHoverHandlers: (meshName: string) => HoverHandlers
+}
+
+export const Experience: React.FC<ExperienceProps> = ({ hoveredMesh, createHoverHandlers }) => {
   return (
     <>
       <Suspense fallback={null}>
-        {/* Add black background */}
         <color attach="background" args={['#000000']} />
         
         <group>
@@ -16,9 +32,12 @@ export const Experience = () => {
             preset="apartment" 
             blur={0.8} 
             environmentIntensity={0.8}
-            background={false} // Disable environment background
+            background={false}
           />
-          <MyRoom />
+          <MyRoom 
+            hoveredMesh={hoveredMesh}
+            createHoverHandlers={createHoverHandlers}
+          />
         </group>
       </Suspense>
     </>

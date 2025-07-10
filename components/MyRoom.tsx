@@ -1,5 +1,4 @@
-// In your components/MyRoom.tsx file, make these changes:
-
+// ===== FILE: components/MyRoom.tsx (KEEP YOUR EXISTING CODE + ADD PROPS) =====
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
@@ -12,6 +11,7 @@ import { StaticMesh } from "@/components/mesh/StaticMesh"
 import { meshConfig } from "@/utils/mesh.config"
 import { GLTFResult, MeshConfig } from "@/types/type"
 import { useMemo, useCallback, Suspense, useEffect } from "react"
+import { ThreeEvent } from '@react-three/fiber'
 
 // Query keys for TanStack Query
 const QUERY_KEYS = {
@@ -117,8 +117,30 @@ const RoomLoader = () => (
   </mesh>
 )
 
-export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
-  const { hoveredMesh, createHoverHandlers } = useHoverState()
+// ===== UPDATE the MyRoomProps interface in your MyRoom.tsx =====
+
+// Define proper event handler types
+type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void
+
+interface HoverHandlers {
+  onPointerEnter: PointerEventHandler
+  onPointerLeave: PointerEventHandler
+  onPointerMove?: PointerEventHandler
+  style: { cursor: string }
+}
+
+// ===== ADD INTERFACE FOR PROPS =====
+interface MyRoomProps {
+  hoveredMesh?: string | null
+  createHoverHandlers?: (meshName: string) => HoverHandlers
+}
+
+// ===== UPDATE FUNCTION SIGNATURE =====
+export function MyRoom(props: MyRoomProps) {
+  // ===== MODIFY THIS LINE TO USE PROPS OR FALLBACK =====
+  const localHoverState = useHoverState()
+  const hoveredMesh = props.hoveredMesh ?? localHoverState.hoveredMesh
+  const createHoverHandlers = props.createHoverHandlers ?? localHoverState.createHoverHandlers
 
   // ADD THIS: Initialize Easy Popup when component mounts (client-side only)
   useEffect(() => {
@@ -240,23 +262,32 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
   }
 
   const renderStaticMeshes = () => {
+    // Add safety check for nodes
+    if (!nodes) {
+      console.warn('Nodes object is not available yet')
+      return null
+    }
+
     return staticMeshConfigs.map((config) => {
       const geometry = nodes[config.name as keyof typeof nodes]?.geometry
-      const material = getMaterial(config.name)
-
-      if (!geometry) return null
+      
+      if (!geometry) {
+        console.warn(`Geometry not found for static mesh: ${config.name}`)
+        return null
+      }
 
       return (
         <StaticMesh
           key={`static-${config.name}`}
           config={config}
-          geometry={geometry}
-          material={material}
+          nodes={nodes}
+          getMaterial={getMaterial}
         />
       )
     })
   }
 
+  // ===== PASS THROUGH OTHER PROPS TO GROUP =====
   return (
     <Suspense fallback={<RoomLoader />}>
       <OrbitControls 
@@ -270,7 +301,7 @@ export function MyRoom(props: React.JSX.IntrinsicElements['group']) {
         maxAzimuthAngle={roomConfig?.cameraConfig.maxAzimuthAngle}
         enablePan={false}
       />
-      <group {...props} dispose={null}>
+      <group dispose={null}>
         <group name="Scene">
           {renderInteractiveMeshes()}
           {renderStaticMeshes()}

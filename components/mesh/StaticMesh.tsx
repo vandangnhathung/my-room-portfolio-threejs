@@ -1,20 +1,38 @@
+// ===== FILE: components/mesh/StaticMesh.tsx (REPLACE EXISTING) =====
+'use client'
+
 import * as THREE from "three"
-import { MeshConfig } from "@/types/type"
+import { GLTFResult, MeshConfig } from "@/types/type"
 
 export const StaticMesh: React.FC<{
-    config: MeshConfig
-    geometry: THREE.BufferGeometry
-    material: THREE.Material
-  }> = ({ config, geometry, material }) => (
+  config: MeshConfig
+  nodes: GLTFResult['nodes']
+  getMaterial: (name: string) => THREE.Material
+}> = ({ config, nodes, getMaterial }) => {
+  // Add safety checks for nodes
+  if (!nodes) {
+    console.warn(`Nodes object is undefined for mesh: ${config.name}`)
+    return null
+  }
+
+  const geometry = nodes[config.name as keyof typeof nodes]?.geometry
+  const material = getMaterial(config.name)
+
+  if (!geometry) {
+    console.warn(`Geometry not found for mesh: ${config.name}`)
+    return null
+  }
+
+  return (
     <mesh
       name={config.name}
-      castShadow
-      receiveShadow
       geometry={geometry}
       material={material}
       position={config.position}
       rotation={config.rotation}
       scale={config.scale}
+      castShadow
+      receiveShadow
     />
   )
-  
+}

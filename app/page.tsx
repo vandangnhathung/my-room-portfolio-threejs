@@ -1,34 +1,40 @@
+// ===== FILE: app/page.tsx (REPLACE EXISTING) =====
 'use client'
 
 import { Canvas } from '@react-three/fiber'
 import { Experience } from '@/components/Experience'
-import { PopupManager, PopupTestButtons } from '@/components/popup/PopupManager'
+import { useHoverState } from '@/hooks/use-hover-state'
+import { HoverMessage } from '@/components/HoverMessage'
+import { PopupManager } from '@/components/popup/PopupManager'
 
 export default function Home() {
+  const { hoveredMesh, createHoverHandlers, hoverMessage } = useHoverState()
+
   return (
-    <>
-      {/* Main 3D Canvas */}
+    <div className="relative w-full h-screen">
+      {/* 3D Canvas */}
       <Canvas
         camera={{
-          fov: 75,
+          fov: 45,
           near: 0.1,
-          far: 1000,
-          position: [10, 10, 10]
+          far: 200,
+          position: [3, 2, 6]
         }}
-        style={{
-          width: '100vw',
-          height: '100vh',
-          background: 'black'
-        }}
+        shadows
       >
-        <Experience />
+        <Experience 
+          hoveredMesh={hoveredMesh}
+          createHoverHandlers={createHoverHandlers}
+        />
       </Canvas>
 
-      {/* Popup Manager - renders popup HTML outside Canvas */}
-      <PopupManager />
+      {/* Hover message overlay - renders outside Canvas */}
+      <div className="absolute inset-0 pointer-events-none">
+        <HoverMessage messageState={hoverMessage.messageState} />
+      </div>
 
-      {/* Optional: Test buttons for development */}
-      {process.env.NODE_ENV === 'development' && <PopupTestButtons />}
-    </>
+      {/* Add PopupManager to ensure popups are available */}
+      <PopupManager />
+    </div>
   )
 }

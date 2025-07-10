@@ -1,3 +1,4 @@
+// ===== FILE: components/mesh/InteractiveMesh.tsx (REPLACE EXISTING) =====
 'use client'
 
 import * as THREE from "three"
@@ -5,6 +6,17 @@ import { animated } from "@react-spring/three"
 import { GLTFResult, MeshConfig } from "@/types/type"
 import { useHoverAnimation } from "@/hooks/use-hover-animation"
 import { useChairRotation } from "@/hooks/use-chair-rotation"
+import { ThreeEvent } from '@react-three/fiber'
+
+// Define proper event handler types
+type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void
+
+interface HoverHandlers {
+  onPointerEnter: PointerEventHandler
+  onPointerLeave: PointerEventHandler
+  onPointerMove?: PointerEventHandler
+  style: { cursor: string }
+}
 
 // Create a separate component for interactive meshes to handle hooks properly
 export function InteractiveMeshWrapper({ 
@@ -18,11 +30,7 @@ export function InteractiveMeshWrapper({
   nodes: GLTFResult['nodes']
   getMaterial: (name: string) => THREE.Material
   hoveredMesh: string | null
-  createHoverHandlers: (name: string) => { 
-    onPointerEnter: () => void; 
-    onPointerLeave: () => void; 
-    style: { cursor: string } 
-  }
+  createHoverHandlers: (name: string) => HoverHandlers
 }) {
   const animatedScale = useHoverAnimation(config.name, config.scale, hoveredMesh)
   const chairRotation = useChairRotation(config.name, 0.3) // Slow initial speed
@@ -54,11 +62,7 @@ export const InteractiveMesh: React.FC<{
   animatedScale: {
     scale: number | [number, number, number]
   }
-  hoverHandlers: {
-    onPointerEnter: () => void
-    onPointerLeave: () => void
-    style: { cursor: string }
-  }
+  hoverHandlers: HoverHandlers
   chairRotationRef?: React.RefObject<THREE.Mesh | null>
 }> = ({ config, geometry, material, animatedScale, hoverHandlers, chairRotationRef }) => (
   <animated.mesh

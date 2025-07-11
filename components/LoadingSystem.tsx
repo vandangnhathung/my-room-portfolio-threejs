@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { useProgress, Preload } from '@react-three/drei';
+import { Preload } from '@react-three/drei';
 
 // Types
 export interface LoadingSystemProps {
@@ -33,12 +33,7 @@ interface ThemeConfig {
   shadowColor: string;
 }
 
-interface ProgressData {
-  progress: number;
-  loaded: number;
-  total: number;
-  active: boolean;
-}
+
 
 // Theme configurations
 const themes: Record<ThemeType, ThemeConfig> = {
@@ -81,25 +76,7 @@ const themes: Record<ThemeType, ThemeConfig> = {
   }
 };
 
-// Progress Tracker Component (inside Canvas)
-interface ProgressTrackerProps {
-  onProgressUpdate: (data: ProgressData) => void;
-}
-
-const ProgressTracker: React.FC<ProgressTrackerProps> = ({ onProgressUpdate }) => {
-  const { progress, loaded, total, active } = useProgress();
-  
-  useEffect(() => {
-    // Use setTimeout to defer state updates to avoid render conflicts
-    const timeoutId = setTimeout(() => {
-      onProgressUpdate({ progress, loaded, total, active });
-    }, 0);
-    
-    return () => clearTimeout(timeoutId);
-  }, [progress, loaded, total, active, onProgressUpdate]);
-  
-  return null;
-};
+// No more ProgressTracker - we'll use Suspense behavior instead
 
 // Loading Overlay Component
 interface LoadingOverlayProps {
@@ -107,8 +84,6 @@ interface LoadingOverlayProps {
   themeType: ThemeType;
   loadingPhase: LoadingPhase;
   loadingText: string;
-  displayProgress: number;
-  progressData: ProgressData;
   isEnterEnabled: boolean;
   onEnterClick: () => void;
 }
@@ -118,8 +93,6 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   themeType,
   loadingPhase,
   loadingText,
-  displayProgress,
-  progressData,
   isEnterEnabled,
   onEnterClick
 }) => {
@@ -313,56 +286,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           {loadingText}
         </div>
 
-        {/* Progress Bar */}
-        {loadingPhase === 'loading' && (
-          <div
-            style={{
-              width: '100%',
-              height: '6px',
-              backgroundColor: `${theme.accentColor}33`,
-              borderRadius: '10px',
-              marginBottom: '30px',
-              overflow: 'hidden',
-              position: 'relative'
-            }}
-          >
-            <div
-              style={{
-                width: `${displayProgress}%`,
-                height: '100%',
-                background: theme.buttonGradient,
-                borderRadius: '10px',
-                transition: 'width 0.3s ease',
-                position: 'relative'
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: `${displayProgress}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                animation: 'shimmer 2s ease-in-out infinite'
-              }}
-            />
-          </div>
-        )}
 
-        {/* Progress Details */}
-        {loadingPhase === 'loading' && progressData.total > 0 && (
-          <div
-            style={{
-              fontSize: '14px',
-              color: theme.accentColor,
-              marginBottom: '30px',
-              opacity: 0.8
-            }}
-          >
-            {progressData.loaded} of {progressData.total} items loaded
-          </div>
-        )}
 
         {/* Enter Button */}
         <button
@@ -436,11 +360,6 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           50% { transform: scale(1.05); opacity: 0.8; }
         }
         
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
-        }
-        
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(15px); }
           to { opacity: 0.7; transform: translateY(0); }
@@ -460,12 +379,6 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>('initializing');
   const [loadingText, setLoadingText] = useState<string>('');
   const [isEnterEnabled, setIsEnterEnabled] = useState<boolean>(false);
-  const [progressData, setProgressData] = useState<ProgressData>({ 
-    progress: 0, 
-    loaded: 0, 
-    total: 0, 
-    active: true 
-  });
 
   // Default messages
   const defaultMessages: LoadingMessages = {
@@ -478,16 +391,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   // Merge custom messages with defaults
   const messages: LoadingMessages = { ...defaultMessages, ...customMessages };
 
-  // Enhanced progress calculation
-  const actualProgress = progressData.total > 0 ? Math.round((progressData.loaded / progressData.total) * 100) : 0;
-  const displayProgress = Math.max(progressData.progress, actualProgress);
-
-  // Progress update handler
-  const handleProgressUpdate = useCallback((data: ProgressData) => {
-    setProgressData(data);
-  }, []);
-
-  // Loading phases management
+  // Simplified loading phases management
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
@@ -495,11 +399,9 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       setLoadingText(messages.initializing);
       timeoutId = setTimeout(() => setLoadingPhase('loading'), 800);
     } else if (loadingPhase === 'loading') {
-      if (!progressData.active && displayProgress >= 99 && progressData.total > 0 && progressData.loaded >= progressData.total) {
-        timeoutId = setTimeout(() => setLoadingPhase('ready'), 500);
-      } else {
-        setLoadingText(`${messages.loading} ${displayProgress}%`);
-      }
+      setLoadingText(messages.loading);
+      // Simulate loading completion after a reasonable time
+      timeoutId = setTimeout(() => setLoadingPhase('ready'), 3000);
     } else if (loadingPhase === 'ready') {
       setLoadingText(messages.ready);
       setIsEnterEnabled(true);
@@ -511,7 +413,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [loadingPhase, displayProgress, progressData, messages]);
+  }, [loadingPhase, messages]);
 
   // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
@@ -526,10 +428,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       <Canvas
         camera={{ fov: 45, near: 0.1, far: 200, position: [3, 2, 6] }}
         style={{ width: '100%', height: '100%' }}
-      >
-        {/* Progress tracker inside Canvas */}
-        <ProgressTracker onProgressUpdate={handleProgressUpdate} />
-        
+      >        
         {/* Preload all assets */}
         <Preload all />
         
@@ -545,8 +444,6 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
         themeType={theme}
         loadingPhase={loadingPhase}
         loadingText={loadingText}
-        displayProgress={displayProgress}
-        progressData={progressData}
         isEnterEnabled={isEnterEnabled}
         onEnterClick={handleLoadingComplete}
       />

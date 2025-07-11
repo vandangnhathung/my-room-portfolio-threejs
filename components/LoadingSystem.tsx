@@ -90,7 +90,12 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ onProgressUpdate }) =
   const { progress, loaded, total, active } = useProgress();
   
   useEffect(() => {
-    onProgressUpdate({ progress, loaded, total, active });
+    // Use setTimeout to defer state updates to avoid render conflicts
+    const timeoutId = setTimeout(() => {
+      onProgressUpdate({ progress, loaded, total, active });
+    }, 0);
+    
+    return () => clearTimeout(timeoutId);
   }, [progress, loaded, total, active, onProgressUpdate]);
   
   return null;
@@ -153,41 +158,45 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     try {
       const { gsap } = await import('gsap');
       
-      const timeline = gsap.timeline({
-        onComplete: () => {
-          if (overlayRef.current) {
-            overlayRef.current.style.display = 'none';
-            overlayRef.current.style.pointerEvents = 'none';
+      return new Promise<void>((resolve) => {
+        const timeline = gsap.timeline({
+          onComplete: () => {
+            if (overlayRef.current) {
+              overlayRef.current.style.display = 'none';
+              overlayRef.current.style.pointerEvents = 'none';
+            }
+            resolve(); // Resolve promise when animation completes
           }
-        }
-      });
+        });
 
-      // Bottom-to-top swipe animation
-      timeline
-        .to(loadingTextRef.current, {
-          opacity: 0,
-          y: -30,
-          duration: 0.4,
-          ease: "power2.in"
-        })
-        .to(enterButtonRef.current, {
-          opacity: 0,
-          scale: 0.7,
-          y: -20,
-          duration: 0.3,
-          ease: "power2.in"
-        }, "-=0.2")
-        .to(overlayRef.current, {
-          clipPath: "inset(100% 0 0 0)", // Bottom-to-top swipe
-          duration: 1.2,
-          ease: "power3.inOut"
-        }, "-=0.1");
+        // Bottom-to-top swipe animation
+        timeline
+          .to(loadingTextRef.current, {
+            opacity: 0,
+            y: -30,
+            duration: 0.4,
+            ease: "power2.in"
+          })
+          .to(enterButtonRef.current, {
+            opacity: 0,
+            scale: 0.7,
+            y: -20,
+            duration: 0.3,
+            ease: "power2.in"
+          }, "-=0.2")
+          .to(overlayRef.current, {
+            clipPath: "inset(100% 0 0 0)", // Bottom-to-top swipe
+            duration: 1.2,
+            ease: "power3.inOut"
+          }, "-=0.1");
+      });
 
     } catch (error) {
       console.error('Exit animation failed:', error);
       if (overlayRef.current) {
         overlayRef.current.style.display = 'none';
       }
+      return Promise.resolve(); // Resolve even on error
     }
   }, []);
 
@@ -196,14 +205,19 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     if (!isEnterEnabled || !enterButtonRef.current) return;
     
     enterButtonRef.current.textContent = 'Entering...';
+    
+    // Start the animation BEFORE calling onEnterClick
     await handleExitAnimation();
+    
+    // Only call onComplete after animation finishes
     onEnterClick();
   }, [isEnterEnabled, onEnterClick, handleExitAnimation]);
 
-  // Don't render if complete
-  if (loadingPhase === 'complete') {
-    return null;
-  }
+  // Don't render if complete - REMOVED THIS EARLY RETURN
+  // The animation needs to complete first
+  // if (loadingPhase === 'complete') {
+  //   return null;
+  // }
 
   const getThemeIcon = (theme: ThemeType): string => {
     switch (theme) {
@@ -230,7 +244,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
         justifyContent: 'center',
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
         overflow: 'hidden',
-        pointerEvents: 'auto'
+        pointerEvents: loadingPhase === 'complete' ? 'none' : 'auto'
       }}
     >
       {/* Background */}
@@ -501,7 +515,8 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
 
   // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
-    setLoadingPhase('complete');
+    // DON'T set phase to complete immediately
+    // Let the animation handle the completion
     onComplete();
   }, [onComplete]);
 

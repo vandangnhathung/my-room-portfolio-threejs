@@ -54,20 +54,7 @@ export default function HomePage() {
           
           {/* Navigation hint */}
           <div
-            style={{
-              position: 'fixed',
-              bottom: '30px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'rgba(139, 115, 85, 0.9)',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '25px',
-              fontSize: '14px',
-              backdropFilter: 'blur(10px)',
-              zIndex: 1000,
-              animation: 'fadeInUp 1s ease-out'
-            }}
+            className='absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm z-50 animate-fade-in-up'
           >
             🖱️ Use mouse to explore • 👆 Click objects to interact
           </div>

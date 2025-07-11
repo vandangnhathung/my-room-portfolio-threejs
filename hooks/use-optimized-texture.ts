@@ -1,21 +1,41 @@
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import * as THREE from "three"
 import { TextureConfig } from "@/types/type"
 import { useLoadingManagerContext } from '@/components/LoadingSystem';
 
 export const useOptimizedTexture = (config: TextureConfig): THREE.MeshStandardMaterial => {
   const manager = useLoadingManagerContext();
+  const textureRef = useRef<THREE.Texture | null>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
   
   return useMemo(() => {
-    const loader = new THREE.TextureLoader(manager); // Pass the manager here
-    const texture = loader.load(config.path);
+    // Create a cache key for this texture configuration
+    const cacheKey = `${config.path}-${config.colorSpace}-${config.flipY}-${config.generateMipmaps}`;
     
-    texture.flipY = config.flipY
-    texture.colorSpace = config.colorSpace
-    texture.minFilter = THREE.NearestFilter
-    texture.magFilter = THREE.NearestFilter
-    texture.generateMipmaps = config.generateMipmaps
+    // If we already have a material for this exact configuration, return it
+    if (materialRef.current && materialRef.current.userData.cacheKey === cacheKey) {
+      return materialRef.current;
+    }
     
-    return new THREE.MeshStandardMaterial({ map: texture })
+    // Only create new texture if we don't have one for this path
+    if (!textureRef.current || textureRef.current.userData.path !== config.path) {
+      const loader = new THREE.TextureLoader(manager);
+      textureRef.current = loader.load(config.path);
+      textureRef.current.userData.path = config.path; // Mark the texture with its path
+    }
+    
+    // Configure texture properties
+    textureRef.current.flipY = config.flipY;
+    textureRef.current.colorSpace = config.colorSpace;
+    textureRef.current.minFilter = THREE.NearestFilter;
+    textureRef.current.magFilter = THREE.NearestFilter;
+    textureRef.current.generateMipmaps = config.generateMipmaps;
+    
+    // Create new material with the texture
+    const material = new THREE.MeshStandardMaterial({ map: textureRef.current });
+    material.userData.cacheKey = cacheKey;
+    
+    materialRef.current = material;
+    return material;
   }, [config.path, config.colorSpace, config.flipY, config.generateMipmaps, manager]);
 }

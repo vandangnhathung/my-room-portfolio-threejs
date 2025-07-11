@@ -31,7 +31,7 @@ export const Experience: React.FC<ExperienceProps> = ({ hoveredMesh, createHover
           <Environment 
             preset="apartment" 
             blur={0.8} 
-            environmentIntensity={0.8}
+            environmentIntensity={1.3}
             background={false}
           />
           <MyRoom 

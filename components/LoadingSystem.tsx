@@ -1,7 +1,7 @@
 // components/LoadingSystem.tsx
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
 import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
@@ -411,7 +411,11 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
     entering: 'Entering...'
   };
   
-  const messages: LoadingMessages = { ...defaultMessages, ...customMessages };
+  // Memoize the messages object to prevent infinite re-renders
+  const messages = useMemo(() => ({
+    ...defaultMessages,
+    ...customMessages
+  }), [customMessages]);
 
   // Handle loading phases based on actual progress
   useEffect(() => {

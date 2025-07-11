@@ -2,7 +2,7 @@
 'use client'
 
 import * as THREE from 'three'
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useRef, useCallback } from 'react'
 
 export interface LoadingManagerState {
   progress: number
@@ -40,32 +40,44 @@ export function useLoadingManager(): LoadingManagerHook {
     })
   }, [])
 
-  const manager = useMemo(() => {
+  // Create manager once with useRef and define callbacks directly
+  const managerRef = useRef<THREE.LoadingManager | null>(null)
+  const isInitialized = useRef(false)
+  
+  if (!managerRef.current) {
     const manager = new THREE.LoadingManager()
     
+    // Use setTimeout to avoid calling setState during render
     manager.onStart = (url: string, itemsLoaded: number, itemsTotal: number) => {
+      if (isInitialized.current) return; // Prevent multiple initializations
+      
       console.log(`🚀 Loading started: ${url}`)
       console.log(`📊 Progress: ${itemsLoaded}/${itemsTotal}`)
       
-      setState(prev => ({
-        ...prev,
-        isLoading: true,
-        currentUrl: url,
-        loaded: itemsLoaded,
-        total: itemsTotal,
-        progress: itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
-      }))
+      setTimeout(() => {
+        setState(prev => ({
+          ...prev,
+          isLoading: true,
+          currentUrl: url,
+          loaded: itemsLoaded,
+          total: itemsTotal,
+          progress: itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
+        }))
+      }, 0)
     }
 
     manager.onLoad = () => {
       console.log('✅ All loading completed!')
       
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        progress: 100,
-        currentUrl: ''
-      }))
+      setTimeout(() => {
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          progress: 100,
+          currentUrl: ''
+        }))
+        isInitialized.current = true; // Mark as initialized after first complete load
+      }, 0)
     }
 
     manager.onProgress = (url: string, itemsLoaded: number, itemsTotal: number) => {
@@ -74,27 +86,38 @@ export function useLoadingManager(): LoadingManagerHook {
       console.log(`📈 Loading progress: ${url}`)
       console.log(`📊 Progress: ${itemsLoaded}/${itemsTotal} (${Math.round(progress)}%)`)
       
-      setState(prev => ({
-        ...prev,
-        currentUrl: url,
-        loaded: itemsLoaded,
-        total: itemsTotal,
-        progress
-      }))
+      // Throttle progress updates to avoid too many state updates
+      setTimeout(() => {
+        setState(prev => {
+          // Only update if progress has actually changed significantly
+          if (Math.abs(prev.progress - progress) > 5) {
+            return {
+              ...prev,
+              currentUrl: url,
+              loaded: itemsLoaded,
+              total: itemsTotal,
+              progress
+            }
+          }
+          return prev
+        })
+      }, 0)
     }
 
     manager.onError = (url: string) => {
       console.error(`❌ Loading error: ${url}`)
       
-      setState(prev => ({
-        ...prev,
-        errors: [...prev.errors, url],
-        currentUrl: url
-      }))
+      setTimeout(() => {
+        setState(prev => ({
+          ...prev,
+          errors: [...prev.errors, url],
+          currentUrl: url
+        }))
+      }, 0)
     }
 
-    return manager
-  }, [])
+    managerRef.current = manager
+  }
 
-  return { manager, state, reset }
+  return { manager: managerRef.current, state, reset }
 } 

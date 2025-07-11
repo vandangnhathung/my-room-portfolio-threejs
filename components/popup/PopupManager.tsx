@@ -113,7 +113,7 @@ export const PopupManager = () => {
     <>
       {/* Popup HTML content */}
       {Object.entries(popupConfigs).map(([id, config]) => (
-        <div key={id} data-easy-popup={id} style={{maxWidth: '500px'}}>
+        <div key={id} data-easy-popup={id}>
           {config.content}
         </div>
       ))}

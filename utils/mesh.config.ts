@@ -25,13 +25,15 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Executive_office_chair_raycaster', position: [2.661, 3.223, 1.622], rotation: [-Math.PI, 1.516, -Math.PI], scale: 3.591, isInteractive: true },
     { name: 'camera_raycaster', position: [5.349, 4.492, 3.479], scale: 1, isInteractive: true },
     { name: 'guitar_raycaster', position: [2.996, 1.79, -2.331], rotation: [0, 0.875, 0], scale: 1.081, isInteractive: true, onClick: () => console.log('clicked') },
-    { name: 'screen_raycaster', position: [5.292, 5.872, -0.059], scale: 1, isInteractive: true },
-    { name: 'screen001_raycaster', position: [5.384, 5.872, 3.272], scale: 1, isInteractive: true },
+    { name: 'screen_raycaster', position: [5.367, 5.918, -0.059], scale: 1, isInteractive: true },
+    { name: 'screen001_raycaster', position: [5.418, 5.88, 3.295], scale: 1, isInteractive: true },
     { name: 'player_button_raycaster', position: [-1.965, 4.711, 2.343], scale: 1, isInteractive: true },
     { name: 'headphone_raycaster', position: [5.012, 4.499, 0.226], scale: 1, isInteractive: true },
     { name: 'cup_coaster_raycaster', position: [4.115, 4.528, -0.227], scale: 1, isInteractive: true },
     { name: 'lamp_raycaster', position: [-0.505, 4.486, 3.918], rotation: [0, 0, -Math.PI], scale: [0.469, 0.183, 0.469], isInteractive: true },
     { name: 'vinyl_record_player_raycaster', position: [-2.36, 4.571, 3.398], scale: 1, isInteractive: true },
     { name: 'misc_things004_raycaster', position: [6.875, 6.363, -4.456], scale: 1, isInteractive: true },
-    { name: 'misc_things009_raycaster', position: [6.875, 6.363, -3.91], scale: 1, isInteractive: true }
+    { name: 'misc_things009_raycaster', position: [6.875, 6.363, -3.91], scale: 1, isInteractive: true },
+    { name: 'inside_screen_raycaster', position: [5.367, 5.918, -0.059], scale: 1, isInteractive: true },
+    { name: 'inside_screen001_raycaster', position: [5.418, 5.88, 3.295], scale: 1, isInteractive: true }
   ]

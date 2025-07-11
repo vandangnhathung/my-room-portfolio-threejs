@@ -13,6 +13,7 @@ import { GLTFResult, MeshConfig } from "@/types/type"
 import { useMemo, useCallback, Suspense, useEffect } from "react"
 import { ThreeEvent } from '@react-three/fiber'
 import { useLoadingManagerContext } from '@/components/LoadingSystem';
+import { useVideoTexture } from '@/hooks/use-video-texture'
 
 // Query keys for TanStack Query
 const QUERY_KEYS = {
@@ -24,7 +25,7 @@ const QUERY_KEYS = {
 // EasyPopup types are declared in PopupManager.tsx
 
 // Updated mesh config to ensure screens have proper click handlers
-const enhancedMeshConfig = (originalConfig: MeshConfig[]): MeshConfig[] => {
+const enhancedMeshConfig = (originalConfig: MeshConfig[], videoControls?: any): MeshConfig[] => {
   return originalConfig.map(config => {
     // Special handling for the executive chair
     if (config.name === 'Executive_office_chair_raycaster') {
@@ -37,13 +38,25 @@ const enhancedMeshConfig = (originalConfig: MeshConfig[]): MeshConfig[] => {
       }
     }
     
-    // Handle screen raycaster objects
+    // Handle screen raycaster objects with video controls
     if (config.name === 'screen_raycaster') {
       return {
         ...config,
         onClick: () => {
-          console.log('Screen clicked! Opening popup...')
-          // Check if EasyPopup is available
+          console.log('Screen clicked! Controlling video...')
+          
+          // Toggle video play/pause
+          if (videoControls?.video) {
+            if (videoControls.video.paused) {
+              videoControls.play()
+              console.log('Video playing')
+            } else {
+              videoControls.pause()
+              console.log('Video paused')
+            }
+          }
+          
+          // Also open popup if you want
           if (typeof window !== 'undefined' && window.EasyPopup) {
             const popup = window.EasyPopup.get('screen-popup')
             if (popup) {
@@ -74,15 +87,14 @@ const enhancedMeshConfig = (originalConfig: MeshConfig[]): MeshConfig[] => {
   })
 }
 
-// Rest of your existing code stays exactly the same...
-const processMeshConfigs = async (): Promise<MeshConfig[]> => {
+const processMeshConfigs = async (videoControls?: any): Promise<MeshConfig[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const processedConfigs = meshConfig.map((config: MeshConfig) => ({
         ...config,
         isInteractive: config.name.includes('raycaster')
       }))
-      resolve(enhancedMeshConfig(processedConfigs))
+      resolve(enhancedMeshConfig(processedConfigs, videoControls))
     }, 0)
   })
 }
@@ -172,13 +184,20 @@ export function MyRoom(props: MyRoomProps) {
     loadEasyPopup()
   }, [])
 
-  // All your existing TanStack Query code stays the same...
+  // Add video texture for screen
+  const screenVideoMaterial = useVideoTexture({
+    src: '/textures/videos/video-1.mov', // Fixed path - remove '../public'
+    autoPlay: true,
+    loop: true,
+    muted: true
+  })
+
   const {
     data: meshConfigs = [],
     isLoading: meshConfigsLoading,
   } = useQuery({
     queryKey: QUERY_KEYS.MESH_CONFIGS,
-    queryFn: processMeshConfigs,
+    queryFn: () => processMeshConfigs(screenVideoMaterial), // Pass video controls
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   })
@@ -243,12 +262,29 @@ export function MyRoom(props: MyRoomProps) {
     generateMipmaps: false
   })
 
+  const screen001VideoMaterial = useVideoTexture({
+    src: '/textures/videos/video-1.mov',
+    autoPlay: true,
+    loop: true,
+    muted: true
+  })
+
   const getMaterial = useCallback((meshName: string): THREE.Material => {
     if (meshName === 'floor') return woodMaterial
     if (meshName === 'Room') return fixedObjectMaterial
     if (meshName === 'plant') return plantMaterial
+    
+    // Use video materials for different screens
+    if (meshName === 'inside_screen_raycaster' && screenVideoMaterial) {
+      return screenVideoMaterial
+    }
+    
+    if (meshName === 'inside_screen001_raycaster' && screen001VideoMaterial) {
+      return screen001VideoMaterial
+    }
+    
     return raycasterObjectMaterial
-  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial])
+  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screenVideoMaterial, screen001VideoMaterial])
 
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {
     const interactive = meshConfigs.filter(config => config.isInteractive)

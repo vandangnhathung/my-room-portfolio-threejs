@@ -33,7 +33,7 @@ export function InteractiveMeshWrapper({
   createHoverHandlers: (name: string) => HoverHandlers
 }) {
   const animatedScale = useHoverAnimation(config.name, config.scale, hoveredMesh)
-  const chairRotation = useChairRotation(config.name, 0.3) // Slow initial speed
+  const chairRotation = useChairRotation(config.name, 0.7) // Slow initial speed
   const hoverHandlers = createHoverHandlers(config.name)
   const geometry = nodes[config.name as keyof typeof nodes]?.geometry
   const material = getMaterial(config.name)

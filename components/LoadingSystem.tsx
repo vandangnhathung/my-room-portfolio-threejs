@@ -6,6 +6,7 @@ import { Canvas } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
 import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
 import * as THREE from 'three';
+import { gsap } from 'gsap';
 
 // Context for sharing LoadingManager
 const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
@@ -115,72 +116,53 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   // Handle enter button animation
   useEffect(() => {
     if (loadingPhase === 'ready' && enterButtonRef.current) {
-      import('gsap').then(({ gsap }) => {
-        gsap.fromTo(enterButtonRef.current!, 
-          { scale: 0, opacity: 0, rotation: -10 },
-          { 
-            scale: 1, 
-            opacity: 1, 
-            rotation: 0,
-            duration: 0.8,
-            ease: "back.out(1.7)",
-            delay: 0.3
-          }
-        );
-      }).catch((error) => {
-        console.error('GSAP animation failed:', error);
-        if (enterButtonRef.current) {
-          enterButtonRef.current.style.opacity = '1';
-          enterButtonRef.current.style.transform = 'scale(1)';
+      gsap.fromTo(enterButtonRef.current!, 
+        { scale: 0, opacity: 0, rotation: -10 },
+        { 
+          scale: 1, 
+          opacity: 1, 
+          rotation: 0,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+          delay: 0.3
         }
-      });
+      );
     }
   }, [loadingPhase]);
 
   // Handle exit animation
   const handleExitAnimation = useCallback(async () => {
-    try {
-      const { gsap } = await import('gsap');
-      
-      return new Promise<void>((resolve) => {
-        const timeline = gsap.timeline({
-          onComplete: () => {
-            if (overlayRef.current) {
-              overlayRef.current.style.display = 'none';
-              overlayRef.current.style.pointerEvents = 'none';
-            }
-            resolve();
+    return new Promise<void>((resolve) => {
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          if (overlayRef.current) {
+            overlayRef.current.style.display = 'none';
+            overlayRef.current.style.pointerEvents = 'none';
           }
-        });
-
-        timeline
-          .to(loadingTextRef.current, {
-            opacity: 0,
-            y: -30,
-            duration: 0.4,
-            ease: "power2.in"
-          })
-          .to(enterButtonRef.current, {
-            opacity: 0,
-            scale: 0.7,
-            y: -20,
-            duration: 0.3,
-            ease: "power2.in"
-          }, "-=0.2")
-          .to(overlayRef.current, {
-            clipPath: "inset(100% 0 0 0)",
-            duration: 1.2,
-            ease: "power3.inOut"
-          }, "-=0.1");
+          resolve();
+        }
       });
 
-    } catch (error) {
-      console.error('Exit animation failed:', error);
-      if (overlayRef.current) {
-        overlayRef.current.style.display = 'none';
-      }
-      return Promise.resolve();
-    }
+      timeline
+        .to(loadingTextRef.current, {
+          opacity: 0,
+          y: -30,
+          duration: 0.4,
+          ease: "power2.in"
+        })
+        .to(enterButtonRef.current, {
+          opacity: 0,
+          scale: 0.7,
+          y: -20,
+          duration: 0.3,
+          ease: "power2.in"
+        }, "-=0.2")
+        .to(overlayRef.current, {
+          clipPath: "inset(100% 0 0 0)",
+          duration: 1.2,
+          ease: "power3.inOut"
+        }, "-=0.1");
+    });
   }, []);
 
   // Handle enter click

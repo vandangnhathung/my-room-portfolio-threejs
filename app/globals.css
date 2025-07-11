@@ -104,6 +104,7 @@ body {
           }
           
           /* Style the SVG icon inside the close button */
+          .ep-close-button {color: #fff !important;}
           .ep-close-button svg {
             width: 18px !important;
             height: 18px !important;
@@ -113,6 +114,8 @@ body {
           .ep-close-button:hover {
             background: #fff !important;
           }
+
+          .ep-close-button:hover {color: rgba(139, 111, 78) !important;}
           .ep-close-button:hover svg {
             fill: rgba(139, 111, 78) !important;
           }

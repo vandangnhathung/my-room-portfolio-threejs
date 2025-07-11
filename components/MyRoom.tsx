@@ -12,6 +12,7 @@ import { meshConfig } from "@/utils/mesh.config"
 import { GLTFResult, MeshConfig } from "@/types/type"
 import { useMemo, useCallback, Suspense, useEffect } from "react"
 import { ThreeEvent } from '@react-three/fiber'
+import { useLoadingManagerContext } from '@/components/LoadingSystem';
 
 // Query keys for TanStack Query
 const QUERY_KEYS = {
@@ -100,8 +101,8 @@ const getRoomConfiguration = async () => {
     modelPath: '/models/Room_ver2-v1 (2).glb',
     cameraConfig: {
       target: [4.149959777666874, 4.647045028235788, 1.2788151669711065] as [number, number, number],
-      minDistance: 12,
-      maxDistance: 20,
+      minDistance: 20,
+      maxDistance: 40,
       minPolarAngle: 0,
       maxPolarAngle: Math.PI / 2,
       minAzimuthAngle: Math.PI * -1,
@@ -137,6 +138,8 @@ interface MyRoomProps {
 
 // ===== UPDATE FUNCTION SIGNATURE =====
 export function MyRoom(props: MyRoomProps) {
+  const manager = useLoadingManagerContext();
+  
   // ===== MODIFY THIS LINE TO USE PROPS OR FALLBACK =====
   const localHoverState = useHoverState()
   const hoveredMesh = props.hoveredMesh ?? localHoverState.hoveredMesh
@@ -200,9 +203,18 @@ export function MyRoom(props: MyRoomProps) {
     gcTime: 1000 * 60 * 60,
   })
 
-  // Rest of your component code stays exactly the same...
-  const { nodes } = useGLTF(roomConfig?.modelPath || '/models/Room_ver2-v1 (2).glb') as unknown as GLTFResult
+  // Use manager with useGLTF
+  const { nodes } = useGLTF(
+    roomConfig?.modelPath || '/models/Room_ver2-v1 (2).glb',
+    false, // draco
+    false, // ktx2
+    (loader) => {
+      // Configure the loader to use our LoadingManager
+      loader.manager = manager;
+    }
+  ) as unknown as GLTFResult;
 
+  // Rest of your component code stays exactly the same...
   const woodMaterial = useOptimizedTexture({
     path: materialPaths?.wood || '/textures/room/wood.png',
     colorSpace: THREE.SRGBColorSpace,

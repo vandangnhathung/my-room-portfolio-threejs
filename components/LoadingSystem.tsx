@@ -1,9 +1,22 @@
 // components/LoadingSystem.tsx
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
+import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
+import * as THREE from 'three';
+
+// Context for sharing LoadingManager
+const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
+
+export const useLoadingManagerContext = () => {
+  const context = useContext(LoadingManagerContext);
+  if (!context) {
+    throw new Error('useLoadingManagerContext must be used within LoadingSystem');
+  }
+  return context;
+};
 
 // Types
 export interface LoadingSystemProps {
@@ -33,9 +46,7 @@ interface ThemeConfig {
   shadowColor: string;
 }
 
-
-
-// Theme configurations
+// Theme configurations (keeping your existing themes)
 const themes: Record<ThemeType, ThemeConfig> = {
   cozy: {
     background: 'linear-gradient(145deg, #f4f1eb 0%, #e8dcc6 30%, #d4c4a8 100%)',
@@ -76,8 +87,6 @@ const themes: Record<ThemeType, ThemeConfig> = {
   }
 };
 
-// No more ProgressTracker - we'll use Suspense behavior instead
-
 // Loading Overlay Component
 interface LoadingOverlayProps {
   theme: ThemeConfig;
@@ -86,6 +95,7 @@ interface LoadingOverlayProps {
   loadingText: string;
   isEnterEnabled: boolean;
   onEnterClick: () => void;
+  loadingState: LoadingManagerState;
 }
 
 const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
@@ -94,7 +104,8 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   loadingPhase,
   loadingText,
   isEnterEnabled,
-  onEnterClick
+  onEnterClick,
+  loadingState
 }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const enterButtonRef = useRef<HTMLButtonElement>(null);
@@ -138,11 +149,10 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
               overlayRef.current.style.display = 'none';
               overlayRef.current.style.pointerEvents = 'none';
             }
-            resolve(); // Resolve promise when animation completes
+            resolve();
           }
         });
 
-        // Bottom-to-top swipe animation
         timeline
           .to(loadingTextRef.current, {
             opacity: 0,
@@ -158,7 +168,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
             ease: "power2.in"
           }, "-=0.2")
           .to(overlayRef.current, {
-            clipPath: "inset(100% 0 0 0)", // Bottom-to-top swipe
+            clipPath: "inset(100% 0 0 0)",
             duration: 1.2,
             ease: "power3.inOut"
           }, "-=0.1");
@@ -169,7 +179,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       if (overlayRef.current) {
         overlayRef.current.style.display = 'none';
       }
-      return Promise.resolve(); // Resolve even on error
+      return Promise.resolve();
     }
   }, []);
 
@@ -179,18 +189,9 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     
     enterButtonRef.current.textContent = 'Entering...';
     
-    // Start the animation BEFORE calling onEnterClick
     await handleExitAnimation();
-    
-    // Only call onComplete after animation finishes
     onEnterClick();
   }, [isEnterEnabled, onEnterClick, handleExitAnimation]);
-
-  // Don't render if complete - REMOVED THIS EARLY RETURN
-  // The animation needs to complete first
-  // if (loadingPhase === 'complete') {
-  //   return null;
-  // }
 
   const getThemeIcon = (theme: ThemeType): string => {
     switch (theme) {
@@ -278,7 +279,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           style={{
             fontSize: '20px',
             fontWeight: '500',
-            marginBottom: '30px',
+            marginBottom: '20px',
             letterSpacing: '0.5px',
             lineHeight: '1.4'
           }}
@@ -286,7 +287,50 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           {loadingText}
         </div>
 
-
+        {/* Real-time Progress Bar */}
+        {loadingPhase === 'loading' && (
+          <div style={{ marginBottom: '20px' }}>
+            <div
+              style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                marginBottom: '10px'
+              }}
+            >
+              <div
+                style={{
+                  width: `${loadingState.progress}%`,
+                  height: '100%',
+                  backgroundColor: theme.accentColor,
+                  borderRadius: '4px',
+                  transition: 'width 0.3s ease',
+                  boxShadow: `0 0 10px ${theme.accentColor}50`
+                }}
+              />
+            </div>
+            <div style={{ 
+              fontSize: '14px', 
+              opacity: 0.8,
+              color: theme.accentColor,
+              marginBottom: '8px'
+            }}>
+              {Math.round(loadingState.progress)}% • {loadingState.loaded}/{loadingState.total}
+            </div>
+            {loadingState.currentUrl && (
+              <div style={{ 
+                fontSize: '12px', 
+                opacity: 0.6,
+                color: theme.textColor,
+                wordBreak: 'break-word'
+              }}>
+                {loadingState.currentUrl.split('/').pop()}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Enter Button */}
         <button
@@ -341,11 +385,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
               opacity: 0.7,
               color: theme.accentColor,
               animation: 'fadeInUp 0.8s ease-out 0.5s both',
-              textAlign: 'center',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
+              textAlign: 'center'
             }}
           >
             Use mouse to explore • Click objects to interact
@@ -376,6 +416,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   customMessages = {},
   theme = 'cozy'
 }) => {
+  const { manager, state: loadingState, reset } = useLoadingManager();
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>('initializing');
   const [loadingText, setLoadingText] = useState<string>('');
   const [isEnterEnabled, setIsEnterEnabled] = useState<boolean>(false);
@@ -383,71 +424,66 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   // Default messages
   const defaultMessages: LoadingMessages = {
     initializing: 'Preparing your space...',
-    loading: 'Loading furniture and decor...',
+    loading: 'Loading assets...',
     ready: 'Your cozy space is ready!',
     entering: 'Entering...'
   };
   
-  // Merge custom messages with defaults
   const messages: LoadingMessages = { ...defaultMessages, ...customMessages };
 
-  // Simplified loading phases management
+  // Handle loading phases based on actual progress
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    if (loadingPhase === 'initializing') {
+    if (loadingState.progress === 0 && !loadingState.isLoading) {
+      setLoadingPhase('initializing');
       setLoadingText(messages.initializing);
-      timeoutId = setTimeout(() => setLoadingPhase('loading'), 800);
-    } else if (loadingPhase === 'loading') {
+      setIsEnterEnabled(false);
+    } else if (loadingState.isLoading && loadingState.progress < 100) {
+      setLoadingPhase('loading');
       setLoadingText(messages.loading);
-      // Simulate loading completion after a reasonable time
-      timeoutId = setTimeout(() => setLoadingPhase('ready'), 3000);
-    } else if (loadingPhase === 'ready') {
+      setIsEnterEnabled(false);
+    } else if (loadingState.progress === 100 && !loadingState.isLoading) {
+      setLoadingPhase('ready');
       setLoadingText(messages.ready);
       setIsEnterEnabled(true);
     }
-    // 'entering' and 'complete' phases are handled elsewhere
-    
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [loadingPhase, messages]);
+  }, [loadingState.progress, loadingState.isLoading, messages]);
 
-  // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
-    // DON'T set phase to complete immediately
-    // Let the animation handle the completion
     onComplete();
   }, [onComplete]);
 
-  return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {/* Canvas with 3D Scene - ALWAYS RENDERED and LOADING DURING PROGRESS */}
-      <Canvas
-        camera={{ fov: 45, near: 0.1, far: 200, position: [3, 2, 6] }}
-        style={{ width: '100%', height: '100%' }}
-      >        
-        {/* Preload all assets */}
-        <Preload all />
-        
-        {/* Your 3D scene - renders immediately and loads models */}
-        <React.Suspense fallback={null}>
-          {children}
-        </React.Suspense>
-      </Canvas>
+  // Reset loading state when component unmounts
+  useEffect(() => {
+    return () => reset();
+  }, [reset]);
 
-      {/* Loading Overlay - shows on top while loading */}
-      <LoadingOverlay
-        theme={themes[theme]}
-        themeType={theme}
-        loadingPhase={loadingPhase}
-        loadingText={loadingText}
-        isEnterEnabled={isEnterEnabled}
-        onEnterClick={handleLoadingComplete}
-      />
-    </div>
+  return (
+    <LoadingManagerContext.Provider value={manager}>
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+        {/* Canvas with 3D Scene */}
+        <Canvas
+          camera={{ fov: 45, near: 0.1, far: 200, position: [3, 2, 6] }}
+          style={{ width: '100%', height: '100%' }}
+        >        
+          <Preload all />
+          
+          <React.Suspense fallback={null}>
+            {children}
+          </React.Suspense>
+        </Canvas>
+
+        {/* Loading Overlay */}
+        <LoadingOverlay
+          theme={themes[theme]}
+          themeType={theme}
+          loadingPhase={loadingPhase}
+          loadingText={loadingText}
+          isEnterEnabled={isEnterEnabled}
+          onEnterClick={handleLoadingComplete}
+          loadingState={loadingState}
+        />
+      </div>
+    </LoadingManagerContext.Provider>
   );
 };
 

@@ -1,17 +1,21 @@
 import { useMemo } from "react"
-import { useTexture } from "@react-three/drei"
 import * as THREE from "three"
 import { TextureConfig } from "@/types/type"
+import { useLoadingManagerContext } from '@/components/LoadingSystem';
 
 export const useOptimizedTexture = (config: TextureConfig): THREE.MeshStandardMaterial => {
-    const texture = useTexture(config.path)
+  const manager = useLoadingManagerContext();
+  
+  return useMemo(() => {
+    const loader = new THREE.TextureLoader(manager); // Pass the manager here
+    const texture = loader.load(config.path);
     
-    return useMemo(() => {
-      texture.flipY = config.flipY
-      texture.colorSpace = config.colorSpace
-      texture.minFilter = THREE.NearestFilter
-      texture.magFilter = THREE.NearestFilter
-      texture.generateMipmaps = config.generateMipmaps
-      return new THREE.MeshStandardMaterial({ map: texture })
-    }, [texture, config])
-  }
+    texture.flipY = config.flipY
+    texture.colorSpace = config.colorSpace
+    texture.minFilter = THREE.NearestFilter
+    texture.magFilter = THREE.NearestFilter
+    texture.generateMipmaps = config.generateMipmaps
+    
+    return new THREE.MeshStandardMaterial({ map: texture })
+  }, [config.path, config.colorSpace, config.flipY, config.generateMipmaps, manager]);
+}

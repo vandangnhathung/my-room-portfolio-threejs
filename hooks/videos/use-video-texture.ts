@@ -51,6 +51,7 @@ export const useVideoTexture = (config: VideoTextureConfig) => {
     texture.magFilter = THREE.LinearFilter
     texture.format = THREE.RGBFormat
     texture.colorSpace = THREE.SRGBColorSpace
+    texture.flipY = false  // Add this line to fix upside down video
     
     textureRef.current = texture
     

@@ -32,26 +32,28 @@ export function InteractiveMeshWrapper({
   hoveredMesh: string | null
   createHoverHandlers: (name: string) => HoverHandlers
 }) {
-  const animatedScale = useHoverAnimation(config.name, config.scale, hoveredMesh)
-  const chairRotation = useChairRotation(config.name, 0.7) // Slow initial speed
+  // Only apply hover animation if mesh name doesn't contain 'popup'
+  const shouldAnimate = !config.name.includes('popup')
+  const animatedScale = useHoverAnimation(config.name, config.scale, shouldAnimate ? hoveredMesh : null)
+  
+  const chairRotation = useChairRotation(config.name, 0.7)
   const hoverHandlers = createHoverHandlers(config.name)
   const geometry = nodes[config.name as keyof typeof nodes]?.geometry
   const material = getMaterial(config.name)
 
   if (!geometry) return null
 
-  // Check if this is the chair that should rotate
   const isRotatingChair = config.name === 'Executive_office_chair_raycaster'
 
   return (
-      <InteractiveMesh
-        config={config}
-        geometry={geometry}
-        material={material}
-        animatedScale={animatedScale as unknown as { scale: number | [number, number, number] }}
-        hoverHandlers={hoverHandlers}
-        chairRotationRef={isRotatingChair ? chairRotation.meshRef : undefined}
-      />
+    <InteractiveMesh
+      config={config}
+      geometry={geometry}
+      material={material}
+      animatedScale={animatedScale as unknown as { scale: number | [number, number, number] }}
+      hoverHandlers={hoverHandlers}
+      chairRotationRef={isRotatingChair ? chairRotation.meshRef : undefined}
+    />
   )
 }
 

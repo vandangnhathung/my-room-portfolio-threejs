@@ -1,0 +1,41 @@
+import { useOptimizedTexture } from "@/hooks/use-optimized-texture"
+import * as THREE from "three"
+
+interface MaterialPaths {
+  wood?: string
+  fixedObject?: string
+  raycasterObject?: string
+  plant?: string
+}
+
+export const useRoomMaterials = (materialPaths: MaterialPaths) => {
+  const woodMaterial = useOptimizedTexture({
+    path: materialPaths?.wood || '/textures/room/wood.png',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  const fixedObjectMaterial = useOptimizedTexture({
+    path: materialPaths?.fixedObject || '/textures/room/FixedObjectSet.png',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  const raycasterObjectMaterial = useOptimizedTexture({
+    path: materialPaths?.raycasterObject || '/textures/room/RaycasterObjectSet.png',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  const plantMaterial = useOptimizedTexture({
+    path: materialPaths?.plant || '/textures/room/Plant.png',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial }
+} 

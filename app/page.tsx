@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
 import { PopupManager } from '@/components/popup/PopupManager'
-import { useHoverState } from '@/hooks/use-hover-state'
+import { useHoverState } from '@/hooks/hovering/use-hover-state'
 import { HoverMessage } from '@/components/HoverMessage'
 
 export default function HomePage() {

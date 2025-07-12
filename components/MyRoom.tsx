@@ -1,9 +1,9 @@
 // ===== FILE: components/MyRoom.tsx (KEEP YOUR EXISTING CODE + ADD PROPS) =====
 'use client'
 
-import { useHoverState } from "@/hooks/use-hover-state"
+import { useHoverState } from "@/hooks/hovering/use-hover-state"
 import { useRoomMaterials } from "@/hooks/use-room-materials"
-import { useVideoMaterials } from "@/hooks/use-video-materials"
+import { useVideoMaterials } from "@/hooks/videos/use-video-materials"
 import { useEasyPopup } from "@/hooks/use-easy-popup"
 import { useRoomData } from "@/hooks/use-room-data"
 import * as THREE from "three"

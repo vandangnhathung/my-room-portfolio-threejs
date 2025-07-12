@@ -1,6 +1,6 @@
 // ===== FILE: components/HoverMessage.tsx =====
 import React from 'react'
-import { useHoverMessage } from '@/hooks/use-hover-message'
+import { useHoverMessage } from '@/hooks/hovering/use-hover-message'
 
 interface HoverMessageProps {
   messageState: ReturnType<typeof useHoverMessage>['messageState']

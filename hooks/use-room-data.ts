@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { MeshConfig } from "@/types/type"
 import { meshConfig } from "@/utils/mesh.config"
-import { MutableRefObject } from 'react'
+import { RefObject } from 'react'
 
 const QUERY_KEYS = {
   MESH_CONFIGS: ['meshConfigs'],
@@ -10,7 +10,7 @@ const QUERY_KEYS = {
 } as const
 
 const createMeshClickHandlers = (
-  orbitControlsRef: MutableRefObject<{ target: { x: number; y: number; z: number } } | null>,
+  orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
   meshName: string,
   focusOnScreen?: () => void,
   focusOnScreen001?: () => void
@@ -51,7 +51,7 @@ const createMeshClickHandlers = (
 }
 
 const processMeshConfigs = async (
-  orbitControlsRef: MutableRefObject<{ target: { x: number; y: number; z: number } } | null>,
+  orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
   focusOnScreen?: () => void,
   focusOnScreen001?: () => void
 ): Promise<MeshConfig[]> => {
@@ -87,7 +87,7 @@ const getRoomConfiguration = async () => ({
 })
 
 export const useRoomData = (
-  orbitControlsRef: MutableRefObject<{ target: { x: number; y: number; z: number } } | null>,
+  orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
   focusOnScreen?: () => void,
   focusOnScreen001?: () => void
 ) => {

@@ -54,7 +54,7 @@ export const useRoomUtils = (
 
   // 3D model loading
   const { nodes } = useGLTF(
-    roomConfig?.modelPath || '/models/room_portfolio.glb',
+    roomConfig?.modelPath || '/models/Room_Portfolio.glb',
     false, // draco     
     false, // ktx2
     (loader) => {

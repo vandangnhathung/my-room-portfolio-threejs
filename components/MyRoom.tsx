@@ -101,4 +101,4 @@ export function MyRoom() {
   )
 }
 
-useGLTF.preload('/models/room_portfolio.glb')
+useGLTF.preload('/models/Room_Portfolio.glb')

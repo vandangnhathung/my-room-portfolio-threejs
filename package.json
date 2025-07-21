@@ -21,6 +21,7 @@
     "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-responsive": "^10.0.1",
     "stats.js": "^0.17.0",
     "three": "^0.176.0",
     "three-stdlib": "^2.36.0",

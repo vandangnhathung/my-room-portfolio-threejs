@@ -11,28 +11,28 @@ interface MaterialPaths {
 
 export const useRoomMaterials = (materialPaths: MaterialPaths) => {
   const woodMaterial = useOptimizedTexture({
-    path: materialPaths?.wood || '/textures/room/wood.png',
+    path: materialPaths?.wood || '/textures/room/wood.webp',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
     generateMipmaps: false
   })
 
   const fixedObjectMaterial = useOptimizedTexture({
-    path: materialPaths?.fixedObject || '/textures/room/FixedObjectSet.png',
+    path: materialPaths?.fixedObject || '/textures/room/FixedObjectSet.jpg',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
     generateMipmaps: false
   })
 
   const raycasterObjectMaterial = useOptimizedTexture({
-    path: materialPaths?.raycasterObject || '/textures/room/RaycasterObjectSet.png',
+    path: materialPaths?.raycasterObject || '/textures/room/RaycasterObjectSet.webp',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
     generateMipmaps: false
   })
 
   const plantMaterial = useOptimizedTexture({
-    path: materialPaths?.plant || '/textures/room/Plant.png',
+    path: materialPaths?.plant || '/textures/room/Plant.jpg',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
     generateMipmaps: false

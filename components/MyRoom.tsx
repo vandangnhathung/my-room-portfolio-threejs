@@ -1,10 +1,12 @@
-// ===== FILE: components/MyRoom.tsx (KEEP YOUR EXISTING CODE + ADD PROPS) =====
 'use client'
 
 import { useEasyPopup } from "@/hooks/use-easy-popup"
 import { useRoomData } from "@/hooks/use-room-data"
+import { useCameraFocus } from "@/hooks/use-camera-focus"
 import { OrbitControls, useGLTF } from "@react-three/drei"
-import { Suspense } from "react"
+import { Suspense, useRef } from "react"
+import * as React from "react"
+import { useMediaQuery } from "react-responsive"
 import RenderAnimatedMeshes from "./RenderMesh/RenderAnimatedMeshes"
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
@@ -34,12 +36,36 @@ const RenderComponents = () => {
 }
 
 export function MyRoom() {
+  const orbitControlsRef = useRef<{ target: { x: number; y: number; z: number } }>(null)
+  const isMobile = useMediaQuery({ maxWidth: 768 })
   
-  // Initialize EasyPopup
+  // Initialize EasyPopup 
   useEasyPopup()
 
-  // Data fetching with error handling
-  const { roomConfig, isLoading, hasError } = useRoomData()
+  // Camera focus functionality
+  const { isCameraFocused, focusOnScreen, focusOnCertificate, resetCamera } = useCameraFocus(
+    orbitControlsRef, 
+    isMobile
+  )
+
+  // Pass the ref and camera focus functions
+  const { roomConfig, isLoading, hasError } = useRoomData(
+    orbitControlsRef, 
+    focusOnScreen, 
+    focusOnCertificate
+  )
+
+  // Handle ESC key to reset camera
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "Escape" && isCameraFocused) {
+        resetCamera()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isCameraFocused, resetCamera])
 
   if (hasError) {
     console.error("Error loading room data:", hasError)
@@ -49,10 +75,13 @@ export function MyRoom() {
     return <LoadingFallback />
   }
 
+  console.log('Current target:', orbitControlsRef.current?.target)
+
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
   return (
     <Suspense fallback={<LoadingFallback />}>
       <OrbitControls 
-        makeDefault 
+        ref={orbitControlsRef as any}
         target={roomConfig.cameraConfig.target}
         minDistance={roomConfig.cameraConfig.minDistance}
         maxDistance={roomConfig.cameraConfig.maxDistance}
@@ -61,6 +90,7 @@ export function MyRoom() {
         minAzimuthAngle={roomConfig.cameraConfig.minAzimuthAngle}
         maxAzimuthAngle={roomConfig.cameraConfig.maxAzimuthAngle}
         enablePan={false}
+        enableRotate={!isCameraFocused}
       />
       <group dispose={null}>
         <group name="Scene">

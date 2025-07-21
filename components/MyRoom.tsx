@@ -5,7 +5,7 @@ import { useEasyPopup } from "@/hooks/use-easy-popup"
 import { useRoomData } from "@/hooks/use-room-data"
 import { OrbitControls, useGLTF } from "@react-three/drei"
 import { Suspense } from "react"
-import { RenderAnimatedMeshes } from "./RenderMesh/RenderAnimatedMeshes"
+import RenderAnimatedMeshes from "./RenderMesh/RenderAnimatedMeshes"
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
 

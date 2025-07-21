@@ -1,6 +1,8 @@
+import React from "react"
 import FireFlies from "@/components/FireFlies/FireFlies"
 
-export const RenderAnimatedMeshes = () => {
+const RenderAnimatedMeshes = () => {
+  console.log("RenderAnimatedMeshes - This should only log once after initial load")
   try {
     return (
       <group>
@@ -12,3 +14,6 @@ export const RenderAnimatedMeshes = () => {
     return null
   }
 }
+
+// Memoize to prevent unnecessary re-renders
+export default React.memo(RenderAnimatedMeshes)

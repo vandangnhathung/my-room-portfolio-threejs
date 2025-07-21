@@ -5,11 +5,12 @@ import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
 import { PopupManager } from '@/components/popup/PopupManager'
 import { HoverMessage } from '@/components/HoverMessage'
-import { useHoverZustand } from '@/hooks/use-hover-zustand'
+import { useMessageState } from '@/stores/useHoverStore'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
-  const { messageState } = useHoverZustand()
+  // Only subscribe to message state - not hover state
+  const messageState = useMessageState()
 
   const handleLoadingComplete = () => {
     setShowUI(true)

@@ -1,17 +1,19 @@
 'use client'
 
-import { useHoverStore } from '@/stores/useHoverStore'
+import { useHoveredMesh, useMessageState, useHoverHandlers } from '@/stores/useHoverStore'
 
 export const useHoverZustand = () => {
-  const store = useHoverStore()
+  const hoveredMesh = useHoveredMesh()
+  const messageState = useMessageState()
+  const createHoverHandlers = useHoverHandlers()
   
   return {
-    hoveredMesh: store.hoveredMesh,
-    createHoverHandlers: store.createHoverHandlers,
-    messageState: store.messageState,
+    hoveredMesh,
+    createHoverHandlers,
+    messageState,
     // For backwards compatibility
     hoverMessage: {
-      messageState: store.messageState
+      messageState
     }
   }
 } 

@@ -22,10 +22,10 @@ interface MessageState {
 }
 
 interface HoverStore {
-  // Hover state
+  // Hover state (rarely changes)
   hoveredMesh: string | null
   
-  // Message state
+  // Message state (changes frequently during mouse move)
   messageState: MessageState
   
   // Actions
@@ -34,6 +34,30 @@ interface HoverStore {
   hideMessage: () => void
   updateMessagePosition: (x: number, y: number) => void
   createHoverHandlers: (meshName: string) => HoverHandlers
+}
+
+// Throttle function to limit update frequency
+let throttleTimeout: NodeJS.Timeout | null = null
+const throttledUpdatePosition = (
+  set: (partial: Partial<HoverStore>) => void, 
+  get: () => HoverStore, 
+  x: number, 
+  y: number
+) => {
+  if (throttleTimeout) return // Skip if already scheduled
+  
+  throttleTimeout = setTimeout(() => {
+    const currentState = get().messageState
+    if (currentState.isVisible) {
+      set({
+        messageState: {
+          ...currentState,
+          position: { x, y }
+        }
+      })
+    }
+    throttleTimeout = null
+  }, 16) // ~60fps throttling
 }
 
 export const useHoverStore = create<HoverStore>()(
@@ -73,15 +97,7 @@ export const useHoverStore = create<HoverStore>()(
     },
     
     updateMessagePosition: (x: number, y: number) => {
-      const currentState = get().messageState
-      if (currentState.isVisible) {
-        set({
-          messageState: {
-            ...currentState,
-            position: { x, y }
-          }
-        })
-      }
+      throttledUpdatePosition(set, get, x, y)
     },
     
     createHoverHandlers: (meshName: string) => ({
@@ -102,4 +118,9 @@ export const useHoverStore = create<HoverStore>()(
       style: { cursor: 'pointer' }
     })
   }))
-) 
+)
+
+// Optimized selectors for specific data
+export const useHoveredMesh = () => useHoverStore(state => state.hoveredMesh)
+export const useMessageState = () => useHoverStore(state => state.messageState)
+export const useHoverHandlers = () => useHoverStore(state => state.createHoverHandlers) 

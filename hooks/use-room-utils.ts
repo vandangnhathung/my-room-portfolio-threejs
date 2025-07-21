@@ -20,24 +20,30 @@ export const useRoomUtils = (
   const manager = useLoadingManagerContext()
 
   // Materials
-  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial } = useRoomMaterials(materialPaths || {})
+  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial } = useRoomMaterials(materialPaths || {})
   const { screenVideoMaterial, screen001VideoMaterial } = useVideoMaterials()
   
   // Loading spinner texture
   const { loadingMaterial } = useLoadingTexture()
 
   // Material assignment with loading spinner for better UX
-  const getMaterial = useCallback((meshName: string): THREE.Material => {
+  const getMaterial = useCallback((meshName: string, materialType?: string): THREE.Material => {
     const materialMap: Record<string, THREE.Material> = {
       'floor': woodMaterial,
       'Room': fixedObjectMaterial,
       'plant': plantMaterial,
       'inside_screen_popup': screenVideoMaterial || loadingMaterial,
-      'inside_screen001_popup': screen001VideoMaterial || loadingMaterial
+      'inside_screen001_popup': screen001VideoMaterial || loadingMaterial,
+      'devices_on_table': devicesOnTableMaterial || loadingMaterial
+    }
+    
+    // If a specific material type is provided, use it
+    if (materialType && materialMap[materialType]) {
+      return materialMap[materialType]
     }
     
     return materialMap[meshName] || raycasterObjectMaterial
-  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screenVideoMaterial, screen001VideoMaterial, loadingMaterial])
+  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screenVideoMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial])
 
   // Mesh configuration
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {
@@ -48,7 +54,7 @@ export const useRoomUtils = (
 
   // 3D model loading
   const { nodes } = useGLTF(
-    roomConfig?.modelPath || '/models/Room_ver2-v1 (2).glb',
+    roomConfig?.modelPath || '/models/room_portfolio.glb',
     false, // draco     
     false, // ktx2
     (loader) => {
@@ -68,6 +74,7 @@ export const useRoomUtils = (
     fixedObjectMaterial,
     raycasterObjectMaterial,
     plantMaterial,
+    devicesOnTableMaterial,
     screenVideoMaterial,
     screen001VideoMaterial,
     loadingMaterial,

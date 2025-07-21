@@ -70,11 +70,12 @@ const loadMaterialTextures = async () => ({
   wood: '/textures/room/wood.png',
   fixedObject: '/textures/room/FixedObjectSet.png',
   raycasterObject: '/textures/room/RaycasterObjectSet.png',
-  plant: '/textures/room/Plant.png'
+  plant: '/textures/room/Plant.png',
+  devicesOnTable: '/textures/room/devices_on_table.jpg'
 })
 
 const getRoomConfiguration = async () => ({
-  modelPath: '/models/Room_ver2-v1 (2).glb',
+  modelPath: '/models/room_portfolio.glb',
   cameraConfig: {
     target: [4.149959777666874, 4.647045028235788, 1.2788151669711065] as [number, number, number],
     minDistance: 4,

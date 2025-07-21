@@ -6,6 +6,7 @@ interface MaterialPaths {
   fixedObject?: string
   raycasterObject?: string
   plant?: string
+  devicesOnTable?: string
 }
 
 export const useRoomMaterials = (materialPaths: MaterialPaths) => {
@@ -37,5 +38,12 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
     generateMipmaps: false
   })
 
-  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial }
+  const devicesOnTableMaterial = useOptimizedTexture({
+    path: materialPaths?.devicesOnTable || '/textures/room/devices_on_table.jpg',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial }
 } 

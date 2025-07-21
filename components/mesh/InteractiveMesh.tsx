@@ -28,7 +28,7 @@ export function InteractiveMeshWrapper({
 }: {
   config: MeshConfig
   nodes: GLTFResult['nodes']
-  getMaterial: (name: string) => THREE.Material
+  getMaterial: (name: string, materialType?: string) => THREE.Material
   hoveredMesh: string | null
   createHoverHandlers: (name: string) => HoverHandlers
 }) {
@@ -39,7 +39,7 @@ export function InteractiveMeshWrapper({
   const chairRotation = useChairRotation(config.name, 0.7)
   const hoverHandlers = createHoverHandlers(config.name)
   const geometry = nodes[config.name as keyof typeof nodes]?.geometry
-  const material = getMaterial(config.name)
+  const material = getMaterial(config.name, config.material)
 
   if (!geometry) return null
 

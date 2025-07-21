@@ -38,13 +38,14 @@ export type GLTFResult = GLTF & {
   }
   
   export interface MeshConfig {
-    name: string
-    position: [number, number, number]
-    rotation?: [number, number, number]
-    scale: number | [number, number, number]
-    isInteractive: boolean
-    onClick?: () => void
-  }
+  name: string
+  position: [number, number, number]
+  rotation?: [number, number, number]
+  scale: number | [number, number, number]
+  isInteractive: boolean
+  onClick?: () => void
+  material?: string
+}
   
   export interface TextureConfig {
     path: string

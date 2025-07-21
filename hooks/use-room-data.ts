@@ -68,7 +68,7 @@ const processMeshConfigs = async (
 
 const loadMaterialTextures = async () => ({
   wood: '/textures/room/wood.webp',
-  fixedObject: '/textures/room/FixedObjectSet.jpg',
+  fixedObject: '/textures/room/FixedObjectSet.webp',
   raycasterObject: '/textures/room/RaycasterObjectSet.webp',
   plant: '/textures/room/Plant.jpg',
   devicesOnTable: '/textures/room/devices_on_table.jpg'

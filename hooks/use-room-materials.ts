@@ -18,7 +18,7 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
   })
 
   const fixedObjectMaterial = useOptimizedTexture({
-    path: materialPaths?.fixedObject || '/textures/room/FixedObjectSet.jpg',
+    path: materialPaths?.fixedObject || '/textures/room/FixedObjectSet.webp',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
     generateMipmaps: false

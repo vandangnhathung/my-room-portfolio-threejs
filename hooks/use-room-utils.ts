@@ -20,7 +20,7 @@ export const useRoomUtils = (
   const manager = useLoadingManagerContext()
 
   // Materials
-  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial } = useRoomMaterials(materialPaths || {})
+  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial } = useRoomMaterials(materialPaths || {})
   const { screenVideoMaterial, screen001VideoMaterial } = useVideoMaterials()
   
   // Loading spinner texture
@@ -34,7 +34,8 @@ export const useRoomUtils = (
       'plant': plantMaterial,
       'inside_screen_popup': screenVideoMaterial || loadingMaterial,
       'inside_screen001_popup': screen001VideoMaterial || loadingMaterial,
-      'devices_on_table': devicesOnTableMaterial || loadingMaterial
+      'devices_on_table': devicesOnTableMaterial || loadingMaterial,
+      'screen_chair': screenChairMaterial || loadingMaterial
     }
     
     // If a specific material type is provided, use it
@@ -43,7 +44,7 @@ export const useRoomUtils = (
     }
     
     return materialMap[meshName] || raycasterObjectMaterial
-  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screenVideoMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial])
+  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screenVideoMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial, screenChairMaterial])
 
   // Mesh configuration
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {
@@ -75,6 +76,7 @@ export const useRoomUtils = (
     raycasterObjectMaterial,
     plantMaterial,
     devicesOnTableMaterial,
+    screenChairMaterial,
     screenVideoMaterial,
     screen001VideoMaterial,
     loadingMaterial,

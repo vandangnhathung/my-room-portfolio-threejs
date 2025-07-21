@@ -19,12 +19,12 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Cube001', position: [-2.532, 3.727, 3.064], scale: 1, isInteractive: false },
     { name: 'plant', position: [-1.398, -10.285, 5.061], scale: 1, isInteractive: false },
     { name: 'Room', position: [-1.398, 3.066, 5.061], scale: 1, isInteractive: false },
-    { name: 'screen', position: [5.367, 5.918, -0.059], scale: 1, isInteractive: false },
-    { name: 'screen001', position: [5.418, 5.88, 3.295], scale: 1, isInteractive: false },
+    { name: 'screen', position: [5.367, 5.918, -0.059], scale: 1, isInteractive: false, material: 'screen_chair' },
+    { name: 'screen001', position: [5.418, 5.88, 3.295], scale: 1, isInteractive: false, material: 'screen_chair' },
 
     // Interactive meshes
-    { name: 'Executive_office_chair_raycaster001', position: [2.425, 1.673, 1.635], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true },
-    { name: 'Executive_office_chair_raycaster', position: [2.661, 3.223, 1.622], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true },
+    { name: 'Executive_office_chair_raycaster001', position: [2.425, 1.673, 1.635], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true, material: 'screen_chair' },
+    { name: 'Executive_office_chair_raycaster', position: [2.661, 3.223, 1.622], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true, material: 'screen_chair' },
     { name: 'camera_raycaster', position: [5.349, 4.492, 3.479], scale: 1, isInteractive: true, material: 'devices_on_table' },
     { name: 'guitar_raycaster', position: [2.996, 1.79, -2.331], rotation: [0, 0.875, 0], scale: 1, isInteractive: true, onClick: () => console.log('clicked') },
     { name: 'player_button_raycaster', position: [-1.965, 4.711, 2.343], scale: 1, isInteractive: true },

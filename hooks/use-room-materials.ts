@@ -7,6 +7,7 @@ interface MaterialPaths {
   raycasterObject?: string
   plant?: string
   devicesOnTable?: string
+  screenChair?: string
 }
 
 export const useRoomMaterials = (materialPaths: MaterialPaths) => {
@@ -45,5 +46,12 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
     generateMipmaps: false
   })
 
-  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial }
+  const screenChairMaterial = useOptimizedTexture({
+    path: materialPaths?.screenChair || '/textures/room/screen_chair.webp',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial }
 } 

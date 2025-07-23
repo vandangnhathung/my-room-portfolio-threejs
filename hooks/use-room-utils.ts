@@ -32,7 +32,12 @@ export const useRoomUtils = (
       'floor': woodMaterial,
       'Room': fixedObjectMaterial,
       'plant': plantMaterial,
-      'inside_screen_popup': screenVideoMaterial || loadingMaterial,
+      // Hide the screen mesh since it will be replaced with iframe
+      'inside_screen_popup': new THREE.MeshBasicMaterial({ 
+        transparent: true, 
+        opacity: 0,
+        depthWrite: false 
+      }),
       'inside_screen001_popup': screen001VideoMaterial || loadingMaterial,
       'devices_on_table': devicesOnTableMaterial || loadingMaterial,
       'screen_chair': screenChairMaterial || loadingMaterial
@@ -44,7 +49,7 @@ export const useRoomUtils = (
     }
     
     return materialMap[meshName] || raycasterObjectMaterial
-  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screenVideoMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial, screenChairMaterial])
+  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial, screenChairMaterial])
 
   // Mesh configuration
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {

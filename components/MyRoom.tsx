@@ -7,9 +7,9 @@ import { OrbitControls, useGLTF } from "@react-three/drei"
 import { Suspense, useRef } from "react"
 import * as React from "react"
 import { useMediaQuery } from "react-responsive"
-import RenderAnimatedMeshes from "./RenderMesh/RenderAnimatedMeshes"
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
+import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -26,7 +26,7 @@ const RenderComponents = () => {
       <>
         <RenderInteractiveMeshes />
         <RenderStaticMeshes />
-        <RenderAnimatedMeshes />
+        {/* <RenderAnimatedMeshes /> */}
       </>
     )
   } catch (error) {
@@ -75,7 +75,7 @@ export function MyRoom() {
     return <LoadingFallback />
   }
 
-  console.log('Current target:', orbitControlsRef.current?.target)
+  // console.log('Current target:', orbitControlsRef.current?.target)
 
   /* eslint-disable  @typescript-eslint/no-explicit-any */
   return (
@@ -95,6 +95,19 @@ export function MyRoom() {
       <group dispose={null}>
         <group name="Scene">
           <RenderComponents />
+          {/* Optimized iframe with conditional rendering */}
+          <OptimizedIframeScreen 
+            src="https://vandangnhathung.github.io/lofi-ver-2/"
+            position={[5.267, 6.165, -0.079]}
+            rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
+            onLoad={() => console.log('Lofi website loaded successfully!')}
+          />
+        </group>
+        {/* Axes Helper at iframe position */}
+        <group position={[5.267, 6.165, -0.079]}
+      rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]} // Adjust rotation if needed
+      >
+          {/* <primitive object={new AxesHelper(2)} /> */}
         </group>
       </group>
     </Suspense>

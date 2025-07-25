@@ -6,7 +6,8 @@ import { Canvas } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
 import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
 import * as THREE from 'three';
-import { gsap } from 'gsap';
+import gsap from 'gsap';
+import GSAPTimeline from 'gsap';
 
 // Context for sharing LoadingManager
 const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
@@ -103,7 +104,6 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   theme,
   themeType,
   loadingPhase,
-  loadingText,
   isEnterEnabled,
   onEnterClick,
   loadingState
@@ -112,21 +112,36 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   const enterButtonRef = useRef<HTMLButtonElement>(null);
   const loadingTextRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
+  const loadingContentRef = useRef<HTMLDivElement>(null);
+  const timeline = useRef<GSAPTimeline>(null);
+  const enterButtonContainerRef = useRef<HTMLDivElement>(null);
 
   // Handle enter button animation
   useEffect(() => {
-    if (loadingPhase === 'ready' && enterButtonRef.current) {
-      gsap.fromTo(enterButtonRef.current!, 
-        { scale: 0, opacity: 0, rotation: -10 },
+    timeline.current = gsap.timeline();
+
+    if (loadingPhase === 'ready') {
+      timeline.current.to(loadingContentRef.current, 
+        { 
+          height: '350px',
+          duration:1,
+          ease: "back.out(1.7)",
+          delay: 0.2
+        }
+      ).to(enterButtonContainerRef.current, {
+        display: 'inline-block',
+        delay: 0.2
+      })
+      .to(enterButtonRef.current, 
         { 
           scale: 1, 
           opacity: 1, 
           rotation: 0,
-          duration: 0.8,
+          duration: 1,
           ease: "back.out(1.7)",
-          delay: 0.3
+          delay: 0.5
         }
-      );
+      )
     }
   }, [loadingPhase]);
 
@@ -231,11 +246,13 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       />
       
       {/* Loading Content */}
+      <div className="w-[400px] px-2 max-w-full">
       <div
+        ref={loadingContentRef}
+        className="overflow-hidden min-h-[200px]"
         style={{
           textAlign: 'center',
           color: theme.textColor,
-          maxWidth: '420px',
           padding: '40px',
           backgroundColor: theme.cardBackground,
           borderRadius: '20px',
@@ -255,30 +272,14 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           {getThemeIcon(themeType)}
         </div>
 
-        {/* Loading Text */}
-        <div
-          ref={loadingTextRef}
-          style={{
-            fontSize: '20px',
-            fontWeight: '500',
-            marginBottom: '20px',
-            letterSpacing: '0.5px',
-            lineHeight: '1.4'
-          }}
-        >
-          {loadingText}
-        </div>
-
         {/* Real-time Progress Bar */}
-        {loadingPhase === 'loading' && (
           <div style={{ marginBottom: '20px' }}>
             <div
               style={{
                 width: '100%',
                 height: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(139, 115, 85, 0.3)',
                 borderRadius: '4px',
-                overflow: 'hidden',
                 marginBottom: '10px'
               }}
             >
@@ -289,10 +290,13 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
                   backgroundColor: theme.accentColor,
                   borderRadius: '4px',
                   transition: 'width 0.3s ease',
-                  boxShadow: `0 0 10px ${theme.accentColor}50`
+                  boxShadow: `0 0 10px ${theme.accentColor} 50`
                 }}
               />
             </div>
+
+
+
             <div style={{ 
               fontSize: '14px', 
               opacity: 0.8,
@@ -301,66 +305,54 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
             }}>
               {Math.round(loadingState.progress)}% • {loadingState.loaded}/{loadingState.total}
             </div>
-            {loadingState.currentUrl && (
-              <div style={{ 
-                fontSize: '12px', 
-                opacity: 0.6,
-                color: theme.textColor,
-                wordBreak: 'break-word'
-              }}>
-                {loadingState.currentUrl.split('/').pop()}
-              </div>
-            )}
           </div>
-        )}
 
+      {loadingPhase === 'ready' && (
+       <div ref={enterButtonContainerRef} className='hidden'>
         {/* Enter Button */}
-        <button
-          ref={enterButtonRef}
-          onClick={handleEnterClickInternal}
-          disabled={!isEnterEnabled}
-          style={{
-            padding: '16px 40px',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: isEnterEnabled ? '#ffffff' : '#999',
-            background: isEnterEnabled 
-              ? theme.buttonGradient
-              : 'linear-gradient(135deg, #ccc 0%, #bbb 100%)',
-            border: 'none',
-            borderRadius: '50px',
-            cursor: isEnterEnabled ? 'pointer' : 'default',
-            transition: 'all 0.3s ease',
-            textTransform: 'none',
-            letterSpacing: '0.5px',
-            boxShadow: isEnterEnabled 
-              ? `0 8px 25px ${theme.shadowColor}`
-              : '0 4px 15px rgba(0,0,0,0.1)',
-            transform: isEnterEnabled ? 'scale(1)' : 'scale(0)',
-            outline: 'none',
-            fontFamily: 'inherit'
-          }}
-          onMouseEnter={(e) => {
-            if (isEnterEnabled) {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1.05)';
-              target.style.boxShadow = `0 12px 35px ${theme.shadowColor}`;
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (isEnterEnabled) {
-              const target = e.target as HTMLElement;
-              target.style.transform = 'scale(1)';
-              target.style.boxShadow = `0 8px 25px ${theme.shadowColor}`;
-            }
-          }}
-        >
-          Enter Your Space
-        </button>
+          <button
+            ref={enterButtonRef}
+            onClick={handleEnterClickInternal}
+            className={`${isEnterEnabled ? 'opacity-100' : ''} opacity-0 scale-0`}
+            style={{
+              padding: '16px 40px',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: isEnterEnabled ? '#ffffff' : '#999',
+              background: isEnterEnabled 
+                ? theme.buttonGradient
+                : 'linear-gradient(135deg, #ccc 0%, #bbb 100%)',
+              border: 'none',
+              borderRadius: '50px',
+              cursor: isEnterEnabled ? 'pointer' : 'default',
+              transition: 'all 0.3s ease',
+              textTransform: 'none',
+              letterSpacing: '0.5px',
+              boxShadow: isEnterEnabled 
+                ? `0 8px 25px ${theme.shadowColor}`
+                : '0 4px 15px rgba(0,0,0,0.1)',
+              outline: 'none',
+              fontFamily: 'inherit'
+            }}
+            onMouseEnter={(e) => {
+              if (isEnterEnabled) {
+                const target = e.target as HTMLElement;
+                target.style.transform = 'scale(1.05)';
+                target.style.boxShadow = `0 12px 35px ${theme.shadowColor}`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (isEnterEnabled) {
+                const target = e.target as HTMLElement;
+                target.style.transform = 'scale(1)';
+                target.style.boxShadow = `0 8px 25px ${theme.shadowColor}`;
+              }
+            }}
+          >
+            Enter Your Space
+          </button>
 
-        {/* Loading Instructions */}
-        {loadingPhase === 'ready' && (
-          <div
+         <div
             style={{
               marginTop: '25px',
               fontSize: '13px',
@@ -372,7 +364,9 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           >
             Use mouse to explore • Click objects to interact
           </div>
+         </div>
         )}
+       </div>
       </div>
 
       {/* CSS Animations */}
@@ -448,7 +442,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Canvas with 3D Scene */}
         <Canvas
-          camera={{ fov: 45, near: 0.1, far: 200, position: [3, 2, 6] }}
+          camera={{ fov: 45, near: 0.1, far: 200, position: [6, 10, 10] }}
           style={{ width: '100%', height: '100%' }}
         >        
           <Preload all />

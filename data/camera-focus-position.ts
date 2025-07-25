@@ -2,7 +2,7 @@
 export const cameraFocusPositions = {
      // Initial camera position
      initial: {
-       desktop: [-14.268085813930709, 10.623876164530241, -16.32492398272113] as [number, number, number],
+       desktop: [-14.268085813930709, 15.623876164530241, -16.32492398272113] as [number, number, number],
        mobile: [24.340123505652443, 16.324186649232594, 25.927875821449923] as [number, number, number],
      },
      

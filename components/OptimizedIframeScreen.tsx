@@ -73,7 +73,8 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
             justifyContent: 'center',
             color: '#ffffff',
             fontSize: '18px',
-            zIndex: 1
+            zIndex: 1,
+            transform: 'scaleY(-1)'
           }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ 
@@ -83,7 +84,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
                 borderTop: '3px solid #fff', 
                 borderRadius: '50%', 
                 animation: 'spin 1s linear infinite',
-                margin: '0 auto 10px'
+                margin: '0 auto 10px',
               }} />
               <p>Loading Website...</p>
             </div>

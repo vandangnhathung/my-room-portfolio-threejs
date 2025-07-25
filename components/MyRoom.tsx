@@ -36,7 +36,17 @@ const RenderComponents = () => {
 }
 
 export function MyRoom() {
-  const orbitControlsRef = useRef<{ target: { x: number; y: number; z: number } }>(null)
+  const orbitControlsRef = useRef<{ 
+    target: { x: number; y: number; z: number },
+    enabled: boolean,
+    minDistance: number,
+    maxDistance: number,
+    minPolarAngle: number,
+    maxPolarAngle: number,
+    minAzimuthAngle: number,
+    maxAzimuthAngle: number
+  }>(null)
+  
   const isMobile = useMediaQuery({ maxWidth: 768 })
   
   // Initialize EasyPopup 
@@ -74,8 +84,6 @@ export function MyRoom() {
   if (isLoading || !roomConfig) {
     return <LoadingFallback />
   }
-
-  // console.log('Current target:', orbitControlsRef.current?.target)
 
   /* eslint-disable  @typescript-eslint/no-explicit-any */
   return (

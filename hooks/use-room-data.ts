@@ -77,7 +77,7 @@ const loadMaterialTextures = async () => ({
 const getRoomConfiguration = async () => ({
   modelPath: '/models/Room_Portfolio.glb',
   cameraConfig: {
-    target: [4.149959777666874, 4.647045028235788, 1.2788151669711065] as [number, number, number],
+    target: [4.149959777666874, 7.647045028235788, 1.2788151669711065] as [number, number, number],
     minDistance: 4,
     maxDistance: 40,
     minPolarAngle: 0,

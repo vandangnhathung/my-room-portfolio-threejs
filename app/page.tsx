@@ -20,14 +20,7 @@ export default function HomePage() {
     <main style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <LoadingSystem
         onComplete={handleLoadingComplete}
-        theme="cozy"
-        customMessages={{
-          initializing: 'Preparing your cozy room...',
-          loading: 'Loading furniture and decor...',
-          ready: 'Your room is ready to explore!',
-          entering: 'Welcome home...'
-        }}
-      >
+        theme="cozy">
         <Experience />
       </LoadingSystem>
       

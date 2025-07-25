@@ -54,12 +54,10 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
       zIndexRange={[10, 0]}
     >
       <div style={{
-        width: '1385px',
-        height: '754px',
+        width: '1380px',
+        height: '724px',
         position: 'relative',
         backgroundColor: '#000',
-        borderRadius: '8px',
-        overflow: 'hidden'
       }}>
         {/* Loading Placeholder */}
         {isLoading && (

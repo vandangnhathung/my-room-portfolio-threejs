@@ -405,9 +405,9 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
 
   // Default messages
   const defaultMessages: LoadingMessages = {
-    initializing: 'Preparing your space...',
+    initializing: 'Preparing Hung space...',
     loading: 'Loading assets...',
-    ready: 'Your cozy space is ready!',
+    ready: 'Welcome!',
     entering: 'Entering...'
   };
   

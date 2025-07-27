@@ -8,6 +8,8 @@ interface MaterialPaths {
   plant?: string
   devicesOnTable?: string
   screenChair?: string
+  fifthTextureSet?: string
+  window?: string
 }
 
 export const useRoomMaterials = (materialPaths: MaterialPaths) => {
@@ -53,5 +55,19 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
     generateMipmaps: false
   })
 
-  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial }
+  const fifthTextureSetMaterial = useOptimizedTexture({
+    path: materialPaths?.fifthTextureSet || '/textures/room/FifthTextureSet.webp',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  const windowMaterial = useOptimizedTexture({
+    path: materialPaths?.window || '/textures/room/window_texture_set.webp',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial }
 } 

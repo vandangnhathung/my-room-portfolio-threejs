@@ -19,6 +19,11 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Cube001', position: [-2.532, 3.727, 3.064], scale: 1, isInteractive: false },
     { name: 'plant', position: [-1.398, -10.285, 5.061], scale: 1, isInteractive: false },
     { name: 'Room', position: [-1.398, 3.066, 5.061], scale: 1, isInteractive: false },
+    { name: 'Room001', position: [-1.398, 3.066, 5.061], scale: 1, isInteractive: false, material: 'fifth_texture_set' },
+    { name: 'Room002', position: [-1.398, 3.066, 5.061], scale: 1, isInteractive: false, material: 'Room' },
+    { name: 'Room003', position: [-1.398, 3.066, 5.061], scale: 1, isInteractive: false, material: 'window' },
+    { name: 'Room004', position: [-1.398, 3.066, 5.061], scale: 1, isInteractive: false, material: 'Room' },
+    { name: 'Room005', position: [-4.428, 2.889, 3.318], scale: 1, isInteractive: false, material: 'fifth_texture_set' },
     { name: 'screen', position: [5.367, 5.918, -0.059], scale: 1, isInteractive: false, material: 'screen_chair' },
     { name: 'screen001', position: [5.418, 5.88, 3.295], scale: 1, isInteractive: false, material: 'screen_chair' },
 

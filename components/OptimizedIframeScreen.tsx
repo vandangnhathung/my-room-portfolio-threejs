@@ -16,7 +16,6 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   rotation, 
   isVisible = true,
   onLoad,
-  isMobile = false
 }) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -47,12 +46,12 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
 
   // Responsive container styles
   const containerStyle = {
-    width: isMobile ? '100vw' : '1380px',
-    height: isMobile ? '100vh' : '724px',
+    width: "1380px" ,
+    height: "724px",
     position: 'relative' as const,
     backgroundColor: '#000',
-    maxWidth: isMobile ? '100%' : 'none',
-    maxHeight: isMobile ? '100%' : 'none',
+    maxWidth: '100%',
+    maxHeight: '100%',
   }
 
   // Responsive iframe styles
@@ -60,7 +59,6 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
     width: '100%',
     height: '100%',
     border: 'none',
-    borderRadius: '8px',
     backgroundColor: '#000',
     transform: 'scaleY(-1)',
     opacity: isLoaded ? 1 : 0,
@@ -73,7 +71,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   return (
     <Html
       transform
-      distanceFactor={isMobile ? 1.2 : 0.97} // Adjust for mobile
+      distanceFactor={0.97} // Adjust for mobile
       position={position}
       rotation={rotation}
       occlude="blending"

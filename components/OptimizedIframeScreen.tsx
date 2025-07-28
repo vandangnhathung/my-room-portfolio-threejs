@@ -7,6 +7,7 @@ interface OptimizedIframeScreenProps {
   rotation: [number, number, number]
   isVisible?: boolean
   onLoad?: () => void
+  isMobile?: boolean // Add mobile prop
 }
 
 export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({ 
@@ -14,7 +15,8 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   position, 
   rotation, 
   isVisible = true,
-  onLoad 
+  onLoad,
+  isMobile = false
 }) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -43,22 +45,42 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
     return null
   }
 
+  // Responsive container styles
+  const containerStyle = {
+    width: isMobile ? '100vw' : '1380px',
+    height: isMobile ? '100vh' : '724px',
+    position: 'relative' as const,
+    backgroundColor: '#000',
+    maxWidth: isMobile ? '100%' : 'none',
+    maxHeight: isMobile ? '100%' : 'none',
+  }
+
+  // Responsive iframe styles
+  const iframeStyle = {
+    width: '100%',
+    height: '100%',
+    border: 'none',
+    borderRadius: '8px',
+    backgroundColor: '#000',
+    transform: 'scaleY(-1)',
+    opacity: isLoaded ? 1 : 0,
+    transition: 'opacity 0.3s ease-in-out',
+    // iOS Safari specific fixes
+    WebkitTransform: 'scaleY(-1)',
+    WebkitOverflowScrolling: 'touch' as const,
+  }
+
   return (
     <Html
       transform
-      distanceFactor={0.97}
+      distanceFactor={isMobile ? 1.2 : 0.97} // Adjust for mobile
       position={position}
       rotation={rotation}
       occlude="blending"
       wrapperClass="htmlScreen"
       zIndexRange={[10, 0]}
     >
-      <div style={{
-        width: '1380px',
-        height: '724px',
-        position: 'relative',
-        backgroundColor: '#000',
-      }}>
+      <div style={containerStyle}>
         {/* Loading Placeholder */}
         {isLoading && (
           <div style={{
@@ -130,16 +152,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
         {/* Iframe */}
         <iframe 
           src={src}
-          style={{
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            borderRadius: '8px',
-            backgroundColor: '#000',
-            transform: 'scaleY(-1)',
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out'
-          }}
+          style={iframeStyle}
           title="Lofi Website"
           loading="lazy"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
@@ -148,11 +161,45 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
         />
       </div>
 
-      {/* CSS for loading animation */}
+      {/* CSS for loading animation and mobile fixes */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+          .htmlScreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+          }
+          
+          .htmlScreen iframe {
+            width: 100% !important;
+            height: 100% !important;
+            -webkit-transform: scaleY(-1) !important;
+            transform: scaleY(-1) !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+          .htmlScreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+          }
+          
+          .htmlScreen iframe {
+            width: 100% !important;
+            height: 100% !important;
+            -webkit-transform: scaleY(-1) !important;
+            transform: scaleY(-1) !important;
+          }
         }
       `}</style>
     </Html>

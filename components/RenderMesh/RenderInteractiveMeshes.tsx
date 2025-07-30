@@ -1,4 +1,4 @@
-import { InteractiveMeshWrapper } from "@/components/mesh/InteractiveMesh"
+import { InteractiveMeshWrapper } from "@/components/Mesh/InteractiveMesh"
 import { useRoomUtils } from "@/hooks/use-room-utils"
 import { useHoveredMesh, useHoverHandlers } from "@/stores/useHoverStore"
 

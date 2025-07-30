@@ -1,7 +1,7 @@
 // For Next.js App Router, add to your layout.tsx
 import type { Metadata } from 'next';
 import './globals.css';
-import { RoomQueryProvider } from '@/components/Providers/query-provider';
+import { RoomQueryProvider } from '@/components/providers/query-provider';
 
 export const metadata: Metadata = {
   title: 'Create Next App',

@@ -7,6 +7,7 @@ import { GLTFResult, MeshConfig } from "@/types/type"
 import { useHoverAnimation } from "@/hooks/hovering/use-hover-animation"
 import { useChairRotation } from "@/hooks/use-chair-rotation"
 import { ThreeEvent } from '@react-three/fiber'
+import { useEffect, useRef } from "react"
 
 // Define proper event handler types
 type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void
@@ -24,14 +25,37 @@ export function InteractiveMeshWrapper({
   nodes, 
   getMaterial, 
   hoveredMesh, 
-  createHoverHandlers 
+  createHoverHandlers,
+  isCameraFocused,
+  onMeshRef
 }: {
   config: MeshConfig
   nodes: GLTFResult['nodes']
   getMaterial: (name: string, materialType?: string) => THREE.Material
   hoveredMesh: string | null
   createHoverHandlers: (name: string) => HoverHandlers
+  isCameraFocused: boolean
+  onMeshRef?: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
 }) {
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  useEffect(() => {
+    if (config.name === 'Executive_office_chair_raycaster' && onMeshRef) {
+      onMeshRef(config.name, meshRef)
+    }
+  }, [config.name, onMeshRef])
+
+  useEffect(() => {
+    if (meshRef.current && config.name === 'Executive_office_chair_raycaster') {
+      // Hide the chair when camera is focused
+      if (isCameraFocused) {
+        meshRef.current.visible = false
+      } else {
+        meshRef.current.visible = true
+      }
+    }
+  }, [isCameraFocused, config.name])
+
   // Only apply hover animation if mesh name doesn't contain 'popup'
   const shouldAnimate = !config.name.includes('popup')
   const animatedScale = useHoverAnimation(config.name, config.scale, shouldAnimate ? hoveredMesh : null)
@@ -53,6 +77,7 @@ export function InteractiveMeshWrapper({
       animatedScale={animatedScale as unknown as { scale: number | [number, number, number] }}
       hoverHandlers={hoverHandlers}
       chairRotationRef={isRotatingChair ? chairRotation.meshRef : undefined}
+      meshRef={meshRef}
     />
   )
 }
@@ -66,9 +91,14 @@ export const InteractiveMesh: React.FC<{
   }
   hoverHandlers: HoverHandlers
   chairRotationRef?: React.RefObject<THREE.Mesh | null>
-}> = ({ config, geometry, material, animatedScale, hoverHandlers, chairRotationRef }) => (
+  meshRef?: React.RefObject<THREE.Mesh | null>
+}> = ({ config, geometry, material, animatedScale, hoverHandlers, chairRotationRef, meshRef }) => (
   <animated.mesh
-    ref={chairRotationRef}
+    ref={(node) => {
+      // Handle both refs
+      if (meshRef) meshRef.current = node
+      if (chairRotationRef) chairRotationRef.current = node
+    }}
     name={config.name}
     castShadow
     receiveShadow

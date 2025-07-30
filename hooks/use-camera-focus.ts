@@ -2,6 +2,7 @@ import { useCallback, useState, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
 import gsap from 'gsap'
 import { cameraFocusPositions } from '@/data/camera-focus-position'
+import * as THREE from 'three'
 
 interface CameraFocusHook {
   isCameraFocused: boolean
@@ -31,7 +32,8 @@ export const useCameraFocus = (
     minAzimuthAngle: number,
     maxAzimuthAngle: number
   } | null>,
-  isMobile: boolean = false
+  isMobile: boolean = false,
+  meshRefs?: React.MutableRefObject<Map<string, React.RefObject<THREE.Mesh | null>>>
 ): CameraFocusHook => {
   const { camera } = useThree()
   const [isCameraFocused, setIsCameraFocused] = useState(false)
@@ -186,12 +188,19 @@ export const useCameraFocus = (
   const resetCamera = useCallback(() => {
     if (!orbitControlsRef.current) return
 
+    // Show the chair BEFORE starting the animation
+    const chairRef = meshRefs?.current.get('Executive_office_chair_raycaster')
+    if (chairRef?.current) {
+      chairRef.current.visible = true
+    }
+
+    // Set isCameraFocused to false BEFORE starting animation
     setIsCameraFocused(false)
 
     const tl = gsap.timeline({ 
       ease: "power3.inOut",
       onComplete: () => {
-        setIsCameraFocused(false)
+        // Only restore constraints after animation completes
         restoreConstraints()
         // Clear stored constraints after restoration
         originalConstraintsRef.current = null
@@ -218,7 +227,7 @@ export const useCameraFocus = (
       z: cameraPos[2],
       duration: 1.4,
     }, "-=1.4")
-  }, [orbitControlsRef, camera, isMobile])
+  }, [orbitControlsRef, camera, isMobile, meshRefs])
 
   return {
     isCameraFocused,

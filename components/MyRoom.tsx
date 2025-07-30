@@ -7,10 +7,12 @@ import { OrbitControls, useGLTF } from "@react-three/drei"
 import { Suspense, useRef } from "react"
 import * as React from "react"
 import { useMediaQuery } from "react-responsive"
+import * as THREE from "three" // Add this import
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
 import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
+import { TOUCH } from 'three' // Add this import
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -21,11 +23,22 @@ const LoadingFallback = () => (
 )
 
 // Error boundary for render components
-const RenderComponents = ({focusOnScreen}: {focusOnScreen: () => void}) => {
+const RenderComponents = ({
+  focusOnScreen, 
+  isCameraFocused, 
+  onMeshRef
+}: {
+  focusOnScreen: () => void, 
+  isCameraFocused: boolean,
+  onMeshRef: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
+}) => {
   try {
     return (
       <>
-        <RenderInteractiveMeshes />
+        <RenderInteractiveMeshes 
+          isCameraFocused={isCameraFocused} 
+          onMeshRef={onMeshRef}
+        />
         <RenderStaticMeshes />
         <PointCursor handleClick={focusOnScreen} />
         {/* <RenderAnimatedMeshes /> */}
@@ -49,12 +62,18 @@ export function MyRoom() {
     maxAzimuthAngle: number
   }>(null)
   
+  const meshRefs = useRef<Map<string, React.RefObject<THREE.Mesh | null>>>(new Map())
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  // Camera focus functionality
+  const handleMeshRef = (name: string, ref: React.RefObject<THREE.Mesh | null>) => {
+    meshRefs.current.set(name, ref)
+  }
+
+  // Camera focus functionality with mesh refs
   const { isCameraFocused, focusOnScreen, focusOnCertificate, resetCamera } = useCameraFocus(
     orbitControlsRef, 
-    isMobile
+    isMobile,
+    meshRefs
   )
 
   // Debounced keydown handler
@@ -134,12 +153,28 @@ export function MyRoom() {
         maxPolarAngle={roomConfig.cameraConfig.maxPolarAngle}
         minAzimuthAngle={roomConfig.cameraConfig.minAzimuthAngle}
         maxAzimuthAngle={roomConfig.cameraConfig.maxAzimuthAngle}
-        enablePan={false}
+        enablePan={isMobile} // Enable panning on mobile
         enableRotate={!isCameraFocused && !isDebouncing}
+        enableZoom={true}
+        enableDamping={true}
+        dampingFactor={0.1}
+        // Mobile-specific configurations
+        touches={{
+          ONE: TOUCH.ROTATE,
+          TWO: TOUCH.DOLLY_PAN
+        }}
+        // Optional: Adjust sensitivity for mobile
+        rotateSpeed={isMobile ? 0.5 : 1.0}
+        zoomSpeed={isMobile ? 0.5 : 1.0}
+        panSpeed={isMobile ? 0.5 : 1.0}
       />
       <group dispose={null}>
         <group name="Scene">
-          <RenderComponents focusOnScreen={focusOnScreen}/>
+          <RenderComponents 
+            focusOnScreen={focusOnScreen} 
+            isCameraFocused={isCameraFocused}
+            onMeshRef={handleMeshRef}
+          />
           {/* Optimized iframe with conditional rendering */}
           <OptimizedIframeScreen 
             src="https://vandangnhathung.github.io/lofi-ver-2/"

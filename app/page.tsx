@@ -5,12 +5,13 @@ import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
 import { HoverMessage } from '@/components/HoverMessage'
 import { useMessageState } from '@/stores/useHoverStore'
+import { useCameraStore } from '@/stores/useCameraStore'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
   // Only subscribe to message state - not hover state
   const messageState = useMessageState()
-
+  const isCameraFocused = useCameraStore((state) => state.isCameraFocused)
   const handleLoadingComplete = () => {
     setShowUI(true)
   }
@@ -23,6 +24,14 @@ export default function HomePage() {
         <Experience />
       </LoadingSystem>
       
+      {isCameraFocused && (
+        <button className='absolute top-4 left-4 bg-white text-black p-2 rounded-md z-10' onClick={() => {
+          useCameraStore.getState().resetCameraFocus()
+        }}>
+          Go back
+        </button>
+      )}
+
       {showUI && (
         <>
           <div className="absolute inset-0 pointer-events-none">

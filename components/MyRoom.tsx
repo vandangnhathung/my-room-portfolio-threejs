@@ -9,6 +9,7 @@ import { useMediaQuery } from "react-responsive"
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
 import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
+import PointCursor from "./PointCursor/PointCursor"
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -19,12 +20,13 @@ const LoadingFallback = () => (
 )
 
 // Error boundary for render components
-const RenderComponents = () => {
+const RenderComponents = ({focusOnScreen}: {focusOnScreen: () => void}) => {
   try {
     return (
       <>
         <RenderInteractiveMeshes />
         <RenderStaticMeshes />
+        <PointCursor handleClick={focusOnScreen} />
         {/* <RenderAnimatedMeshes /> */}
       </>
     )
@@ -119,7 +121,7 @@ export function MyRoom() {
       />
       <group dispose={null}>
         <group name="Scene">
-          <RenderComponents />
+          <RenderComponents focusOnScreen={focusOnScreen}/>
           {/* Optimized iframe with conditional rendering */}
           <OptimizedIframeScreen 
             src="https://vandangnhathung.github.io/lofi-ver-2/"

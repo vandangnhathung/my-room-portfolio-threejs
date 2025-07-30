@@ -2,6 +2,7 @@
 
 import { useRoomData } from "@/hooks/use-room-data"
 import { useCameraFocus } from "@/hooks/use-camera-focus"
+import { useDebounceKeydown } from "@/hooks/use-debounce-keydown"
 import { OrbitControls, useGLTF } from "@react-three/drei"
 import { Suspense, useRef } from "react"
 import * as React from "react"
@@ -56,15 +57,32 @@ export function MyRoom() {
     isMobile
   )
 
-  // Camera and orbit controls logging
-  // const { logCurrentValues, logCameraPosition, logOrbitTarget } = useCameraOrbitLogger(
-  //   orbitControlsRef,
-  //   {
-  //     logInterval: 2000, // Log every 2 seconds
-  //     enabled: true, // Enable logging
-  //     logOnChange: false // Log continuously (set to true to log only when values change)
-  //   }
-  // )
+  // Debounced keydown handler
+  const { handleKeyDown: debouncedKeyDown, isDebouncing } = useDebounceKeydown({
+    delay: 500, // 500ms debounce delay to allow camera transitions to complete
+    onKeyDown: (event: KeyboardEvent) => {
+      if (event.code === "Escape" && isCameraFocused) {
+        resetCamera()
+      }
+      
+      // Add keyboard shortcuts for manual logging
+      // if (event.code === "KeyL" && event.ctrlKey) {
+      //   logCurrentValues()
+      // }
+      // if (event.code === "KeyC" && event.ctrlKey) {
+      //   logCameraPosition()
+      // }
+      // if (event.code === "KeyT" && event.ctrlKey) {
+      //   logOrbitTarget()
+      // }
+    }
+  })
+
+  // Handle ESC key to reset camera with debouncing
+  React.useEffect(() => {
+    window.addEventListener("keydown", debouncedKeyDown)
+    return () => window.removeEventListener("keydown", debouncedKeyDown)
+  }, [debouncedKeyDown])
 
   // Pass the ref and camera focus functions
   const { roomConfig, isLoading, hasError } = useRoomData(
@@ -117,7 +135,7 @@ export function MyRoom() {
         minAzimuthAngle={roomConfig.cameraConfig.minAzimuthAngle}
         maxAzimuthAngle={roomConfig.cameraConfig.maxAzimuthAngle}
         enablePan={false}
-        enableRotate={!isCameraFocused}
+        enableRotate={!isCameraFocused && !isDebouncing}
       />
       <group dispose={null}>
         <group name="Scene">

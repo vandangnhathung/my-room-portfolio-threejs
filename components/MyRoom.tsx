@@ -13,6 +13,7 @@ import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
 import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
 import { TOUCH } from 'three' // Add this import
+import { useCameraStore } from '@/stores/useCameraStore'
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -25,20 +26,15 @@ const LoadingFallback = () => (
 // Error boundary for render components
 const RenderComponents = ({
   focusOnScreen, 
-  isCameraFocused, 
   onMeshRef
 }: {
   focusOnScreen: () => void, 
-  isCameraFocused: boolean,
   onMeshRef: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
 }) => {
   try {
     return (
       <>
-        <RenderInteractiveMeshes 
-          isCameraFocused={isCameraFocused} 
-          onMeshRef={onMeshRef}
-        />
+        <RenderInteractiveMeshes onMeshRef={onMeshRef} />
         <RenderStaticMeshes />
         <PointCursor handleClick={focusOnScreen} />
         {/* <RenderAnimatedMeshes /> */}
@@ -70,11 +66,14 @@ export function MyRoom() {
   }
 
   // Camera focus functionality with mesh refs
-  const { isCameraFocused, focusOnScreen, focusOnCertificate, resetCamera } = useCameraFocus(
+  const { focusOnScreen, focusOnScreen001, resetCamera } = useCameraFocus(
     orbitControlsRef, 
     isMobile,
     meshRefs
   )
+
+  // Get isCameraFocused from Zustand store
+  const isCameraFocused = useCameraStore((state) => state.isCameraFocused)
 
   // Debounced keydown handler
   const { handleKeyDown: debouncedKeyDown, isDebouncing } = useDebounceKeydown({
@@ -107,7 +106,7 @@ export function MyRoom() {
   const { roomConfig, isLoading, hasError } = useRoomData(
     orbitControlsRef, 
     focusOnScreen, 
-    focusOnCertificate
+    focusOnScreen001
   )
 
   // Handle ESC key to reset camera
@@ -172,7 +171,6 @@ export function MyRoom() {
         <group name="Scene">
           <RenderComponents 
             focusOnScreen={focusOnScreen} 
-            isCameraFocused={isCameraFocused}
             onMeshRef={handleMeshRef}
           />
           {/* Optimized iframe with conditional rendering */}

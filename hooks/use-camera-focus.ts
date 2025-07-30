@@ -1,16 +1,9 @@
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
-import gsap from 'gsap'
+import { gsap } from 'gsap'
 import { cameraFocusPositions } from '@/data/camera-focus-position'
+import { useCameraStore } from '@/stores/useCameraStore'
 import * as THREE from 'three'
-
-interface CameraFocusHook {
-  isCameraFocused: boolean
-  focusOnScreen: () => void
-  focusOnScreen001: () => void
-  focusOnCertificate: () => void
-  resetCamera: () => void
-}
 
 interface ConstraintsState {
   minDistance: number
@@ -34,10 +27,12 @@ export const useCameraFocus = (
   } | null>,
   isMobile: boolean = false,
   meshRefs?: React.MutableRefObject<Map<string, React.RefObject<THREE.Mesh | null>>>
-): CameraFocusHook => {
+) => {
   const { camera } = useThree()
-  const [isCameraFocused, setIsCameraFocused] = useState(false)
   const originalConstraintsRef = useRef<ConstraintsState | null>(null)
+  
+  // Use Zustand store instead of local state
+  const { isCameraFocused, setIsCameraFocused } = useCameraStore()
 
   const storeOriginalConstraints = () => {
     if (orbitControlsRef.current && !originalConstraintsRef.current) {
@@ -77,7 +72,6 @@ export const useCameraFocus = (
   const focusOnScreen = useCallback(() => {
     if (isCameraFocused || !orbitControlsRef.current) return
 
-    // Store and remove constraints
     storeOriginalConstraints()
     removeConstraints()
 
@@ -85,7 +79,6 @@ export const useCameraFocus = (
       ease: "power3.inOut",
       onComplete: () => {
         setIsCameraFocused(true)
-        // Keep constraints removed while focused
       }
     })
     
@@ -109,12 +102,11 @@ export const useCameraFocus = (
       z: cameraPos[2],
       duration: 1,
     }, "-=1")
-  }, [isCameraFocused, orbitControlsRef, camera, isMobile])
+  }, [isCameraFocused, orbitControlsRef, camera, isMobile, setIsCameraFocused])
 
   const focusOnScreen001 = useCallback(() => {
     if (isCameraFocused || !orbitControlsRef.current) return
 
-    // Store and remove constraints
     storeOriginalConstraints()
     removeConstraints()
 
@@ -122,7 +114,6 @@ export const useCameraFocus = (
       ease: "power3.inOut",
       onComplete: () => {
         setIsCameraFocused(true)
-        // Keep constraints removed while focused
       }
     })
     
@@ -146,63 +137,24 @@ export const useCameraFocus = (
       z: cameraPos[2],
       duration: 1,
     }, "-=1")
-  }, [isCameraFocused, orbitControlsRef, camera, isMobile])
-
-  const focusOnCertificate = useCallback(() => {
-    if (isCameraFocused || !orbitControlsRef.current) return
-
-    // Store and remove constraints
-    storeOriginalConstraints()
-    removeConstraints()
-
-    const tl = gsap.timeline({ 
-      ease: "power3.inOut",
-      onComplete: () => {
-        setIsCameraFocused(true)
-        // Keep constraints removed while focused
-      }
-    })
-    
-    const targetPos = isMobile 
-      ? cameraFocusPositions.screenFocused.target.mobile 
-      : cameraFocusPositions.screenFocused.target.desktop
-    
-    const cameraPos = isMobile 
-      ? cameraFocusPositions.screenFocused.camera.mobile 
-      : cameraFocusPositions.screenFocused.camera.desktop
-
-    tl.to(orbitControlsRef.current.target, {
-      x: targetPos[0],
-      y: targetPos[1],
-      z: targetPos[2],
-      duration: 1,
-    })
-    .to(camera.position, {
-      x: cameraPos[0],
-      y: cameraPos[1],
-      z: cameraPos[2],
-      duration: 1,
-    }, "-=1")
-  }, [isCameraFocused, orbitControlsRef, camera, isMobile])
+  }, [isCameraFocused, orbitControlsRef, camera, isMobile, setIsCameraFocused])
 
   const resetCamera = useCallback(() => {
     if (!orbitControlsRef.current) return
 
-    // Show the chair BEFORE starting the animation
+    // Show chair BEFORE animation starts
     const chairRef = meshRefs?.current.get('Executive_office_chair_raycaster')
     if (chairRef?.current) {
       chairRef.current.visible = true
     }
 
-    // Set isCameraFocused to false BEFORE starting animation
+    // Set state to false BEFORE animation
     setIsCameraFocused(false)
 
     const tl = gsap.timeline({ 
       ease: "power3.inOut",
       onComplete: () => {
-        // Only restore constraints after animation completes
         restoreConstraints()
-        // Clear stored constraints after restoration
         originalConstraintsRef.current = null
       }
     })
@@ -227,13 +179,12 @@ export const useCameraFocus = (
       z: cameraPos[2],
       duration: 1.4,
     }, "-=1.4")
-  }, [orbitControlsRef, camera, isMobile, meshRefs])
+  }, [orbitControlsRef, camera, isMobile, meshRefs, setIsCameraFocused])
 
   return {
     isCameraFocused,
     focusOnScreen,
     focusOnScreen001,
-    focusOnCertificate,
-    resetCamera
+    resetCamera,
   }
 }

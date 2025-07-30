@@ -47,7 +47,6 @@ export function InteractiveMeshWrapper({
 
   useEffect(() => {
     if (meshRef.current && config.name === 'Executive_office_chair_raycaster') {
-      // Hide the chair when camera is focused
       if (isCameraFocused) {
         meshRef.current.visible = false
       } else {

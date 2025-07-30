@@ -1,6 +1,5 @@
 'use client'
 
-import { useEasyPopup } from "@/hooks/use-easy-popup"
 import { useRoomData } from "@/hooks/use-room-data"
 import { useCameraFocus } from "@/hooks/use-camera-focus"
 import { OrbitControls, useGLTF } from "@react-three/drei"
@@ -48,9 +47,6 @@ export function MyRoom() {
   }>(null)
   
   const isMobile = useMediaQuery({ maxWidth: 768 })
-  
-  // Initialize EasyPopup 
-  useEasyPopup()
 
   // Camera focus functionality
   const { isCameraFocused, focusOnScreen, focusOnCertificate, resetCamera } = useCameraFocus(

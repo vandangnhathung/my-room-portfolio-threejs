@@ -28,22 +28,12 @@ const createMeshClickHandlers = (
       console.log('Screen clicked! orbitControlsTarget...', currentTarget)
       
       if (focusOnScreen) focusOnScreen()
-      
-      if (typeof window !== 'undefined' && window.EasyPopup) {
-        // const popup = window.EasyPopup.get('screen-popup')
-        // if (popup) popup.open()
-      }
     },
     'inside_screen001_popup': () => {
       const currentTarget = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
-      console.log('Screen001 clicked! Opening popup...', currentTarget)
+      console.log('Screen001 clicked!', currentTarget)
       
       if (focusOnScreen001) focusOnScreen001()
-      
-      if (typeof window !== 'undefined' && window.EasyPopup) {
-        const popup = window.EasyPopup.get('screen001-popup')
-        if (popup) popup.open()
-      }
     }
   }
   

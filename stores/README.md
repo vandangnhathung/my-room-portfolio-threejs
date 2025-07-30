@@ -48,7 +48,7 @@ const { hoveredMesh, setHoveredMesh } = useHoverStore(
 interface UIStore {
   isLoading: boolean
   showUI: boolean
-  activePopup: string | null
+  activeModal: string | null
 }
 ```
 

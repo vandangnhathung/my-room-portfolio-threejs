@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
-import { PopupManager } from '@/components/popup/PopupManager'
 import { HoverMessage } from '@/components/HoverMessage'
 import { useMessageState } from '@/stores/useHoverStore'
 
@@ -26,8 +25,6 @@ export default function HomePage() {
       
       {showUI && (
         <>
-          <PopupManager />
-
           <div className="absolute inset-0 pointer-events-none">
             <HoverMessage messageState={messageState} />
           </div>

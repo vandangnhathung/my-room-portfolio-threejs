@@ -37,8 +37,6 @@ export const useCameraFocus = (
   const [isCameraFocused, setIsCameraFocused] = useState(false)
   const originalConstraintsRef = useRef<ConstraintsState | null>(null)
 
-  // console.log(camera.position)
-
   const storeOriginalConstraints = () => {
     if (orbitControlsRef.current && !originalConstraintsRef.current) {
       originalConstraintsRef.current = {

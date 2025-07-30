@@ -442,7 +442,12 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Canvas with 3D Scene */}
         <Canvas
-          camera={{ fov: 45, near: 0.1, far: 100, position: [6, 7, 13] }}
+          camera={{ 
+            fov: 45, 
+            near: 0.1, 
+            far: 100, 
+            position: [-17.547789383813438, 11.056949441827566, -22.784703347122825] 
+          }}
           style={{ width: '100%', height: '100%' }}
         >        
           <Preload all />

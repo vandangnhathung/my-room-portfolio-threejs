@@ -54,6 +54,16 @@ export function MyRoom() {
     isMobile
   )
 
+  // Camera and orbit controls logging
+  // const { logCurrentValues, logCameraPosition, logOrbitTarget } = useCameraOrbitLogger(
+  //   orbitControlsRef,
+  //   {
+  //     logInterval: 2000, // Log every 2 seconds
+  //     enabled: true, // Enable logging
+  //     logOnChange: false // Log continuously (set to true to log only when values change)
+  //   }
+  // )
+
   // Pass the ref and camera focus functions
   const { roomConfig, isLoading, hasError } = useRoomData(
     orbitControlsRef, 
@@ -67,6 +77,17 @@ export function MyRoom() {
       if (event.code === "Escape" && isCameraFocused) {
         resetCamera()
       }
+      
+      // Add keyboard shortcuts for manual logging
+      // if (event.code === "KeyL" && event.ctrlKey) {
+      //   logCurrentValues()
+      // }
+      // if (event.code === "KeyC" && event.ctrlKey) {
+      //   logCameraPosition()
+      // }
+      // if (event.code === "KeyT" && event.ctrlKey) {
+      //   logOrbitTarget()
+      // }
     }
 
     window.addEventListener("keydown", handleKeyDown)

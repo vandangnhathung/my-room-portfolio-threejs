@@ -2,14 +2,14 @@
 export const cameraFocusPositions = {
      // Initial camera position
      initial: {
-       desktop: [-14.268085813930709, 15.623876164530241, -16.32492398272113] as [number, number, number],
-       mobile: [24.340123505652443, 16.324186649232594, 25.927875821449923] as [number, number, number],
+       desktop: [-17.547789383813438, 11.056949441827566, -22.784703347122825] as [number, number, number],
+       mobile: [-17.547789383813438, 11.056949441827566, -22.784703347122825] as [number, number, number],
      },
      
      // Initial orbit controls target
      initialTarget: {
-       desktop: [-0.8783316342959402, 3.5, -1.7424402227468443] as [number, number, number],
-       mobile: [-1.3778645865330086, 3, -1.438617629177433] as [number, number, number],
+       desktop: [4.149959777666874, 7.647045028235788, 1.2788151669711065] as [number, number, number],
+       mobile: [4.149959777666874, 7.647045028235788, 1.2788151669711065] as [number, number, number],
      },
      
      // Screen focused positions (inside_screen_popup at [5.367, 5.918, -0.059])

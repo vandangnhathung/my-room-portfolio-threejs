@@ -1,7 +1,6 @@
 'use client'
 
 import { useRoomData } from "@/hooks/use-room-data"
-import { useCameraFocus } from "@/hooks/use-camera-focus"
 import { useDebounceKeydown } from "@/hooks/use-debounce-keydown"
 import { OrbitControls, useGLTF } from "@react-three/drei"
 import { Suspense, useRef } from "react"
@@ -14,6 +13,7 @@ import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
 import { TOUCH } from 'three' // Add this import
 import { useCameraStore } from '@/stores/useCameraStore'
+import { useThree } from "@react-three/fiber"
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -60,27 +60,25 @@ export function MyRoom() {
   
   const meshRefs = useRef<Map<string, React.RefObject<THREE.Mesh | null>>>(new Map())
   const isMobile = useMediaQuery({ maxWidth: 768 })
+  const { camera } = useThree()
+
+  const { 
+    isCameraFocused, 
+    focusOnScreen, 
+    focusOnScreen001, 
+    resetCamera 
+  } = useCameraStore()
 
   const handleMeshRef = (name: string, ref: React.RefObject<THREE.Mesh | null>) => {
     meshRefs.current.set(name, ref)
   }
-
-  // Camera focus functionality with mesh refs
-  const { focusOnScreen, focusOnScreen001, resetCamera } = useCameraFocus(
-    orbitControlsRef, 
-    isMobile,
-    meshRefs
-  )
-
-  // Get isCameraFocused from Zustand store
-  const isCameraFocused = useCameraStore((state) => state.isCameraFocused)
 
   // Debounced keydown handler
   const { handleKeyDown: debouncedKeyDown, isDebouncing } = useDebounceKeydown({
     delay: 500, // 500ms debounce delay to allow camera transitions to complete
     onKeyDown: (event: KeyboardEvent) => {
       if (event.code === "Escape" && isCameraFocused) {
-        resetCamera()
+        resetCamera(orbitControlsRef, camera, isMobile, meshRefs)
       }
       
       // Add keyboard shortcuts for manual logging
@@ -105,15 +103,15 @@ export function MyRoom() {
   // Pass the ref and camera focus functions
   const { roomConfig, isLoading, hasError } = useRoomData(
     orbitControlsRef, 
-    focusOnScreen, 
-    focusOnScreen001
+    () => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs),
+    () => focusOnScreen001(orbitControlsRef, camera, isMobile)
   )
 
   // Handle ESC key to reset camera
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Escape" && isCameraFocused) {
-        resetCamera()
+        resetCamera(orbitControlsRef, camera, isMobile, meshRefs)
       }
       
       // Add keyboard shortcuts for manual logging
@@ -170,7 +168,7 @@ export function MyRoom() {
       <group dispose={null}>
         <group name="Scene">
           <RenderComponents 
-            focusOnScreen={focusOnScreen} 
+            focusOnScreen={() => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)}
             onMeshRef={handleMeshRef}
           />
           {/* Optimized iframe with conditional rendering */}

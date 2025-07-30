@@ -1,4 +1,4 @@
-import { StaticMesh } from "../Mesh/StaticMesh"
+import { StaticMesh } from "@/components/Mesh/StaticMesh"
 import { useRoomUtils } from "@/hooks/use-room-utils"
 
 export const RenderStaticMeshes = () => {

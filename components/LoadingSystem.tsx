@@ -409,7 +409,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   const messages = useMemo(() => ({
     ...defaultMessages,
     ...customMessages
-  }), [customMessages]);
+  }), [customMessages, defaultMessages]);
 
   // Handle loading phases based on actual progress
   useEffect(() => {

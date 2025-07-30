@@ -128,7 +128,7 @@ export function MyRoom() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isCameraFocused, resetCamera])
+  }, [isCameraFocused, resetCamera, camera, isMobile])
 
   if (hasError) {
     console.error("Error loading room data:", hasError)

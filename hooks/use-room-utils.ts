@@ -9,7 +9,7 @@ import { useGLTF } from "@react-three/drei"
 import { useLoadingManagerContext } from "@/components/LoadingSystem"
 
 export const useRoomUtils = (
-  orbitControlsRef: React.RefObject<{ 
+  orbitControlsRef?: React.RefObject<{ 
     target: { x: number; y: number; z: number },
     enabled: boolean,
     minDistance: number,
@@ -19,9 +19,12 @@ export const useRoomUtils = (
     minAzimuthAngle: number,
     maxAzimuthAngle: number
   } | null>,
-  focusOnScreen: () => void
+  focusOnScreen?: () => void
 ) => {
-  const { meshConfigs, materialPaths, roomConfig, isLoading } = useRoomData(orbitControlsRef, focusOnScreen)
+  const { meshConfigs, materialPaths, roomConfig, isLoading } = useRoomData(
+    orbitControlsRef || { current: null } as React.RefObject<{ target: { x: number; y: number; z: number } } | null>, 
+    focusOnScreen || (() => {})
+  )
   
   // Loading manager
   const manager = useLoadingManagerContext()

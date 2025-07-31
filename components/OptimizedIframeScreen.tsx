@@ -1,5 +1,6 @@
 import { Html } from "@react-three/drei"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { useIframePerformance } from "@/hooks/use-iframe-performance"
 
 interface OptimizedIframeScreenProps {
   src: string
@@ -7,7 +8,7 @@ interface OptimizedIframeScreenProps {
   rotation: [number, number, number]
   isVisible?: boolean
   onLoad?: () => void
-  isMobile?: boolean // Add mobile prop
+  isMobile?: boolean
 }
 
 export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({ 
@@ -18,8 +19,25 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   onLoad,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true) // Start loading immediately
   const [hasError, setHasError] = useState(false)
+  const [shouldLoad, setShouldLoad] = useState(true) // Always load immediately
+  
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Performance monitoring hook
+  const {
+    metrics,
+    startLoading,
+    handleLoadSuccess,
+    handleLoadError,
+    retry
+  } = useIframePerformance({
+    maxRetries: 3,
+    timeoutMs: 10000,
+    enableLogging: true
+  })
 
   const isIOSDevice = () => {
     if (typeof window === 'undefined') return false
@@ -30,20 +48,39 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   // Reset states when src changes
   useEffect(() => {
     setIsLoaded(false)
-    setIsLoading(true)
+    setIsLoading(true) // Start loading immediately
     setHasError(false)
+    setShouldLoad(true) // Always load immediately
   }, [src])
 
-  const handleIframeLoad = () => {
+  // Start loading immediately when component mounts
+  useEffect(() => {
+    if (shouldLoad && !isLoaded && !hasError) {
+      setIsLoading(true)
+      startLoading()
+    }
+  }, [shouldLoad, isLoaded, hasError, startLoading])
+
+  const handleIframeLoad = useCallback(() => {
     setIsLoaded(true)
     setIsLoading(false)
+    handleLoadSuccess()
     onLoad?.()
-  }
+  }, [handleLoadSuccess, onLoad])
 
-  const handleIframeError = () => {
+  const handleIframeError = useCallback(() => {
     setHasError(true)
     setIsLoading(false)
-  }
+    handleLoadError()
+  }, [handleLoadError])
+
+  // Start loading when shouldLoad becomes true
+  useEffect(() => {
+    if (shouldLoad && !isLoaded && !isLoading && !hasError) {
+      setIsLoading(true)
+      startLoading()
+    }
+  }, [shouldLoad, isLoaded, isLoading, hasError, startLoading])
 
   // Don't render if not visible
   if (!isVisible) {
@@ -52,7 +89,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
 
   // Responsive container styles
   const containerStyle = {
-    width: "1380px" ,
+    width: "1380px",
     height: "724px",
     position: 'relative' as const,
     backgroundColor: '#000',
@@ -83,9 +120,9 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
       wrapperClass="htmlScreen1"
       zIndexRange={[10, 0]}
     >
-      <div style={containerStyle}>
+      <div ref={containerRef} style={containerStyle}>
         {/* Loading Placeholder */}
-        {isLoading && (
+        {(!shouldLoad || isLoading) && (
           <div style={{
             position: 'absolute',
             top: 0,
@@ -111,7 +148,12 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
                 animation: 'spin 1s linear infinite',
                 margin: '0 auto 10px',
               }} />
-              <p>Loading Website...</p>
+              <p>{!shouldLoad ? 'Waiting to load...' : 'Loading Website...'}</p>
+              {metrics.loadDuration && (
+                <p style={{ fontSize: '12px', opacity: 0.7, marginTop: '5px' }}>
+                  Loaded in {Math.round(metrics.loadDuration)}ms
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -148,20 +190,40 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
               >
                 Open in New Tab
               </button>
+              {metrics.retryCount < 3 && (
+                <button 
+                  onClick={() => retry()}
+                  style={{
+                    marginTop: '10px',
+                    marginLeft: '10px',
+                    padding: '8px 16px',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Retry
+                </button>
+              )}
             </div>
           </div>
         )}
 
-        {/* Iframe */}
-        <iframe 
-          src={src}
-          style={iframeStyle}
-          title="Lofi Website"
-          loading="lazy"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
-          onLoad={handleIframeLoad}
-          onError={handleIframeError}
-        />
+        {/* Iframe - Only render when shouldLoad is true */}
+        {shouldLoad && (
+          <iframe 
+            ref={iframeRef}
+            src={src}
+            style={iframeStyle}
+            title="Lofi Website"
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+            onLoad={handleIframeLoad}
+            onError={handleIframeError}
+          />
+        )}
       </div>
 
       {/* Optimized CSS - IMMEDIATE iOS transform */}

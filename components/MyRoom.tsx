@@ -169,7 +169,7 @@ export function MyRoom() {
             focusOnScreen={() => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)}
             onMeshRef={handleMeshRef}
           />
-          {/* Optimized iframe with conditional rendering */}
+          {/* Optimized iframe with immediate loading */}
           <OptimizedIframeScreen 
             src="https://vandangnhathung.github.io/lofi-ver-2/"
             position={[5.287, 6.189, -0.05]}

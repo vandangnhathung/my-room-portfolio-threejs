@@ -6,6 +6,7 @@ import { Experience } from '@/components/Experience'
 import { HoverMessage } from '@/components/HoverMessage'
 import { useMessageState } from '@/stores/useHoverStore'
 import { useCameraStore } from '@/stores/useCameraStore'
+import { IframePreloader } from '@/components/IframePreloader'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
@@ -17,6 +18,12 @@ export default function HomePage() {
 
   return (
     <main style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      {/* Iframe preloader for performance optimization - outside Three.js scene */}
+      <IframePreloader 
+        src="https://vandangnhathung.github.io/lofi-ver-2/"
+        onPreloadComplete={() => console.log('Iframe preloaded successfully!')}
+      />
+      
       <LoadingSystem
         onComplete={handleLoadingComplete}
         theme="cozy">

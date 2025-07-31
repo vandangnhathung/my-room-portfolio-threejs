@@ -92,18 +92,5 @@ export const meshInfoDatabase: Record<string, MeshInfo> = {
       category: 'Office',
       interactionHint: 'Click to organize'
     },
-    'inside_screen_popup': {
-      name: 'inside_screen_popup',
-      displayName: 'Screen',
-      description: 'A screen for displaying content',
-      category: 'Electronics',
-      interactionHint: 'Click to turn on/off'
-    },  
-    'inside_screen001_popup': {
-      name: 'inside_screen001_popup',
-      displayName: 'Screen',
-      description: 'A screen for displaying content',
-      category: 'Electronics',
-      interactionHint: 'Click to turn on/off'
-    }
+   
   }

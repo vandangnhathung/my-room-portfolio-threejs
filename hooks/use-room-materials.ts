@@ -10,6 +10,7 @@ interface MaterialPaths {
   screenChair?: string
   fifthTextureSet?: string
   window?: string
+  world?: string
 }
 
 export const useRoomMaterials = (materialPaths: MaterialPaths) => {
@@ -69,5 +70,14 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
     generateMipmaps: false
   })
 
-  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial }
+  const worldMaterial = useOptimizedTexture({
+    path: materialPaths?.world || '/textures/room/World.webp',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
+  return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial,
+     plantMaterial, devicesOnTableMaterial, screenChairMaterial,
+      fifthTextureSetMaterial, windowMaterial, worldMaterial }
 } 

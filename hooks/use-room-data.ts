@@ -56,7 +56,8 @@ const loadMaterialTextures = async () => ({
   fixedObject: '/textures/room/FixedObjectSet.webp',
   raycasterObject: '/textures/room/RaycasterObjectSet.webp',
   plant: '/textures/room/Plant.jpg',
-  devicesOnTable: '/textures/room/devices_on_table.jpg'
+  devicesOnTable: '/textures/room/devices_on_table.jpg',
+  world: '/textures/room/World.webp'
 })
 
 const getRoomConfiguration = async () => ({
@@ -64,7 +65,7 @@ const getRoomConfiguration = async () => ({
   cameraConfig: {
     target: [4.149959777666874, 7.647045028235788, 1.2788151669711065] as [number, number, number],
     minDistance: 4,
-    maxDistance: 40,
+    maxDistance: 38,
     minPolarAngle: 0,
     maxPolarAngle: Math.PI / 2,
     minAzimuthAngle: Math.PI * -1,

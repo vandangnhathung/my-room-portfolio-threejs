@@ -172,7 +172,7 @@ export function MyRoom() {
           {/* Optimized iframe with immediate loading */}
           <OptimizedIframeScreen 
             src="https://vandangnhathung.github.io/lofi-ver-2/"
-            position={[5.287, 6.189, -0.05]}
+            position={[5.287, 6.719, -0.05]}
             rotation={[192 * (Math.PI / 180), 73 * (Math.PI / 180), -11.5 * (Math.PI / 180)]}
             onLoad={() => console.log('Lofi website loaded successfully!')}
           />

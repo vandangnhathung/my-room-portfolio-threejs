@@ -16,13 +16,13 @@ export const cameraFocusPositions = {
      screenFocused: {
        camera: {
          // Position camera in front and slightly to the side of screen for good viewing angle
-         desktop: [3.0, 6, 0.72] as [number, number, number],
-         mobile: [-1.5, 6.5, 1.5] as [number, number, number], // Same as desktop
+         desktop: [3.0, 6.5, 0.72] as [number, number, number],
+         mobile: [-1.5, 7, 1.5] as [number, number, number], // Same as desktop
        },
        target: {
          // Target the actual screen position
-         desktop: [7.269509471470827, 6.2971078318642945, -0.6732945365055517] as [number, number, number],
-         mobile: [7.269509471470827, 6.2971078318642945, -0.6732945365055517] as [number, number, number], // Same as desktop
+         desktop: [7.269509471470827, 6.8271078318642945, -0.6732945365055517] as [number, number, number],
+         mobile: [7.269509471470827, 6.8271078318642945, -0.6732945365055517] as [number, number, number], // Same as desktop
        }
      },
      

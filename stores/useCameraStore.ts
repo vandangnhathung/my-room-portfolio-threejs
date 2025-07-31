@@ -34,11 +34,15 @@ interface CameraStore {
   setIsCameraFocused: (focused: boolean) => void
   focusOnScreen: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean, meshRefs?: MeshRefs) => void
   focusOnCertificate: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean) => void
-  resetCamera: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean, meshRefs?: MeshRefs) => void
+  resetCamera: (shouldReset: boolean) => void
 }
 
 export const useCameraStore = create<CameraStore>((set, get) => {
   let originalConstraintsRef: ConstraintsState | null = null
+  let storedOrbitControlsRef: OrbitControlsRef | null = null
+  let cameraRef: THREE.Camera | null = null
+  let isMobileRef: boolean = false
+  let meshRefsRef: MeshRefs | null = null
 
   const storeOriginalConstraints = (orbitControlsRef: OrbitControlsRef) => {
     if (orbitControlsRef.current && !originalConstraintsRef) {
@@ -78,8 +82,15 @@ export const useCameraStore = create<CameraStore>((set, get) => {
   return {
     isCameraFocused: false,
     setIsCameraFocused: (focused: boolean) => set({ isCameraFocused: focused }),
-    focusOnScreen: (orbitControlsRef, camera, isMobile) => {
+    
+    focusOnScreen: (orbitControlsRef, camera, isMobile, meshRefs) => {
       if (get().isCameraFocused || !orbitControlsRef.current) return
+
+      // Store references for resetCamera
+      storedOrbitControlsRef = orbitControlsRef
+      cameraRef = camera
+      isMobileRef = isMobile
+      meshRefsRef = meshRefs || null
 
       storeOriginalConstraints(orbitControlsRef)
       removeConstraints(orbitControlsRef)
@@ -109,6 +120,11 @@ export const useCameraStore = create<CameraStore>((set, get) => {
 
     focusOnCertificate: (orbitControlsRef, camera, isMobile) => {
       if (get().isCameraFocused || !orbitControlsRef.current) return
+
+      // Store references for resetCamera
+      storedOrbitControlsRef = orbitControlsRef
+      cameraRef = camera
+      isMobileRef = isMobile
 
       storeOriginalConstraints(orbitControlsRef)
       removeConstraints(orbitControlsRef)
@@ -142,11 +158,11 @@ export const useCameraStore = create<CameraStore>((set, get) => {
       }, "-=1")
     },
 
-    resetCamera: (orbitControlsRef, camera, isMobile, meshRefs) => {
-      if (!orbitControlsRef.current) return
+    resetCamera: (shouldReset: boolean) => {
+      if (!shouldReset || !storedOrbitControlsRef?.current || !cameraRef) return
 
       // Show chair BEFORE animation starts
-      const chairRef = meshRefs?.current.get('Executive_office_chair_raycaster')
+      const chairRef = meshRefsRef?.current.get('Executive_office_chair_raycaster')
       if (chairRef?.current) {
         chairRef.current.visible = true
       }
@@ -157,23 +173,23 @@ export const useCameraStore = create<CameraStore>((set, get) => {
       const tl = gsap.timeline({ 
         ease: "power3.inOut",
         onComplete: () => {
-          restoreConstraints(orbitControlsRef)
+          restoreConstraints(storedOrbitControlsRef!)
           originalConstraintsRef = null
         }
       })
 
-      const targetPos = isMobile 
+      const targetPos = isMobileRef 
         ? cameraFocusPositions.initialTarget.mobile 
         : cameraFocusPositions.initialTarget.desktop
       
-      const cameraPos = isMobile 
+      const cameraPos = isMobileRef 
         ? cameraFocusPositions.initial.mobile 
         : cameraFocusPositions.initial.desktop
 
-      tl.to(orbitControlsRef.current.target, {
+      tl.to(storedOrbitControlsRef.current.target, {
         x: targetPos[0], y: targetPos[1], z: targetPos[2], duration: 1.4,
       })
-      .to(camera.position, {
+      .to(cameraRef.position, {
         x: cameraPos[0], y: cameraPos[1], z: cameraPos[2], duration: 1.4,
       }, "-=1.4")
     },

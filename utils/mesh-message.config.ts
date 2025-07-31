@@ -36,13 +36,6 @@ export const meshInfoDatabase: Record<string, MeshInfo> = {
       category: 'Musical Instrument',
       interactionHint: 'Click to play a chord'
     },
-    'screen_raycaster': {
-      name: 'screen_raycaster',
-      displayName: 'Computer Monitor',
-      description: 'A modern computer monitor for work and entertainment',
-      category: 'Electronics',
-      interactionHint: 'Click to turn on/off'
-    },
     'screen001_raycaster': {
       name: 'screen001_raycaster',
       displayName: 'Secondary Monitor',

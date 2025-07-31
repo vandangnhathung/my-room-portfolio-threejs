@@ -5,11 +5,12 @@ import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
 import { HoverMessage } from '@/components/HoverMessage'
 import { useMessageState } from '@/stores/useHoverStore'
+import { useCameraStore } from '@/stores/useCameraStore'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
   const messageState = useMessageState()
-  
+  const { isCameraFocused, resetCamera } = useCameraStore()
   const handleLoadingComplete = () => {
     setShowUI(true)
   }
@@ -22,14 +23,17 @@ export default function HomePage() {
         <Experience />
       </LoadingSystem>
 
-      <button className='absolute top-3 left-1/2 -translate-x-1/2 bg-white/50 text-black px-4 py-2 rounded-lg text-sm backdrop-blur-sm z-50 animate-fade-in-up'
-        onClick={() => {
-          window.open('https://www.google.com', '_blank')
-        }}
-      >
-        Open in new tab
-      </button>
-      
+      {isCameraFocused && (
+          <button className='absolute top-3 left-3 bg-primary
+           text-white px-4 py-2 rounded-lg !opacity-100 text-sm z-50 animate-fade-in-up
+           hover:bg-white hover:text-primary transition-all duration-300 cursor-pointer'
+              onClick={() => {
+              resetCamera(true)
+              }}
+            >
+              Go back
+            </button>
+        )}
       {showUI && (
         <>
           <div className="absolute inset-0 pointer-events-none">

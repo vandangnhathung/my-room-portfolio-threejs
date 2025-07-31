@@ -77,7 +77,7 @@ export function MyRoom() {
     delay: 500, // 500ms debounce delay to allow camera transitions to complete
     onKeyDown: (event: KeyboardEvent) => {
       if (event.code === "Escape" && isCameraFocused) {
-        resetCamera(orbitControlsRef, camera, isMobile, meshRefs)
+        resetCamera(true)
       }
       
       // Add keyboard shortcuts for manual logging
@@ -109,7 +109,7 @@ export function MyRoom() {
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Escape" && isCameraFocused) {
-        resetCamera(orbitControlsRef, camera, isMobile, meshRefs)
+        resetCamera(true)
       }
       
       // Add keyboard shortcuts for manual logging
@@ -126,7 +126,7 @@ export function MyRoom() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isCameraFocused, resetCamera, camera, isMobile])
+  }, [isCameraFocused, resetCamera])
 
   if (hasError) {
     console.error("Error loading room data:", hasError)

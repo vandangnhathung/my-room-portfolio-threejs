@@ -21,6 +21,12 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
+  const isIOSDevice = () => {
+    if (typeof window === 'undefined') return false
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  }
+
   // Reset states when src changes
   useEffect(() => {
     setIsLoaded(false)
@@ -54,28 +60,27 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
     maxHeight: '100%',
   }
 
-  // Responsive iframe styles
+  // Responsive iframe styles with IMMEDIATE iOS transform
   const iframeStyle = {
     width: '100%',
     height: '100%',
     border: 'none',
     backgroundColor: '#000',
+    // Desktop transform only - iOS handled by CSS
     transform: 'scaleY(-1)',
     opacity: isLoaded ? 1 : 0,
     transition: 'opacity 0.3s ease-in-out',
-    // iOS Safari specific fixes
     WebkitTransform: 'scaleY(-1)',
-    WebkitOverflowScrolling: 'touch' as const,
   }
 
   return (
     <Html
       transform
-      distanceFactor={0.97} // Adjust for mobile
+      distanceFactor={0.97}
       position={position}
       rotation={rotation}
       occlude="blending"
-      wrapperClass="htmlScreen"
+      wrapperClass="htmlScreen1"
       zIndexRange={[10, 0]}
     >
       <div style={containerStyle}>
@@ -94,7 +99,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
             color: '#ffffff',
             fontSize: '18px',
             zIndex: 1,
-            transform: 'scaleY(-1)'
+            transform: isIOSDevice() ? 'translateY(30%) scaleY(-1)' : 'scaleY(-1)'
           }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ 
@@ -159,44 +164,27 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
         />
       </div>
 
-      {/* CSS for loading animation and mobile fixes */}
+      {/* Optimized CSS - IMMEDIATE iOS transform */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
         
-        /* iOS Safari specific fixes */
+        /* IMMEDIATE iOS transform application */
         @supports (-webkit-touch-callout: none) {
-          .htmlScreen {
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow: hidden !important;
+          .htmlScreen1 {
+            position: fixed !important;
+            top:-10%!important;
           }
-          
-          .htmlScreen iframe {
+
+          .htmlScreen1 iframe {
+            position: relative !important;
             width: 100% !important;
             height: 100% !important;
             -webkit-transform: scaleY(-1) !important;
             transform: scaleY(-1) !important;
             -webkit-overflow-scrolling: touch !important;
-          }
-        }
-        
-        /* Mobile-specific styles */
-        @media (max-width: 768px) {
-          .htmlScreen {
-            width: 100vw !important;
-            height: 100vh !important;
-            max-width: 100% !important;
-            max-height: 100% !important;
-          }
-          
-          .htmlScreen iframe {
-            width: 100% !important;
-            height: 100% !important;
-            -webkit-transform: scaleY(-1) !important;
-            transform: scaleY(-1) !important;
           }
         }
       `}</style>

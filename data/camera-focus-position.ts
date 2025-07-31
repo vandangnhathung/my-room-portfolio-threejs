@@ -17,7 +17,7 @@ export const cameraFocusPositions = {
        camera: {
          // Position camera in front and slightly to the side of screen for good viewing angle
          desktop: [3.0, 6, 0.72] as [number, number, number],
-         mobile: [0.5, 6.5, 1.5] as [number, number, number], // Same as desktop
+         mobile: [-1.5, 6.5, 1.5] as [number, number, number], // Same as desktop
        },
        target: {
          // Target the actual screen position

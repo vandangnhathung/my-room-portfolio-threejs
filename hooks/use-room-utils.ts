@@ -1,20 +1,27 @@
-import { useRoomMaterials } from "@/hooks/use-room-materials"
+import { useRoomData } from './use-room-data'
+import { useRoomMaterials } from './use-room-materials'
 import { useVideoMaterials } from "@/hooks/videos/use-video-materials"
 import { useLoadingTexture } from "@/hooks/use-loading-texture"
 import * as THREE from "three"
-import { useCallback, useMemo, RefObject } from "react"
-import { useRoomData } from "@/hooks/use-room-data"
+import { useCallback, useMemo } from "react"
 import { GLTFResult } from "@/types/type"
 import { useGLTF } from "@react-three/drei"
 import { useLoadingManagerContext } from "@/components/LoadingSystem"
 
 export const useRoomUtils = (
-  orbitControlsRef?: RefObject<{ target: { x: number; y: number; z: number } } | null>,
-  focusOnScreen?: () => void,
-  focusOnScreen001?: () => void
+  orbitControlsRef: React.RefObject<{ 
+    target: { x: number; y: number; z: number },
+    enabled: boolean,
+    minDistance: number,
+    maxDistance: number,
+    minPolarAngle: number,
+    maxPolarAngle: number,
+    minAzimuthAngle: number,
+    maxAzimuthAngle: number
+  } | null>,
+  focusOnScreen: () => void
 ) => {
-  // Data fetching
-  const { meshConfigs, materialPaths, roomConfig, isLoading } = useRoomData(orbitControlsRef || { current: null }, focusOnScreen, focusOnScreen001)
+  const { meshConfigs, materialPaths, roomConfig, isLoading } = useRoomData(orbitControlsRef, focusOnScreen)
   
   // Loading manager
   const manager = useLoadingManagerContext()

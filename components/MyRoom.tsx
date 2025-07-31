@@ -65,7 +65,6 @@ export function MyRoom() {
   const { 
     isCameraFocused, 
     focusOnScreen, 
-    focusOnScreen001, 
     resetCamera 
   } = useCameraStore()
 
@@ -103,8 +102,7 @@ export function MyRoom() {
   // Pass the ref and camera focus functions
   const { roomConfig, isLoading, hasError } = useRoomData(
     orbitControlsRef, 
-    () => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs),
-    () => focusOnScreen001(orbitControlsRef, camera, isMobile)
+    () => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)
   )
 
   // Handle ESC key to reset camera

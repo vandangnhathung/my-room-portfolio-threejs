@@ -21,6 +21,14 @@ export default function HomePage() {
         theme="cozy">
         <Experience />
       </LoadingSystem>
+
+      <button className='absolute top-3 left-1/2 -translate-x-1/2 bg-white/50 text-black px-4 py-2 rounded-lg text-sm backdrop-blur-sm z-50 animate-fade-in-up'
+        onClick={() => {
+          window.open('https://www.google.com', '_blank')
+        }}
+      >
+        Open in new tab
+      </button>
       
       {showUI && (
         <>

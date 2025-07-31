@@ -29,15 +29,15 @@ interface ConstraintsState {
   maxAzimuthAngle: number
 }
 
-interface CameraState {
+interface CameraStore {
   isCameraFocused: boolean
   setIsCameraFocused: (focused: boolean) => void
   focusOnScreen: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean, meshRefs?: MeshRefs) => void
-  focusOnScreen001: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean) => void
+  focusOnCertificate: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean) => void
   resetCamera: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean, meshRefs?: MeshRefs) => void
 }
 
-export const useCameraStore = create<CameraState>((set, get) => {
+export const useCameraStore = create<CameraStore>((set, get) => {
   let originalConstraintsRef: ConstraintsState | null = null
 
   const storeOriginalConstraints = (orbitControlsRef: OrbitControlsRef) => {
@@ -107,7 +107,7 @@ export const useCameraStore = create<CameraState>((set, get) => {
       }, "-=1")
     },
 
-    focusOnScreen001: (orbitControlsRef, camera, isMobile) => {
+    focusOnCertificate: (orbitControlsRef, camera, isMobile) => {
       if (get().isCameraFocused || !orbitControlsRef.current) return
 
       storeOriginalConstraints(orbitControlsRef)
@@ -129,10 +129,16 @@ export const useCameraStore = create<CameraState>((set, get) => {
         : cameraFocusPositions.screen001Focused.camera.desktop
 
       tl.to(orbitControlsRef.current.target, {
-        x: targetPos[0], y: targetPos[1], z: targetPos[2], duration: 1,
+        x: targetPos[0],
+        y: targetPos[1],
+        z: targetPos[2],
+        duration: 1,
       })
       .to(camera.position, {
-        x: cameraPos[0], y: cameraPos[1], z: cameraPos[2], duration: 1,
+        x: cameraPos[0],
+        y: cameraPos[1],
+        z: cameraPos[2],
+        duration: 1,
       }, "-=1")
     },
 

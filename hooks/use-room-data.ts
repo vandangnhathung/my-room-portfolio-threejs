@@ -12,8 +12,7 @@ const QUERY_KEYS = {
 const createMeshClickHandlers = (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
   meshName: string,
-  focusOnScreen?: () => void,
-  focusOnScreen001?: () => void
+  focusOnScreen?: () => void
 ) => {
   const handlers: Record<string, () => void> = {
     'Executive_office_chair_raycaster001': () => {
@@ -33,7 +32,7 @@ const createMeshClickHandlers = (
       const currentTarget = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
       console.log('Screen001 clicked!', currentTarget)
       
-      if (focusOnScreen001) focusOnScreen001()
+      // Removed focusOnScreen001 as per edit hint
     }
   }
   
@@ -42,14 +41,13 @@ const createMeshClickHandlers = (
 
 const processMeshConfigs = async (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
-  focusOnScreen?: () => void,
-  focusOnScreen001?: () => void
+  focusOnScreen?: () => void
 ): Promise<MeshConfig[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const processedConfigs = meshConfig.map((config: MeshConfig) => ({
         ...config,
-        onClick: createMeshClickHandlers(orbitControlsRef, config.name, focusOnScreen, focusOnScreen001)
+        onClick: createMeshClickHandlers(orbitControlsRef, config.name, focusOnScreen)
       }))
       resolve(processedConfigs)
     }, 0)
@@ -79,12 +77,11 @@ const getRoomConfiguration = async () => ({
 
 export const useRoomData = (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
-  focusOnScreen?: () => void,
-  focusOnScreen001?: () => void
+  focusOnScreen?: () => void
 ) => {
   const meshConfigsQuery = useQuery({
     queryKey: QUERY_KEYS.MESH_CONFIGS,
-    queryFn: () => processMeshConfigs(orbitControlsRef, focusOnScreen, focusOnScreen001),
+    queryFn: () => processMeshConfigs(orbitControlsRef, focusOnScreen),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   })

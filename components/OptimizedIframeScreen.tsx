@@ -8,6 +8,7 @@ interface OptimizedIframeScreenProps {
   isVisible?: boolean
   onLoad?: () => void
   isMobile?: boolean
+  isCameraFocused?: boolean
 }
 
 export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({ 
@@ -16,6 +17,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   rotation, 
   isVisible = true,
   onLoad,
+  isCameraFocused = false,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true) // Start loading immediately
@@ -72,6 +74,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
     // Desktop transform only - iOS handled by CSS
     transform: 'scaleY(-1)',
     opacity: isLoaded ? 1 : 0,
+    pointerEvents: isCameraFocused ? 'auto' as const : 'none' as const,
     transition: 'opacity 0.3s ease-in-out',
     WebkitTransform: 'scaleY(-1)',
   }

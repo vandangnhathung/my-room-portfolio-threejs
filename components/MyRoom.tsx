@@ -175,6 +175,7 @@ export function MyRoom() {
             position={[5.287, 6.719, -0.05]}
             rotation={[192 * (Math.PI / 180), 73 * (Math.PI / 180), -11.5 * (Math.PI / 180)]}
             onLoad={() => console.log('Lofi website loaded successfully!')}
+            isCameraFocused={isCameraFocused}
           />
         </group>
         {/* Axes Helper at iframe position */}

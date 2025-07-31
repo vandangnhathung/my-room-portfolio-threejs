@@ -411,7 +411,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
     ...customMessages
   }), [customMessages, defaultMessages]);
 
-  // Handle loading phases based on actual progress
+  // Fast loading - complete quickly
   useEffect(() => {
     if (loadingState.progress === 0 && !loadingState.isLoading) {
       setLoadingPhase('initializing');
@@ -421,7 +421,8 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       setLoadingPhase('loading');
       setLoadingText(messages.loading);
       setIsEnterEnabled(false);
-    } else if (loadingState.progress === 100 && !loadingState.isLoading) {
+    } else if (loadingState.progress >= 50 || !loadingState.isLoading) {
+      // Complete loading much faster - at 50% progress
       setLoadingPhase('ready');
       setLoadingText(messages.ready);
       setIsEnterEnabled(true);

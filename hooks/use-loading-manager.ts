@@ -83,25 +83,20 @@ export function useLoadingManager(): LoadingManagerHook {
     manager.onProgress = (url: string, itemsLoaded: number, itemsTotal: number) => {
       const progress = itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
       
-      console.log(`📈 Loading progress: ${url}`)
-      console.log(`📊 Progress: ${itemsLoaded}/${itemsTotal} (${Math.round(progress)}%)`)
-      
-      // Throttle progress updates to avoid too many state updates
-      setTimeout(() => {
-        setState(prev => {
-          // Only update if progress has actually changed significantly
-          if (Math.abs(prev.progress - progress) > 5) {
-            return {
-              ...prev,
-              currentUrl: url,
-              loaded: itemsLoaded,
-              total: itemsTotal,
-              progress
-            }
+      // Fast progress updates - no throttling
+      setState(prev => {
+        // Update more frequently for better UX
+        if (Math.abs(prev.progress - progress) > 2) {
+          return {
+            ...prev,
+            currentUrl: url,
+            loaded: itemsLoaded,
+            total: itemsTotal,
+            progress
           }
-          return prev
-        })
-      }, 0)
+        }
+        return prev
+      })
     }
 
     manager.onError = (url: string) => {

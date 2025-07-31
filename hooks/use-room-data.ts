@@ -43,15 +43,12 @@ const processMeshConfigs = async (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
   focusOnScreen?: () => void
 ): Promise<MeshConfig[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const processedConfigs = meshConfig.map((config: MeshConfig) => ({
-        ...config,
-        onClick: createMeshClickHandlers(orbitControlsRef, config.name, focusOnScreen)
-      }))
-      resolve(processedConfigs)
-    }, 0)
-  })
+  // Remove artificial delay for faster loading
+  const processedConfigs = meshConfig.map((config: MeshConfig) => ({
+    ...config,
+    onClick: createMeshClickHandlers(orbitControlsRef, config.name, focusOnScreen)
+  }))
+  return processedConfigs
 }
 
 const loadMaterialTextures = async () => ({

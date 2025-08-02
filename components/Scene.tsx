@@ -67,7 +67,8 @@ const Scene = ({ orbitControlsRef, pointerRef, disablePointerRef }: SceneProps) 
 
           const targetRotation = pointerRef.current.x * Math.PI * 0.25
         
-          groupRotationRef.current = THREE.MathUtils.lerp(groupRotationRef.current, targetRotation, 0.1)
+          // CAUTION: > 0.025 causing lag with the iframe
+          groupRotationRef.current = THREE.MathUtils.lerp(groupRotationRef.current, targetRotation, 0.02)
 
           if (groupRef.current) {
                groupRef.current.rotation.y = groupRotationRef.current

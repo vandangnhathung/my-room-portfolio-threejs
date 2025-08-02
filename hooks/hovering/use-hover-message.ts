@@ -1,4 +1,3 @@
-// ===== FILE: hooks/use-hover-message.ts (REPLACE EXISTING) =====
 import { useState, useCallback } from 'react'
 import { ThreeEvent } from '@react-three/fiber'
 import { MeshInfo, meshInfoDatabase } from '@/utils/mesh-message.config'

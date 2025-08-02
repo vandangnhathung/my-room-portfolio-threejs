@@ -1,4 +1,3 @@
-// ===== FILE: hooks/use-hover-state.ts (REPLACE EXISTING) =====
 import { useState, useCallback } from "react"
 import { useHoverMessage } from '@/hooks/hovering/use-hover-message'
 import { ThreeEvent } from '@react-three/fiber'

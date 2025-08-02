@@ -1,4 +1,3 @@
-// ===== FILE: components/mesh/StaticMesh.tsx (REPLACE EXISTING) =====
 'use client'
 
 import * as THREE from "three"

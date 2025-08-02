@@ -1,13 +1,12 @@
 // components/LoadingSystem.tsx
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from 'react';
+import React, { useEffect, useRef, useCallback, useMemo, createContext, useContext } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
 import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import GSAPTimeline from 'gsap';
 
 // Context for sharing LoadingManager
 const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
@@ -393,9 +392,6 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   theme = 'cozy'
 }) => {
   const { manager, state: loadingState, reset } = useLoadingManager();
-  const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>('initializing');
-  const [loadingText, setLoadingText] = useState<string>('');
-  const [isEnterEnabled, setIsEnterEnabled] = useState<boolean>(false);
 
   // Memoize default messages to prevent recreation on every render
   const defaultMessages = useMemo(() => ({
@@ -411,23 +407,26 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
     ...customMessages
   }), [customMessages, defaultMessages]);
 
-  // Fast loading - complete quickly
-  useEffect(() => {
+  // Compute all loading-related values in a single useMemo for better performance
+  const loadingInfo = useMemo(() => {
+    let phase: LoadingPhase;
     if (loadingState.progress === 0 && !loadingState.isLoading) {
-      setLoadingPhase('initializing');
-      setLoadingText(messages.initializing);
-      setIsEnterEnabled(false);
+      phase = 'initializing';
     } else if (loadingState.isLoading && loadingState.progress < 100) {
-      setLoadingPhase('loading');
-      setLoadingText(messages.loading);
-      setIsEnterEnabled(false);
+      phase = 'loading';
     } else if (loadingState.progress >= 50 || !loadingState.isLoading) {
-      // Complete loading much faster - at 50% progress
-      setLoadingPhase('ready');
-      setLoadingText(messages.ready);
-      setIsEnterEnabled(true);
+      phase = 'ready';
+    } else {
+      phase = 'initializing';
     }
+
+    const text = messages[phase as keyof typeof messages] || messages.initializing;
+    const isEnterEnabled = phase === 'ready';
+
+    return { phase, text, isEnterEnabled };
   }, [loadingState.progress, loadingState.isLoading, messages]);
+
+  const { phase: loadingPhase, text: loadingText, isEnterEnabled } = loadingInfo;
 
   const handleLoadingComplete = useCallback(() => {
     onComplete();

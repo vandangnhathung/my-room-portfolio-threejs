@@ -2,7 +2,7 @@
 'use client'
 
 import * as THREE from 'three'
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 
 export interface LoadingManagerState {
   progress: number
@@ -19,25 +19,21 @@ export interface LoadingManagerHook {
   reset: () => void
 }
 
+// Move initial state outside component to prevent recreation on every render
+const initialState: LoadingManagerState = {
+  progress: 0,
+  loaded: 0,
+  total: 0,
+  isLoading: false,
+  currentUrl: '',
+  errors: []
+}
+
 export function useLoadingManager(): LoadingManagerHook {
-  const [state, setState] = useState<LoadingManagerState>({
-    progress: 0,
-    loaded: 0,
-    total: 0,
-    isLoading: false,
-    currentUrl: '',
-    errors: []
-  })
+  const [state, setState] = useState<LoadingManagerState>(initialState)
 
   const reset = useCallback(() => {
-    setState({
-      progress: 0,
-      loaded: 0,
-      total: 0,
-      isLoading: false,
-      currentUrl: '',
-      errors: []
-    })
+    setState(initialState)
   }, [])
 
   // Create manager once with useRef
@@ -102,20 +98,18 @@ export function useLoadingManager(): LoadingManagerHook {
     }))
   }, [])
 
-  // Create manager only once using useEffect
-  useEffect(() => {
-    if (!managerRef.current) {
-      const manager = new THREE.LoadingManager()
-      
-      // Set the stable callbacks
-      manager.onStart = onStart
-      manager.onLoad = onLoad
-      manager.onProgress = onProgress
-      manager.onError = onError
+  // Create manager only once - avoid useEffect completely
+  if (!managerRef.current) {
+    const manager = new THREE.LoadingManager()
+    
+    // Set the stable callbacks
+    manager.onStart = onStart
+    manager.onLoad = onLoad
+    manager.onProgress = onProgress
+    manager.onError = onError
 
-      managerRef.current = manager
-    }
-  }, [onStart, onLoad, onProgress, onError])
+    managerRef.current = manager
+  }
 
   return { 
     manager: managerRef.current!, 

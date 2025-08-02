@@ -79,17 +79,6 @@ export function MyRoom() {
       if (event.code === "Escape" && isCameraFocused) {
         resetCamera(true)
       }
-      
-      // Add keyboard shortcuts for manual logging
-      // if (event.code === "KeyL" && event.ctrlKey) {
-      //   logCurrentValues()
-      // }
-      // if (event.code === "KeyC" && event.ctrlKey) {
-      //   logCameraPosition()
-      // }
-      // if (event.code === "KeyT" && event.ctrlKey) {
-      //   logOrbitTarget()
-      // }
     }
   })
 
@@ -104,29 +93,6 @@ export function MyRoom() {
     orbitControlsRef, 
     () => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)
   )
-
-  // Handle ESC key to reset camera
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === "Escape" && isCameraFocused) {
-        resetCamera(true)
-      }
-      
-      // Add keyboard shortcuts for manual logging
-      // if (event.code === "KeyL" && event.ctrlKey) {
-      //   logCurrentValues()
-      // }
-      // if (event.code === "KeyC" && event.ctrlKey) {
-      //   logCameraPosition()
-      // }
-      // if (event.code === "KeyT" && event.ctrlKey) {
-      //   logOrbitTarget()
-      // }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isCameraFocused, resetCamera])
 
   if (hasError) {
     console.error("Error loading room data:", hasError)

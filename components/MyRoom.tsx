@@ -16,17 +16,27 @@ import { useThree } from "@react-three/fiber"
 // Error boundary for render components
 const RenderComponents = ({
   focusOnScreen, 
-  onMeshRef
+  onMeshRef,
+  disablePointerRef
 }: {
   focusOnScreen: () => void, 
-  onMeshRef: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
+  onMeshRef: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void,
+  disablePointerRef?: React.RefObject<(() => void) | null>
 }) => {
   try {
     return (
       <>
         <RenderInteractiveMeshes onMeshRef={onMeshRef} />
         <RenderStaticMeshes />
-        <PointCursor handleClick={focusOnScreen} />
+        <PointCursor 
+          handleClick={() => {
+            // Disable pointer immediately when clicked
+            if (disablePointerRef?.current) {
+              disablePointerRef.current()
+            }
+            focusOnScreen()
+          }} 
+        />
         {/* <RenderAnimatedMeshes /> */}
       </>
     )
@@ -46,9 +56,10 @@ interface MyRoomProps {
     minAzimuthAngle: number,
     maxAzimuthAngle: number
   } | null>
+  disablePointerRef?: React.RefObject<(() => void) | null>
 }
 
-export function MyRoom({ orbitControlsRef }: MyRoomProps) {
+export function MyRoom({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
   
   const meshRefs = useRef<Map<string, React.RefObject<THREE.Mesh | null>>>(new Map())
   const isMobile = useMediaQuery({ maxWidth: 768 })
@@ -76,6 +87,7 @@ export function MyRoom({ orbitControlsRef }: MyRoomProps) {
           <RenderComponents 
             focusOnScreen={() => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)}
             onMeshRef={handleMeshRef}
+            disablePointerRef={disablePointerRef}
           />
           {/* Optimized iframe with immediate loading */}
           <OptimizedIframeScreen 
@@ -88,8 +100,8 @@ export function MyRoom({ orbitControlsRef }: MyRoomProps) {
         </group>
         {/* Axes Helper at iframe position */}
         <group position={[5.267, 6.165, -0.079]}
-      rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]} // Adjust rotation if needed
-      >
+          rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
+        >
           {/* <primitive object={new AxesHelper(2)} /> */}
         </group>
       </group>

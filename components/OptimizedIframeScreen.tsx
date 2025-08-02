@@ -29,6 +29,9 @@ const styles = {
     backgroundColor: '#000',
     maxWidth: '100%',
     maxHeight: '100%',
+    willChange: 'transform',
+    backfaceVisibility: 'hidden' as const,
+    transformStyle: 'preserve-3d' as const,
   },
   
   iframe: (isLoaded: boolean, isCameraFocused: boolean) => ({
@@ -36,11 +39,15 @@ const styles = {
     height: '100%',
     border: 'none',
     backgroundColor: '#000',
-    transform: 'scaleY(-1)',
+    transform: 'scaleY(-1) translateZ(0)',
     opacity: isLoaded ? 1 : 0,
     pointerEvents: isCameraFocused ? 'auto' as const : 'none' as const,
     transition: 'opacity 0.3s ease-in-out',
-    WebkitTransform: 'scaleY(-1)',
+    WebkitTransform: 'scaleY(-1) translateZ(0)',
+    willChange: 'transform, opacity',
+    backfaceVisibility: 'hidden' as const,
+    WebkitBackfaceVisibility: 'hidden' as const,
+    transformStyle: 'preserve-3d' as const,
   }),
   
   loadingContainer: (isIOSDevice: boolean) => ({
@@ -53,7 +60,7 @@ const styles = {
     display: 'flex' as const,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
-    color: '#ffffff',
+    color: '#ed0000',
     fontSize: '16px',
     zIndex: 1,
     transform: isIOSDevice ? 'translateY(30%) scaleY(-1)' : 'scaleY(-1)'
@@ -201,7 +208,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
       distanceFactor={0.97}
       position={position}
       rotation={rotation}
-      occlude="blending"
+      occlude="raycast"
       wrapperClass="htmlScreen1"
       zIndexRange={[10, 0]}
     >

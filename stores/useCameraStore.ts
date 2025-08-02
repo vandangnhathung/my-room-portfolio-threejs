@@ -35,6 +35,7 @@ interface CameraStore {
   focusOnScreen: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean, meshRefs?: MeshRefs) => void
   focusOnCertificate: (orbitControlsRef: OrbitControlsRef, camera: THREE.Camera, isMobile: boolean) => void
   resetCamera: (shouldReset: boolean) => void
+  setPointerDisableCallback: (callback: (() => void) | null) => void
 }
 
 export const useCameraStore = create<CameraStore>((set, get) => {
@@ -43,6 +44,7 @@ export const useCameraStore = create<CameraStore>((set, get) => {
   let cameraRef: THREE.Camera | null = null
   let isMobileRef: boolean = false
   let meshRefsRef: MeshRefs | null = null
+  let pointerDisableCallback: (() => void) | null = null
 
   const storeOriginalConstraints = (orbitControlsRef: OrbitControlsRef) => {
     if (orbitControlsRef.current && !originalConstraintsRef) {
@@ -85,6 +87,11 @@ export const useCameraStore = create<CameraStore>((set, get) => {
     
     focusOnScreen: (orbitControlsRef, camera, isMobile, meshRefs) => {
       if (get().isCameraFocused || !orbitControlsRef.current) return
+
+      // Disable pointer immediately when focusOnScreen is called
+      if (pointerDisableCallback) {
+        pointerDisableCallback()
+      }
 
       // Store references for resetCamera
       storedOrbitControlsRef = orbitControlsRef
@@ -192,6 +199,10 @@ export const useCameraStore = create<CameraStore>((set, get) => {
       .to(cameraRef.position, {
         x: cameraPos[0], y: cameraPos[1], z: cameraPos[2], duration: 1.4,
       }, "-=1.4")
+    },
+
+    setPointerDisableCallback: (callback: (() => void) | null) => {
+      pointerDisableCallback = callback
     },
   }
 })

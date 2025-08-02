@@ -52,6 +52,7 @@ export const Experience: React.FC = () => {
   )
 
   const pointerRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 })
+  const disablePointerRef = useRef<(() => void) | null>(null)
   
   useEffect(() => {
     const onPointerMove = (e: PointerEvent) => {
@@ -83,8 +84,8 @@ export const Experience: React.FC = () => {
           minAzimuthAngle={roomConfig?.cameraConfig.minAzimuthAngle}
           maxAzimuthAngle={roomConfig?.cameraConfig.maxAzimuthAngle}
           enablePan={isMobile}
-          enableRotate={!isCameraFocused && !isDebouncing}
-          enableZoom={true}
+          enableRotate={isMobile && !isCameraFocused && !isDebouncing} // Only enable on mobile
+          enableZoom={isMobile} // Only enable on mobile
           enableDamping={true}
           dampingFactor={0.1}
           touches={{
@@ -96,7 +97,7 @@ export const Experience: React.FC = () => {
           panSpeed={isMobile ? 0.5 : 1.0}
         />
         
-        <Scene orbitControlsRef={orbitControlsRef} pointerRef={pointerRef} />
+        <Scene orbitControlsRef={orbitControlsRef} pointerRef={pointerRef} disablePointerRef={disablePointerRef} />
       </Suspense>
     </>
   );

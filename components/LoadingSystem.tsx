@@ -397,13 +397,13 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   const [loadingText, setLoadingText] = useState<string>('');
   const [isEnterEnabled, setIsEnterEnabled] = useState<boolean>(false);
 
-  // Default messages
-  const defaultMessages: LoadingMessages = {
+  // Memoize default messages to prevent recreation on every render
+  const defaultMessages = useMemo(() => ({
     initializing: 'Preparing Hung space...',
     loading: 'Loading assets...',
     ready: 'Welcome!',
     entering: 'Entering...'
-  };
+  }), []);
   
   // Memoize the messages object to prevent infinite re-renders
   const messages = useMemo(() => ({

@@ -1,7 +1,7 @@
 'use client'
 
 import { Environment, OrbitControls } from "@react-three/drei";
-import { Suspense, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { TOUCH } from 'three'
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import Scene from "./Scene";
@@ -10,7 +10,6 @@ import { useDebounceKeydown } from '../hooks/use-debounce-keydown'
 import { useMediaQuery } from "react-responsive"
 import { useRoomData } from '../hooks/use-room-data'
 import * as React from "react"
-
 export const Experience: React.FC = () => {
   const orbitControlsRef = useRef<{
     target: { x: number; y: number; z: number },
@@ -52,6 +51,16 @@ export const Experience: React.FC = () => {
     () => {} // Empty function since we don't need focusOnScreen here
   )
 
+  const pointerRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 })
+  
+  useEffect(() => {
+    const onPointerMove = (e: PointerEvent) => {
+      pointerRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
+      pointerRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1
+    }
+    window.addEventListener('pointermove', onPointerMove)
+    return () => window.removeEventListener('pointermove', onPointerMove)
+  })
   return (
     <>
       <Suspense fallback={null}>
@@ -62,7 +71,7 @@ export const Experience: React.FC = () => {
             blur={0.8} 
             environmentIntensity={1.3}
             background={false}
-          />
+        />
           
         <OrbitControls 
           ref={orbitControlsRef as React.RefObject<OrbitControlsImpl>}
@@ -87,7 +96,7 @@ export const Experience: React.FC = () => {
           panSpeed={isMobile ? 0.5 : 1.0}
         />
         
-        <Scene orbitControlsRef={orbitControlsRef} />
+        <Scene orbitControlsRef={orbitControlsRef} pointerRef={pointerRef} />
       </Suspense>
     </>
   );

@@ -15,14 +15,6 @@ import { TOUCH } from 'three' // Add this import
 import { useCameraStore } from '@/stores/useCameraStore'
 import { useThree } from "@react-three/fiber"
 
-// Loading fallback component
-const LoadingFallback = () => (
-  <mesh>
-    <boxGeometry args={[1, 1, 1]} />
-    <meshBasicMaterial color="gray" />
-  </mesh>
-)
-
 // Error boundary for render components
 const RenderComponents = ({
   focusOnScreen, 
@@ -42,7 +34,6 @@ const RenderComponents = ({
     )
   } catch (error) {
     console.error("Error rendering mesh components:", error)
-    return <LoadingFallback />
   }
 }
 
@@ -89,31 +80,23 @@ export function MyRoom() {
   }, [debouncedKeyDown])
 
   // Pass the ref and camera focus functions
-  const { roomConfig, isLoading, hasError } = useRoomData(
+  const { roomConfig } = useRoomData(
     orbitControlsRef, 
     () => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)
   )
 
-  if (hasError) {
-    console.error("Error loading room data:", hasError)
-  }
-
-  if (isLoading || !roomConfig) {
-    return <LoadingFallback />
-  }
-
   /* eslint-disable  @typescript-eslint/no-explicit-any */
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense >
       <OrbitControls 
         ref={orbitControlsRef as any}
-        target={roomConfig.cameraConfig.target}
-        minDistance={roomConfig.cameraConfig.minDistance}
-        maxDistance={roomConfig.cameraConfig.maxDistance}
-        minPolarAngle={roomConfig.cameraConfig.minPolarAngle}
-        maxPolarAngle={roomConfig.cameraConfig.maxPolarAngle}
-        minAzimuthAngle={roomConfig.cameraConfig.minAzimuthAngle}
-        maxAzimuthAngle={roomConfig.cameraConfig.maxAzimuthAngle}
+        target={roomConfig?.cameraConfig.target}
+        minDistance={roomConfig?.cameraConfig.minDistance}
+        maxDistance={roomConfig?.cameraConfig.maxDistance}
+        minPolarAngle={roomConfig?.cameraConfig.minPolarAngle}
+        maxPolarAngle={roomConfig?.cameraConfig.maxPolarAngle}
+        minAzimuthAngle={roomConfig?.cameraConfig.minAzimuthAngle}
+        maxAzimuthAngle={roomConfig?.cameraConfig.maxAzimuthAngle}
         enablePan={isMobile} // Enable panning on mobile
         enableRotate={!isCameraFocused && !isDebouncing}
         enableZoom={true}

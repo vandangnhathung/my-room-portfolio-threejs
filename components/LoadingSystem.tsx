@@ -303,7 +303,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
               color: theme.accentColor,
               marginBottom: '8px'
             }}>
-              {Math.round(loadingState.progress)}% • {loadingState.loaded}/{loadingState.total}
+              {Math.round(loadingState.progress)}%
             </div>
           </div>
 

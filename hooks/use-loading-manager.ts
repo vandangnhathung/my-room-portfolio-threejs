@@ -2,7 +2,7 @@
 'use client'
 
 import * as THREE from 'three'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 export interface LoadingManagerState {
   progress: number
@@ -40,79 +40,86 @@ export function useLoadingManager(): LoadingManagerHook {
     })
   }, [])
 
-  // Create manager once with useRef and define callbacks directly
+  // Create manager once with useRef
   const managerRef = useRef<THREE.LoadingManager | null>(null)
   const isInitialized = useRef(false)
   
-  if (!managerRef.current) {
-    const manager = new THREE.LoadingManager()
+  // Stable callback functions using useCallback
+  const onStart = useCallback((url: string, itemsLoaded: number, itemsTotal: number) => {
+    if (isInitialized.current) return; // Prevent multiple initializations
     
-    // Use setTimeout to avoid calling setState during render
-    manager.onStart = (url: string, itemsLoaded: number, itemsTotal: number) => {
-      if (isInitialized.current) return; // Prevent multiple initializations
-      
-      console.log(`🚀 Loading started: ${url}`)
-      console.log(`📊 Progress: ${itemsLoaded}/${itemsTotal}`)
-      
-      setTimeout(() => {
-        setState(prev => ({
+    console.log(`🚀 Loading started: ${url}`)
+    console.log(`📊 Progress: ${itemsLoaded}/${itemsTotal}`)
+    
+    setState(prev => ({
+      ...prev,
+      isLoading: true,
+      currentUrl: url,
+      loaded: itemsLoaded,
+      total: itemsTotal,
+      progress: itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
+    }))
+  }, [])
+
+  const onLoad = useCallback(() => {
+    console.log('✅ All loading completed!')
+    
+    setState(prev => ({
+      ...prev,
+      isLoading: false,
+      progress: 100,
+      currentUrl: ''
+    }))
+    isInitialized.current = true; // Mark as initialized after first complete load
+  }, [])
+
+  const onProgress = useCallback((url: string, itemsLoaded: number, itemsTotal: number) => {
+    const progress = itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
+    
+    // Throttle progress updates to prevent excessive re-renders
+    setState(prev => {
+      // Only update if progress change is significant (more than 2%)
+      if (Math.abs(prev.progress - progress) > 2) {
+        return {
           ...prev,
-          isLoading: true,
           currentUrl: url,
           loaded: itemsLoaded,
           total: itemsTotal,
-          progress: itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
-        }))
-      }, 0)
-    }
-
-    manager.onLoad = () => {
-      console.log('✅ All loading completed!')
-      
-      setTimeout(() => {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          progress: 100,
-          currentUrl: ''
-        }))
-        isInitialized.current = true; // Mark as initialized after first complete load
-      }, 0)
-    }
-
-    manager.onProgress = (url: string, itemsLoaded: number, itemsTotal: number) => {
-      const progress = itemsTotal > 0 ? (itemsLoaded / itemsTotal) * 100 : 0
-      
-      // Fast progress updates - no throttling
-      setState(prev => {
-        // Update more frequently for better UX
-        if (Math.abs(prev.progress - progress) > 2) {
-          return {
-            ...prev,
-            currentUrl: url,
-            loaded: itemsLoaded,
-            total: itemsTotal,
-            progress
-          }
+          progress
         }
-        return prev
-      })
-    }
+      }
+      return prev
+    })
+  }, [])
 
-    manager.onError = (url: string) => {
-      console.error(`❌ Loading error: ${url}`)
+  const onError = useCallback((url: string) => {
+    console.error(`❌ Loading error: ${url}`)
+    
+    setState(prev => ({
+      ...prev,
+      errors: [...prev.errors, url],
+      currentUrl: url
+    }))
+  }, [])
+
+  // Create manager only once using useEffect
+  useEffect(() => {
+    if (!managerRef.current) {
+      const manager = new THREE.LoadingManager()
       
-      setTimeout(() => {
-        setState(prev => ({
-          ...prev,
-          errors: [...prev.errors, url],
-          currentUrl: url
-        }))
-      }, 0)
+      // Set the stable callbacks
+      manager.onStart = onStart
+      manager.onLoad = onLoad
+      manager.onProgress = onProgress
+      manager.onError = onError
+
+      managerRef.current = manager
     }
+  }, [onStart, onLoad, onProgress, onError])
 
-    managerRef.current = manager
+  return { 
+    manager: managerRef.current!, 
+    state, 
+    reset 
   }
-
-  return { manager: managerRef.current, state, reset }
 } 

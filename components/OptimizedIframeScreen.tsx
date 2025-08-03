@@ -236,6 +236,7 @@ const OptimizedIframeScreenComponent: React.FC<OptimizedIframeScreenProps> = ({
           title="Lofi Website"
           loading="eager"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+          allow="autoplay; encrypted-media; fullscreen; clipboard-write; camera; microphone; geolocation"
           onLoad={handleIframeLoad}
           onError={handleIframeError}
         />

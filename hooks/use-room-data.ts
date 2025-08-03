@@ -12,7 +12,8 @@ const QUERY_KEYS = {
 const createMeshClickHandlers = (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
   meshName: string,
-  focusOnScreen?: () => void
+  focusOnScreen?: () => void,
+  openWoodMeshPopup?: (meshName: string) => void
 ) => {
   const handlers: Record<string, () => void> = {
     'Executive_office_chair_raycaster001': () => {
@@ -25,21 +26,29 @@ const createMeshClickHandlers = (
       const currentTarget = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
       console.log('Screen clicked! orbitControlsTarget...', currentTarget)
       
-      if (focusOnScreen) focusOnScreen()
+      if (focusOnScreen) {
+        focusOnScreen()
+      }
     },
     'inside_screen001_popup': () => {
       const currentTarget = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
       console.log('Screen001 clicked!', currentTarget)
     },
-    // Wood mesh click handlers
+    // Wood mesh click handlers - open popups
     'wood_2': () => {
-      console.log('Wood piece 2 clicked! My work showcase.')
+      if (openWoodMeshPopup) {
+        openWoodMeshPopup('wood_2')
+      }
     },
     'wood_3': () => {
-      console.log('Wood piece 3 clicked! My work showcase.')
+      if (openWoodMeshPopup) {
+        openWoodMeshPopup('wood_3')
+      }
     },
     'wood_4': () => {
-      console.log('Wood piece 4 clicked! My work showcase.')
+      if (openWoodMeshPopup) {
+        openWoodMeshPopup('wood_4')
+      }
     }
   }
   
@@ -48,13 +57,17 @@ const createMeshClickHandlers = (
 
 const processMeshConfigs = async (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
-  focusOnScreen?: () => void
+  focusOnScreen?: () => void,
+  openWoodMeshPopup?: (meshName: string) => void
 ): Promise<MeshConfig[]> => {
   // Remove artificial delay for faster loading
-  const processedConfigs = meshConfig.map((config: MeshConfig) => ({
-    ...config,
-    onClick: createMeshClickHandlers(orbitControlsRef, config.name, focusOnScreen)
-  }))
+  const processedConfigs = meshConfig.map((config: MeshConfig) => {
+    const clickHandler = createMeshClickHandlers(orbitControlsRef, config.name, focusOnScreen, openWoodMeshPopup)
+    return {
+      ...config,
+      onClick: clickHandler
+    }
+  })
   return processedConfigs
 }
 
@@ -82,11 +95,12 @@ const getRoomConfiguration = async () => ({
 
 export const useRoomData = (
   orbitControlsRef: RefObject<{ target: { x: number; y: number; z: number } } | null>,
-  focusOnScreen?: () => void
+  focusOnScreen?: () => void,
+  openWoodMeshPopup?: (meshName: string) => void
 ) => {
   const meshConfigsQuery = useQuery({
-    queryKey: QUERY_KEYS.MESH_CONFIGS,
-    queryFn: () => processMeshConfigs(orbitControlsRef, focusOnScreen),
+    queryKey: [...QUERY_KEYS.MESH_CONFIGS, !!openWoodMeshPopup], // Include function availability in key
+    queryFn: () => processMeshConfigs(orbitControlsRef, focusOnScreen, openWoodMeshPopup),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   })

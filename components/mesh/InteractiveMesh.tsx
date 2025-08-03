@@ -72,6 +72,15 @@ const InteractiveMeshWrapperComponent = ({
   
   const chairRotation = useChairRotation(config.name, 0.7)
   const hoverHandlers = createHoverHandlers(config.name)
+  
+  // Simple cursor configuration for wood meshes
+  const enhancedHoverHandlers = {
+    ...hoverHandlers,
+    style: { 
+      cursor: config.name.includes('wood') ? 'pointer' : hoverHandlers.style.cursor 
+    }
+  }
+  
   const geometry = nodes[config.name as keyof typeof nodes]?.geometry
   const material = getMaterial(config.name, config.material)
 
@@ -85,7 +94,7 @@ const InteractiveMeshWrapperComponent = ({
       geometry={geometry}
       material={material}
       animatedScale={animatedScale as unknown as { scale: number | [number, number, number] }}
-      hoverHandlers={hoverHandlers}
+      hoverHandlers={enhancedHoverHandlers}
       chairRotationRef={isRotatingChair ? chairRotation.meshRef : undefined}
       meshRef={meshRef}
     />

@@ -36,7 +36,12 @@ export const useIframePerformance = (options: UseIframePerformanceOptions = {}) 
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
 
   const logPerformance = useCallback((action: string, data?: Record<string, unknown>) => {
+    // Disable logging by default to prevent console spam
+    // Set enableLogging to true in the hook call if you need debugging
     if (!enableLogging) return
+    
+    // Only log in development mode
+    if (process.env.NODE_ENV !== 'development') return
     
     console.log(`🎯 Iframe Performance - ${action}:`, {
       ...data,

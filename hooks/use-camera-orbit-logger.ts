@@ -1,30 +1,33 @@
 import { useEffect, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
+import { OrbitControls } from 'three-stdlib'
 
-interface CameraOrbitLoggerOptions {
-  logInterval?: number // in milliseconds, default 1000ms
-  enabled?: boolean // whether to enable logging, default true
-  logOnChange?: boolean // log only when values change, default false
+interface UseCameraOrbitLoggerOptions {
+  logInterval?: number
+  enabled?: boolean
+  logOnChange?: boolean
 }
 
+/**
+ * Hook for logging camera and orbit controls data
+ * Useful for debugging camera positions and rotations
+ */
 export const useCameraOrbitLogger = (
-  orbitControlsRef: React.MutableRefObject<{ 
-    target: { x: number; y: number; z: number }
-  } | null>,
-  options: CameraOrbitLoggerOptions = {}
+  orbitControlsRef: React.RefObject<OrbitControls | null>,
+  options: UseCameraOrbitLoggerOptions = {}
 ) => {
   const { camera } = useThree()
   const { 
     logInterval = 1000, 
-    enabled = true, 
-    logOnChange = false 
+    enabled = false, // Disabled by default to prevent console spam
+    logOnChange = true 
   } = options
 
   const lastCameraPos = useRef({ x: 0, y: 0, z: 0 })
   const lastTargetPos = useRef({ x: 0, y: 0, z: 0 })
 
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled) return // Early return if disabled
 
     const logCameraAndTarget = () => {
       const currentCameraPos = {
@@ -35,20 +38,22 @@ export const useCameraOrbitLogger = (
 
       const currentTargetPos = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
 
-      // Only log if values changed (when logOnChange is true)
+      // Only log if positions have changed (when logOnChange is true)
       if (logOnChange) {
-        const cameraChanged = 
-          currentCameraPos.x !== lastCameraPos.current.x ||
-          currentCameraPos.y !== lastCameraPos.current.y ||
-          currentCameraPos.z !== lastCameraPos.current.z
+        const cameraChanged = (
+          Math.abs(currentCameraPos.x - lastCameraPos.current.x) > 0.01 ||
+          Math.abs(currentCameraPos.y - lastCameraPos.current.y) > 0.01 ||
+          Math.abs(currentCameraPos.z - lastCameraPos.current.z) > 0.01
+        )
 
-        const targetChanged = 
-          currentTargetPos.x !== lastTargetPos.current.x ||
-          currentTargetPos.y !== lastTargetPos.current.y ||
-          currentTargetPos.z !== lastTargetPos.current.z
+        const targetChanged = (
+          Math.abs(currentTargetPos.x - lastTargetPos.current.x) > 0.01 ||
+          Math.abs(currentTargetPos.y - lastTargetPos.current.y) > 0.01 ||
+          Math.abs(currentTargetPos.z - lastTargetPos.current.z) > 0.01
+        )
 
         if (!cameraChanged && !targetChanged) {
-          return
+          return // Don't log if nothing changed
         }
       }
 
@@ -67,24 +72,33 @@ export const useCameraOrbitLogger = (
         timestamp: new Date().toISOString()
       }
 
-      console.log('Camera & OrbitControls Data:', logData)
+      // Only log when explicitly enabled for debugging
+      if (enabled) {
+        console.log('Camera & OrbitControls Data:', logData)
+      }
 
       // Update last known positions
       lastCameraPos.current = currentCameraPos
       lastTargetPos.current = currentTargetPos
     }
 
-    // Log initial values
-    logCameraAndTarget()
+    // Log initial values only if enabled
+    if (enabled) {
+      logCameraAndTarget()
+    }
 
-    // Set up interval for continuous logging
-    const interval = setInterval(logCameraAndTarget, logInterval)
+    // Set up interval for continuous logging only if enabled
+    const interval = enabled ? setInterval(logCameraAndTarget, logInterval) : null
 
-    return () => clearInterval(interval)
+    return () => {
+      if (interval) clearInterval(interval)
+    }
   }, [camera, orbitControlsRef, logInterval, enabled, logOnChange])
 
-  // Return functions to manually log current values
+  // Return functions to manually log current values (only when needed for debugging)
   const logCurrentValues = () => {
+    if (!enabled) return
+
     const currentCameraPos = {
       x: camera.position.x,
       y: camera.position.y,
@@ -98,6 +112,8 @@ export const useCameraOrbitLogger = (
   }
 
   const logCameraPosition = () => {
+    if (!enabled) return
+    
     console.log('Camera Position:', {
       x: camera.position.x,
       y: camera.position.y,
@@ -106,13 +122,15 @@ export const useCameraOrbitLogger = (
   }
 
   const logOrbitTarget = () => {
+    if (!enabled) return
+    
     const target = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
     console.log('OrbitControls Target:', target)
   }
 
-  return { 
-    logCurrentValues, 
-    logCameraPosition, 
-    logOrbitTarget 
+  return {
+    logCurrentValues,
+    logCameraPosition,
+    logOrbitTarget
   }
 } 

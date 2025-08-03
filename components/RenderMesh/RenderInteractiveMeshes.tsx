@@ -2,6 +2,7 @@ import { InteractiveMeshWrapper } from "@/components/mesh/InteractiveMesh"
 import { useRoomUtils } from "@/hooks/use-room-utils"
 import { useHoveredMesh, useHoverHandlers } from "@/stores/useHoverStore"
 import { useCameraStore } from "@/stores/useCameraStore"
+import { useWoodMeshPopup } from "@/hooks/use-wood-mesh-popup"
 import * as THREE from "three"
 import React from "react"
 
@@ -10,7 +11,14 @@ const RenderInteractiveMeshesComponent = ({
 }: { 
   onMeshRef?: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
 }) => {
-  const { nodes, getMaterial, interactiveMeshConfigs } = useRoomUtils()
+  // Get wood mesh popup functionality
+  const { openWoodMeshPopup } = useWoodMeshPopup()
+  
+  const { nodes, getMaterial, interactiveMeshConfigs } = useRoomUtils(
+    undefined, // orbitControlsRef - not needed here
+    undefined, // focusOnScreen - not needed here  
+    openWoodMeshPopup // pass the popup function
+  )
   const hoveredMesh = useHoveredMesh()
   const createHoverHandlers = useHoverHandlers()
   

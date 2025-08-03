@@ -12,6 +12,7 @@ import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
 import { useCameraStore } from '@/stores/useCameraStore'
 import { useThree } from "@react-three/fiber"
+import { useWoodMeshPopup } from '@/hooks/use-wood-mesh-popup'
 
 // Error boundary for render components
 const RenderComponentsComponent = ({
@@ -79,6 +80,9 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
     focusOnScreen
   } = useCameraStore()
 
+  // Get wood mesh popup functionality
+  const { openWoodMeshPopup } = useWoodMeshPopup()
+
   const handleMeshRef = useCallback((name: string, ref: React.RefObject<THREE.Mesh | null>) => {
     meshRefs.current.set(name, ref)
   }, [])
@@ -95,7 +99,8 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
   // Pass the ref and camera focus functions
   useRoomData(
     orbitControlsRef, 
-    memoizedFocusOnScreen
+    memoizedFocusOnScreen,
+    openWoodMeshPopup
   )
 
   return (

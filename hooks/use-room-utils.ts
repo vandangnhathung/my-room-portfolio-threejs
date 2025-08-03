@@ -19,11 +19,13 @@ export const useRoomUtils = (
     minAzimuthAngle: number,
     maxAzimuthAngle: number
   } | null>,
-  focusOnScreen?: () => void
+  focusOnScreen?: () => void,
+  openWoodMeshPopup?: (meshName: string) => void
 ) => {
   const { meshConfigs, materialPaths, roomConfig, isLoading } = useRoomData(
     orbitControlsRef || { current: null } as React.RefObject<{ target: { x: number; y: number; z: number } } | null>, 
-    focusOnScreen || (() => {})
+    focusOnScreen || (() => {}),
+    openWoodMeshPopup
   )
   
   // Loading manager

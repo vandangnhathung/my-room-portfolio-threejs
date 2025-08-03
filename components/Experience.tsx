@@ -1,7 +1,7 @@
 'use client'
 
 import { Environment, OrbitControls } from "@react-three/drei";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useRef, useEffect } from "react";
 import { TOUCH } from 'three'
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import Scene from "./Scene";
@@ -10,6 +10,7 @@ import { useDebounceKeydown } from '../hooks/use-debounce-keydown'
 import { useMediaQuery } from "react-responsive"
 import { useRoomData } from '../hooks/use-room-data'
 import { useSetPointer } from '../stores/usePointerStore'
+import { useSimpleResponsive } from '../hooks/use-simple-responsive'
 import * as React from "react"
 
 export const Experience: React.FC = () => {
@@ -33,6 +34,9 @@ export const Experience: React.FC = () => {
 
   // Get stable pointer action from store
   const setPointer = useSetPointer()
+
+  // Add simple responsive camera behavior
+  useSimpleResponsive()
 
   // Debounced keydown handler
   const { handleKeyDown: debouncedKeyDown, isDebouncing } = useDebounceKeydown({
@@ -58,6 +62,7 @@ export const Experience: React.FC = () => {
 
   const disablePointerRef = useRef<(() => void) | null>(null)
   
+  // Simple pointer move handler - back to original working version
   useEffect(() => {
     const onPointerMove = (e: PointerEvent) => {
       // Use optimized store setter

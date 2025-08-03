@@ -453,13 +453,24 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Canvas with 3D Scene */}
         <Canvas
+          style={{ width: '100%', height: '100%' }}
+          dpr={[1, 2]} // Responsive pixel ratio
           camera={{ 
-            fov: 45, 
+            fov: 45, // Will be overridden by responsive camera hook
             near: 0.1, 
             far: 100, 
-            position: [-17.547789383813438, 11.056949441827566, -22.784703347122825] 
+            position: [-17.547789383813438, 11.056949441827566, -22.784703347122825] // Will be adjusted responsively
           }}
-          style={{ width: '100%', height: '100%' }}
+          onCreated={({ gl }) => {
+            // Handle initial resize
+            const handleCanvasResize = () => {
+              gl.setSize(window.innerWidth, window.innerHeight)
+              gl.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+            }
+            
+            // Initial setup
+            handleCanvasResize()
+          }}
         >        
           <Preload all />
           

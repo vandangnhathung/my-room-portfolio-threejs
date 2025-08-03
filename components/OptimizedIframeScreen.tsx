@@ -1,5 +1,5 @@
 import { Html } from "@react-three/drei"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 
 // Types
 interface OptimizedIframeScreenProps {
@@ -195,12 +195,13 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
     setIsLoading(false)
   }, [])
 
+  // Memoize iOS detection to prevent re-computation
+  const iOSDevice = useMemo(() => isIOSDevice(), [])
+
   // Early return if not visible
   if (!isVisible) {
     return null
   }
-
-  const iOSDevice = isIOSDevice()
 
   return (
     <Html

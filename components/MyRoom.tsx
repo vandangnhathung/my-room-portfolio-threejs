@@ -2,7 +2,7 @@
 
 import { useRoomData } from "@/hooks/use-room-data"
 import { useGLTF } from "@react-three/drei"
-import { Suspense, useRef } from "react"
+import { Suspense, useRef, useCallback } from "react"
 import * as React from "react"
 import { useMediaQuery } from "react-responsive"
 import * as THREE from "three"
@@ -70,14 +70,23 @@ export function MyRoom({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
     focusOnScreen
   } = useCameraStore()
 
-  const handleMeshRef = (name: string, ref: React.RefObject<THREE.Mesh | null>) => {
+  const handleMeshRef = useCallback((name: string, ref: React.RefObject<THREE.Mesh | null>) => {
     meshRefs.current.set(name, ref)
-  }
+  }, [])
+
+  // Memoize isMobile to prevent re-renders when viewport changes
+  const stableIsMobile = useRef(isMobile)
+  stableIsMobile.current = isMobile
+
+  // Memoize the focusOnScreen function to prevent re-renders
+  const memoizedFocusOnScreen = useCallback(() => {
+    focusOnScreen(orbitControlsRef, camera, stableIsMobile.current, meshRefs)
+  }, [focusOnScreen, orbitControlsRef, camera])
 
   // Pass the ref and camera focus functions
   useRoomData(
     orbitControlsRef, 
-    () => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)
+    memoizedFocusOnScreen
   )
 
   return (
@@ -85,7 +94,7 @@ export function MyRoom({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
       <group dispose={null}>
         <group name="Scene">
           <RenderComponents 
-            focusOnScreen={() => focusOnScreen(orbitControlsRef, camera, isMobile, meshRefs)}
+            focusOnScreen={memoizedFocusOnScreen}
             onMeshRef={handleMeshRef}
             disablePointerRef={disablePointerRef}
           />
@@ -94,7 +103,6 @@ export function MyRoom({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
             src="https://vandangnhathung.github.io/lofi-ver-2/"
             position={[5.287, 6.719, -0.05]}
             rotation={[192 * (Math.PI / 180), 73 * (Math.PI / 180), -11.5 * (Math.PI / 180)]}
-            onLoad={() => console.log('Lofi website loaded successfully!')}
             isCameraFocused={isCameraFocused}
           />
         </group>

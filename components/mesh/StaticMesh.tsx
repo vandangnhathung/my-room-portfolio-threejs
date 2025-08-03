@@ -2,28 +2,46 @@
 
 import * as THREE from "three"
 import { GLTFResult, MeshConfig } from "@/types/type"
+import { useRef, useEffect } from "react"
+import { useRegisterWoodMesh } from "@/stores/useWoodAnimationStore"
 
 export const StaticMesh: React.FC<{
   config: MeshConfig
   nodes: GLTFResult['nodes']
   getMaterial: (name: string, materialType?: string) => THREE.Material
 }> = ({ config, nodes, getMaterial }) => {
-  // Add safety checks for nodes
-  if (!nodes) {
-    console.warn(`Nodes object is undefined for mesh: ${config.name}`)
-    return null
-  }
+  const meshRef = useRef<THREE.Mesh>(null)
+  const registerWoodMesh = useRegisterWoodMesh()
+  
+ 
 
   const geometry = nodes[config.name as keyof typeof nodes]?.geometry
   const material = getMaterial(config.name, config.material)
 
-  if (!geometry) {
-    console.warn(`Geometry not found for mesh: ${config.name}`)
-    return null
-  }
+
+  // Register wood meshes for animation
+  useEffect(() => {
+     // Add safety checks for nodes
+    if (!nodes) {
+      console.warn(`Nodes object is undefined for mesh: ${config.name}`)
+      return
+    }
+
+    if (!geometry) {
+      console.warn(`Geometry not found for mesh: ${config.name}`)
+      return
+    }
+
+    if (config.name.includes('wood') && meshRef.current) {
+      registerWoodMesh(config.name, meshRef)
+      // Initially hide wood meshes - they will be animated in
+      meshRef.current.scale.set(0, 0, 0)
+    }
+  }, [config.name, registerWoodMesh, geometry, nodes])
 
   return (
     <mesh
+      ref={meshRef}
       name={config.name}
       geometry={geometry}
       material={material}

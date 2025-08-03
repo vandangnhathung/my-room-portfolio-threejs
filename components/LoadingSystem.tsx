@@ -7,6 +7,7 @@ import { Preload } from '@react-three/drei';
 import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { useAnimateWoodMeshes } from '@/stores/useWoodAnimationStore';
 
 // Context for sharing LoadingManager
 const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
@@ -88,7 +89,7 @@ const themes: Record<ThemeType, ThemeConfig> = {
   }
 };
 
-// Loading Overlay Component
+// Loading Overlay Component - keeping existing implementation
 interface LoadingOverlayProps {
   theme: ThemeConfig;
   themeType: ThemeType;
@@ -294,8 +295,6 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
               />
             </div>
 
-
-
             <div style={{ 
               fontSize: '14px', 
               opacity: 0.8,
@@ -392,6 +391,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   theme = 'cozy'
 }) => {
   const { manager, state: loadingState, reset } = useLoadingManager();
+  const animateWoodMeshes = useAnimateWoodMeshes();
 
   // Memoize default messages to prevent recreation on every render
   const defaultMessages = useMemo(() => ({
@@ -428,9 +428,20 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
 
   const { phase: loadingPhase, text: loadingText, isEnterEnabled } = loadingInfo;
 
-  const handleLoadingComplete = useCallback(() => {
+  const handleLoadingComplete = useCallback(async () => {
+    // First complete the loading overlay exit
     onComplete();
-  }, [onComplete]);
+    
+    // Then trigger wood mesh animations after a short delay
+    setTimeout(async () => {
+      try {
+        await animateWoodMeshes();
+        console.log('Wood mesh animations completed in order: wood_1, wood_1001, wood_2, wood_3, wood_4');
+      } catch (error) {
+        console.error('Error animating wood meshes:', error);
+      }
+    }, 500); // 500ms delay to ensure the scene is fully rendered
+  }, [onComplete, animateWoodMeshes]);
 
   // Reset loading state when component unmounts
   useEffect(() => {

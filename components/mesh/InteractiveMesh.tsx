@@ -7,6 +7,7 @@ import { useHoverAnimation } from "@/hooks/hovering/use-hover-animation"
 import { useChairRotation } from "@/hooks/use-chair-rotation"
 import { ThreeEvent } from '@react-three/fiber'
 import { useEffect, useRef } from "react"
+import { useRegisterWoodMesh } from "@/stores/useWoodAnimationStore"
 
 // Define proper event handler types
 type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void
@@ -37,12 +38,22 @@ export function InteractiveMeshWrapper({
   onMeshRef?: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
 }) {
   const meshRef = useRef<THREE.Mesh>(null)
+  const registerWoodMesh = useRegisterWoodMesh()
 
   useEffect(() => {
     if (config.name === 'Executive_office_chair_raycaster' && onMeshRef) {
       onMeshRef(config.name, meshRef)
     }
   }, [config.name, onMeshRef])
+
+  // Register wood meshes for animation
+  useEffect(() => {
+    if (config.name.includes('wood') && meshRef.current) {
+      registerWoodMesh(config.name, meshRef)
+      // Initially hide wood meshes - they will be animated in
+      meshRef.current.scale.set(0, 0, 0)
+    }
+  }, [config.name, registerWoodMesh])
 
   useEffect(() => {
     if (meshRef.current && config.name === 'Executive_office_chair_raycaster') {
@@ -54,8 +65,8 @@ export function InteractiveMeshWrapper({
     }
   }, [isCameraFocused, config.name])
 
-  // Only apply hover animation if mesh name doesn't contain 'popup'
-  const shouldAnimate = !config.name.includes('popup')
+  // Only apply hover animation if mesh name doesn't contain 'popup' and isn't a wood mesh
+  const shouldAnimate = !config.name.includes('popup') && !config.name.includes('wood')
   const animatedScale = useHoverAnimation(config.name, config.scale, shouldAnimate ? hoveredMesh : null)
   
   const chairRotation = useChairRotation(config.name, 0.7)

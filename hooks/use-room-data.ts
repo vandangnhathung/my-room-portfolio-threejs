@@ -22,7 +22,6 @@ const createMeshClickHandlers = (
       console.log('Executive chair clicked! You can add more interaction here.')
     },
     'inside_screen_popup': () => {
-      // Now we get the CURRENT target value, not the stale one
       const currentTarget = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
       console.log('Screen clicked! orbitControlsTarget...', currentTarget)
       
@@ -31,8 +30,16 @@ const createMeshClickHandlers = (
     'inside_screen001_popup': () => {
       const currentTarget = orbitControlsRef.current?.target || { x: 0, y: 0, z: 0 }
       console.log('Screen001 clicked!', currentTarget)
-      
-      // Removed focusOnScreen001 as per edit hint
+    },
+    // Wood mesh click handlers
+    'wood_2': () => {
+      console.log('Wood piece 2 clicked! My work showcase.')
+    },
+    'wood_3': () => {
+      console.log('Wood piece 3 clicked! My work showcase.')
+    },
+    'wood_4': () => {
+      console.log('Wood piece 4 clicked! My work showcase.')
     }
   }
   

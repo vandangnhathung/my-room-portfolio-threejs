@@ -63,7 +63,7 @@ const Scene = ({ orbitControlsRef, pointerRef, disablePointerRef }: SceneProps) 
           // Disable pointer rotation when disabled flag is set
           if (isPointerDisabled.current) return;
 
-          console.log(pointerRef)
+          // console.log(pointerRef)
 
           const targetRotation = pointerRef.current.x * Math.PI * 0.25
         

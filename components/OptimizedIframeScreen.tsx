@@ -1,5 +1,6 @@
 import { Html } from "@react-three/drei"
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
+import React from "react"
 
 // Types
 interface OptimizedIframeScreenProps {
@@ -159,7 +160,7 @@ const iOSStyles = `
 `
 
 // Main Component
-export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({ 
+const OptimizedIframeScreenComponent: React.FC<OptimizedIframeScreenProps> = ({ 
   src, 
   position, 
   rotation, 
@@ -175,6 +176,16 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
   // Refs
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Debug: Log when component renders
+  console.log('🔍 OptimizedIframeScreen render:', {
+    src,
+    isVisible,
+    isLoaded,
+    isCameraFocused,
+    position: position.join(','),
+    rotation: rotation.join(',')
+  })
 
   // Reset states when src changes
   useEffect(() => {
@@ -197,6 +208,11 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
 
   // Memoize iOS detection to prevent re-computation
   const iOSDevice = useMemo(() => isIOSDevice(), [])
+  
+  // Memoize iframe styles to prevent re-renders
+  const iframeStyles = useMemo(() => {
+    return styles.iframe(isLoaded, isCameraFocused)
+  }, [isLoaded, isCameraFocused])
 
   // Early return if not visible
   if (!isVisible) {
@@ -224,7 +240,7 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
         <iframe 
           ref={iframeRef}
           src={src}
-          style={styles.iframe(isLoaded, isCameraFocused)}
+          style={iframeStyles}
           title="Lofi Website"
           loading="eager"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
@@ -237,4 +253,16 @@ export const OptimizedIframeScreen: React.FC<OptimizedIframeScreenProps> = ({
       <style>{iOSStyles}</style>
     </Html>
   )
-} 
+}
+
+// Memoize the component to prevent re-renders when props haven't changed
+export const OptimizedIframeScreen = React.memo(OptimizedIframeScreenComponent, (prevProps, nextProps) => {
+  // Only re-render if these specific props have actually changed
+  return (
+    prevProps.src === nextProps.src &&
+    prevProps.isVisible === nextProps.isVisible &&
+    prevProps.isCameraFocused === nextProps.isCameraFocused &&
+    JSON.stringify(prevProps.position) === JSON.stringify(nextProps.position) &&
+    JSON.stringify(prevProps.rotation) === JSON.stringify(nextProps.rotation)
+  )
+}) 

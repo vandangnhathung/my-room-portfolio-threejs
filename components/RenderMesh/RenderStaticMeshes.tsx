@@ -21,7 +21,7 @@ export const RenderStaticMeshes = () => {
             }
         })
 
-        console.log("myWorkMesh", myWorkMesh)
+        // Debug logging removed for performance
         
     }, [nodes, staticMeshConfigs])
 

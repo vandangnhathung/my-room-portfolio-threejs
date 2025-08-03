@@ -1,6 +1,7 @@
 'use client'
 
 import * as THREE from "three"
+import React from "react"
 import { animated } from "@react-spring/three"
 import { GLTFResult, MeshConfig } from "@/types/type"
 import { useHoverAnimation } from "@/hooks/hovering/use-hover-animation"
@@ -20,7 +21,7 @@ interface HoverHandlers {
 }
 
 // Create a separate component for interactive meshes to handle hooks properly
-export function InteractiveMeshWrapper({ 
+const InteractiveMeshWrapperComponent = ({ 
   config, 
   nodes, 
   getMaterial, 
@@ -36,7 +37,7 @@ export function InteractiveMeshWrapper({
   createHoverHandlers: (name: string) => HoverHandlers
   isCameraFocused: boolean
   onMeshRef?: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
-}) {
+}) => {
   const meshRef = useRef<THREE.Mesh>(null)
   const registerWoodMesh = useRegisterWoodMesh()
 
@@ -66,7 +67,7 @@ export function InteractiveMeshWrapper({
   }, [isCameraFocused, config.name])
 
   // Only apply hover animation if mesh name doesn't contain 'popup' and isn't a wood mesh
-  const shouldAnimate = !config.name.includes('popup') && !config.name.includes('wood')
+  const shouldAnimate = !config.name.includes('popup')
   const animatedScale = useHoverAnimation(config.name, config.scale, shouldAnimate ? hoveredMesh : null)
   
   const chairRotation = useChairRotation(config.name, 0.7)
@@ -90,6 +91,17 @@ export function InteractiveMeshWrapper({
     />
   )
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export const InteractiveMeshWrapper = React.memo(InteractiveMeshWrapperComponent, (prevProps, nextProps) => {
+  // Only re-render if these specific props have actually changed
+  return (
+    prevProps.config.name === nextProps.config.name &&
+    prevProps.hoveredMesh === nextProps.hoveredMesh &&
+    prevProps.isCameraFocused === nextProps.isCameraFocused &&
+    JSON.stringify(prevProps.config) === JSON.stringify(nextProps.config)
+  )
+})
 
 export const InteractiveMesh: React.FC<{
   config: MeshConfig

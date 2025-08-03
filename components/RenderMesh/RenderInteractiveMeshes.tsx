@@ -3,8 +3,9 @@ import { useRoomUtils } from "@/hooks/use-room-utils"
 import { useHoveredMesh, useHoverHandlers } from "@/stores/useHoverStore"
 import { useCameraStore } from "@/stores/useCameraStore"
 import * as THREE from "three"
+import React from "react"
 
-export const RenderInteractiveMeshes = ({ 
+const RenderInteractiveMeshesComponent = ({ 
   onMeshRef 
 }: { 
   onMeshRef?: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
@@ -46,3 +47,9 @@ export const RenderInteractiveMeshes = ({
     </>
   )
 }
+
+// Memoize the component to prevent re-renders when props haven't changed
+export const RenderInteractiveMeshes = React.memo(RenderInteractiveMeshesComponent, (prevProps, nextProps) => {
+  // Only re-render if onMeshRef reference changes
+  return prevProps.onMeshRef === nextProps.onMeshRef
+})

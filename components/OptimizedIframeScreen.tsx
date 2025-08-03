@@ -177,15 +177,7 @@ const OptimizedIframeScreenComponent: React.FC<OptimizedIframeScreenProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Debug: Log when component renders
-  console.log('🔍 OptimizedIframeScreen render:', {
-    src,
-    isVisible,
-    isLoaded,
-    isCameraFocused,
-    position: position.join(','),
-    rotation: rotation.join(',')
-  })
+  // Debug logging removed for performance
 
   // Reset states when src changes
   useEffect(() => {

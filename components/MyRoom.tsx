@@ -14,7 +14,7 @@ import { useCameraStore } from '@/stores/useCameraStore'
 import { useThree } from "@react-three/fiber"
 
 // Error boundary for render components
-const RenderComponents = ({
+const RenderComponentsComponent = ({
   focusOnScreen, 
   onMeshRef,
   disablePointerRef
@@ -45,6 +45,15 @@ const RenderComponents = ({
   }
 }
 
+// Memoize RenderComponents to prevent unnecessary re-renders
+const RenderComponents = React.memo(RenderComponentsComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.focusOnScreen === nextProps.focusOnScreen &&
+    prevProps.onMeshRef === nextProps.onMeshRef &&
+    prevProps.disablePointerRef === nextProps.disablePointerRef
+  )
+})
+
 interface MyRoomProps {
   orbitControlsRef: React.RefObject<{ 
     target: { x: number; y: number; z: number },
@@ -59,7 +68,7 @@ interface MyRoomProps {
   disablePointerRef?: React.RefObject<(() => void) | null>
 }
 
-export function MyRoom({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
+function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
   
   const meshRefs = useRef<Map<string, React.RefObject<THREE.Mesh | null>>>(new Map())
   const isMobile = useMediaQuery({ maxWidth: 768 })
@@ -116,5 +125,13 @@ export function MyRoom({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
     </Suspense>
   )
 }
+
+// Memoize MyRoom component to prevent unnecessary re-renders
+export const MyRoom = React.memo(MyRoomComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.orbitControlsRef === nextProps.orbitControlsRef &&
+    prevProps.disablePointerRef === nextProps.disablePointerRef
+  )
+})
 
 useGLTF.preload('/models/Room_Portfolio.glb')

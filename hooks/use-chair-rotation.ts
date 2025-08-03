@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useSpring } from '@react-spring/three'
+import type { RootState } from '@react-three/fiber'
 import * as THREE from 'three'
 
 // Hook for chair rotation animation
@@ -14,15 +14,14 @@ export const useChairRotation = (meshName: string, initialSpeed: number = 0.7) =
   // Time reference for smooth oscillation
   const timeRef = useRef(0)
   const speedRef = useRef(initialSpeed)
+  const targetSpeedRef = useRef(initialSpeed)
   
-  // Spring for smooth speed transitions
-  const [{ speed }, setSpeed] = useSpring(() => ({
-    speed: initialSpeed,
-    config: { tension: 100, friction: 20 }
-  }))
-
-  useFrame((state, delta) => {
+  // Stable useFrame callback
+  const animationCallback = useCallback((state: RootState, delta: number) => {
     if (!meshRef.current || meshName !== 'Executive_office_chair_raycaster') return
+    
+    // Smooth speed interpolation (manual spring replacement)
+    speedRef.current += (targetSpeedRef.current - speedRef.current) * delta * 5 // 5 is tension factor
     
     // Update time with current speed
     timeRef.current += delta * speedRef.current
@@ -37,31 +36,30 @@ export const useChairRotation = (meshName: string, initialSpeed: number = 0.7) =
     const originalX = meshRef.current.rotation.x
     const originalZ = meshRef.current.rotation.z
     meshRef.current.rotation.set(originalX, yRotation, originalZ)
-    
-    // Update speed reference for frame calculations
-    speedRef.current = speed.get()
-  })
+  }, [meshName]) // Only recreate if meshName changes
 
-  // Functions to control speed
-  const increaseSpeed = () => {
-    setSpeed({ speed: Math.min(speedRef.current + 0.2, 2.0) })
-  }
+  useFrame(animationCallback)
+
+  // Functions to control speed - now just update target values
+  const increaseSpeed = useCallback(() => {
+    targetSpeedRef.current = Math.min(targetSpeedRef.current + 0.2, 2.0)
+  }, [])
   
-  const decreaseSpeed = () => {
-    setSpeed({ speed: Math.max(speedRef.current - 0.2, 0.1) })
-  }
+  const decreaseSpeed = useCallback(() => {
+    targetSpeedRef.current = Math.max(targetSpeedRef.current - 0.2, 0.1)
+  }, [])
   
-  const setRotationSpeed = (newSpeed: number) => {
-    setSpeed({ speed: Math.max(0.1, Math.min(newSpeed, 3.0)) })
-  }
+  const setRotationSpeed = useCallback((newSpeed: number) => {
+    targetSpeedRef.current = Math.max(0.1, Math.min(newSpeed, 3.0))
+  }, [])
   
-  const resetSpeed = () => {
-    setSpeed({ speed: initialSpeed })
-  }
+  const resetSpeed = useCallback(() => {
+    targetSpeedRef.current = initialSpeed
+  }, [initialSpeed])
 
   return {
     meshRef,
-    currentSpeed: speedRef.current,
+    get currentSpeed() { return speedRef.current }, // Getter to avoid creating new objects
     increaseSpeed,
     decreaseSpeed,
     setRotationSpeed,

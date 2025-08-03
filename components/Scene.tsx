@@ -1,8 +1,9 @@
-import React, { useRef } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { MyRoom } from './MyRoom'
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three'
 import { useCameraStore } from '../stores/useCameraStore'
+import { usePointerX, useSetPointerDisabled } from '../stores/usePointerStore'
 
 interface SceneProps {
   orbitControlsRef: React.RefObject<{ 
@@ -15,15 +16,18 @@ interface SceneProps {
     minAzimuthAngle: number,
     maxAzimuthAngle: number
   } | null>
-  pointerRef: React.RefObject<{ x: number, y: number }>
   disablePointerRef: React.RefObject<(() => void) | null>
 }    
 
-const Scene = ({ orbitControlsRef, pointerRef, disablePointerRef }: SceneProps) => {
+const Scene = ({ orbitControlsRef, disablePointerRef }: SceneProps) => {
      
      const groupRef = useRef<THREE.Group>(null)
      const groupRotationRef = useRef<number>(0)
      const isPointerDisabled = useRef<boolean>(false)
+     
+     // Use optimized pointer store
+     const pointerX = usePointerX()
+     const setDisabled = useSetPointerDisabled()
      
      const { isCameraFocused, setPointerDisableCallback } = useCameraStore()
 
@@ -31,6 +35,7 @@ const Scene = ({ orbitControlsRef, pointerRef, disablePointerRef }: SceneProps) 
      React.useEffect(() => {
        const disableFunction = () => {
          isPointerDisabled.current = true
+         setDisabled(true)
          // Reset group rotation to 0 when focusing on screen
          if (groupRef.current) {
            groupRef.current.rotation.y = 0
@@ -48,38 +53,39 @@ const Scene = ({ orbitControlsRef, pointerRef, disablePointerRef }: SceneProps) 
        return () => {
          setPointerDisableCallback(null)
        }
-     }, [disablePointerRef, setPointerDisableCallback])
+     }, [disablePointerRef, setPointerDisableCallback, setDisabled])
 
      // Re-enable pointer when camera focus is reset
      React.useEffect(() => {
        if (!isCameraFocused) {
          isPointerDisabled.current = false
+         setDisabled(false)
        }
-     }, [isCameraFocused])
+     }, [isCameraFocused, setDisabled])
 
-     useFrame(() => {
-          if(!groupRef.current) return;
-          
-          // Disable pointer rotation when disabled flag is set
-          if (isPointerDisabled.current) return;
+     // Stable useFrame callback - only recreated if dependencies change
+     const animationCallback = useCallback(() => {
+       if (!groupRef.current) return;
+       
+       // Disable pointer rotation when disabled flag is set
+       if (isPointerDisabled.current) return;
 
-          // console.log(pointerRef)
+       // Use optimized zustand store value
+       const targetRotation = pointerX * Math.PI * 0.25
+     
+       // CAUTION: > 0.025 causing lag with the iframe
+       groupRotationRef.current = THREE.MathUtils.lerp(groupRotationRef.current, targetRotation, 0.02)
 
-          const targetRotation = pointerRef.current.x * Math.PI * 0.25
-        
-          // CAUTION: > 0.025 causing lag with the iframe
-          groupRotationRef.current = THREE.MathUtils.lerp(groupRotationRef.current, targetRotation, 0.02)
+       groupRef.current.rotation.y = groupRotationRef.current
+     }, [pointerX]) // Only recreate when pointerX changes
 
-          if (groupRef.current) {
-               groupRef.current.rotation.y = groupRotationRef.current
-          }
-     })
+     useFrame(animationCallback)
 
   return (
-     <group ref={groupRef}>
-       <MyRoom orbitControlsRef={orbitControlsRef} disablePointerRef={disablePointerRef} />
-     </group>
-   )
+    <group ref={groupRef}>
+      <MyRoom orbitControlsRef={orbitControlsRef} disablePointerRef={disablePointerRef} />
+    </group>
+  )
 }
 
 export default Scene

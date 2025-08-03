@@ -19,6 +19,11 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Cube001', position: [-2.532, 4.257, 3.064], scale: 1, isInteractive: false },
     { name: 'plant', position: [-1.398, -9.755, 5.061], scale: 1, isInteractive: false },
     { name: 'Room', position: [-1.398, 3.597, 5.061], scale: 1, isInteractive: false },
+    { name: 'wood_1', position: [7.64, 9.669, -8.23], scale: 1, isInteractive: false, material: 'my_work' },
+    { name: 'wood_2', position: [7.218, 7.509, -9.638], scale: 1, isInteractive: false, material: 'my_work' },
+    { name: 'wood_3', position: [7.223, 8.716, -9.558], scale: 1, isInteractive: false, material: 'my_work' },
+    { name: 'wood_4', position: [7.21, 6.311, -9.684], scale: 1, isInteractive: false, material: 'my_work' },
+    { name: 'wood_1001', position: [7.613, 9.431, -9.555], scale: 1, isInteractive: false, material: 'my_work' },
     { name: 'Room001', position: [-1.398, 3.597, 5.061], scale: 1, isInteractive: false, material: 'fifth_texture_set' },
     { name: 'Room002', position: [-1.398, 3.597, 5.061], scale: 1, isInteractive: false, material: 'Room' },
     { name: 'Room003', position: [-1.398, 3.597, 5.061], scale: 1, isInteractive: false, material: 'window' },
@@ -26,7 +31,7 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Room005', position: [-4.428, 3.42, 3.318], scale: 1, isInteractive: false, material: 'fifth_texture_set' },
     { name: 'screen', position: [5.367, 6.449, -0.059], scale: 1, isInteractive: false, material: 'screen_chair' },
     { name: 'screen001', position: [5.418, 6.41, 3.295], scale: 1, isInteractive: false, material: 'screen_chair' },
-    { name: 'World', position: [0, 24.119, 0], scale: 23.362, isInteractive: false, material: 'world' },
+    { name: 'world', position: [-9.87, 52.122, -13.898], scale: 1, isInteractive: false, material: 'world' },
 
     // Interactive meshes
     { name: 'Executive_office_chair_raycaster001', position: [2.425, 2.203, 1.635], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true, material: 'screen_chair' },

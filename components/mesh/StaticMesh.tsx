@@ -3,7 +3,7 @@
 import * as THREE from "three"
 import { GLTFResult, MeshConfig } from "@/types/type"
 import { useRef, useEffect } from "react"
-import { useRegisterWoodMesh } from "@/stores/useWoodAnimationStore"
+import { useRegisterMesh } from "@/stores/useMeshesAnimationStore"
 
 export const StaticMesh: React.FC<{
   config: MeshConfig
@@ -11,7 +11,7 @@ export const StaticMesh: React.FC<{
   getMaterial: (name: string, materialType?: string) => THREE.Material
 }> = ({ config, nodes, getMaterial }) => {
   const meshRef = useRef<THREE.Mesh>(null)
-  const registerWoodMesh = useRegisterWoodMesh()
+  const registerMesh = useRegisterMesh()
   
  
 
@@ -33,11 +33,11 @@ export const StaticMesh: React.FC<{
     }
 
     if (config.name.includes('wood') && meshRef.current) {
-      registerWoodMesh(config.name, meshRef)
+      registerMesh(config.name, meshRef)
       // Initially hide wood meshes - they will be animated in
       meshRef.current.scale.set(0, 0, 0)
     }
-  }, [config.name, registerWoodMesh, geometry, nodes])
+  }, [config.name, registerMesh, geometry, nodes])
 
   return (
     <mesh

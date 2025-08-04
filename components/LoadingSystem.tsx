@@ -7,7 +7,7 @@ import { Preload } from '@react-three/drei';
 import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-manager';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { useAnimateWoodMeshes } from '@/stores/useWoodAnimationStore';
+import { useAnimateMeshes } from '@/stores/useMeshesAnimationStore';
 
 // Context for sharing LoadingManager
 const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
@@ -391,7 +391,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   theme = 'cozy'
 }) => {
   const { manager, state: loadingState, reset } = useLoadingManager();
-  const animateWoodMeshes = useAnimateWoodMeshes();
+  const animateMeshes = useAnimateMeshes();
 
   // Memoize default messages to prevent recreation on every render
   const defaultMessages = useMemo(() => ({
@@ -435,13 +435,13 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
     // Then trigger wood mesh animations after a short delay
     setTimeout(async () => {
       try {
-        await animateWoodMeshes();
+        await animateMeshes();
         console.log('Wood mesh animations completed in order: wood_1, wood_1001, wood_2, wood_3, wood_4');
       } catch (error) {
         console.error('Error animating wood meshes:', error);
       }
     }, 500); // 500ms delay to ensure the scene is fully rendered
-  }, [onComplete, animateWoodMeshes]);
+  }, [onComplete, animateMeshes]);
 
   // Reset loading state when component unmounts
   useEffect(() => {

@@ -15,12 +15,18 @@ interface WoodAnimationStore {
   animationCompleted: boolean
   
   // Actions
-  registerWoodMesh: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
-  animateWoodMeshes: () => Promise<void>
+  registerMesh: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
+  animateMeshes: () => Promise<void>
   resetAnimation: () => void
 }
 
-const WOOD_ANIMATION_ORDER = ['wood_1', 'wood_1001', 'wood_2', 'wood_4', 'wood_3']
+const WOOD_ANIMATION_ORDER = [
+  'camera_raycaster', 'Executive_office_chair_raycaster', 
+  'Executive_office_chair_raycaster001',
+  'guitar_raycaster', 'player_button_raycaster', 'headphone_raycaster', 
+  'cup_coaster_raycaster', 'lamp_raycaster', 'vinyl_record_player_raycaster',
+   'misc_things004_raycaster', 'misc_things009_raycaster', 'inside_screen_popup', 'inside_screen001_popup',
+  'wood_1', 'wood_1001', 'wood_2', 'wood_4', 'wood_3']
 
 export const useWoodAnimationStore = create<WoodAnimationStore>()(
   subscribeWithSelector((set, get) => ({
@@ -28,14 +34,16 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
     isAnimating: false,
     animationCompleted: false,
     
-    registerWoodMesh: (name: string, ref: React.RefObject<THREE.Mesh | null>) => {
+    registerMesh: (name: string, ref: React.RefObject<THREE.Mesh | null>) => {
       const { woodMeshRefs } = get()
       const newMap = new Map(woodMeshRefs)
       newMap.set(name, ref)
       set({ woodMeshRefs: newMap })
+
+      console.log('woodMeshRefs', woodMeshRefs)
     },
     
-    animateWoodMeshes: async () => {
+    animateMeshes: async () => {
       const { woodMeshRefs, isAnimating } = get()
       
       if (isAnimating) return
@@ -82,7 +90,7 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
 )
 
 // Individual selector hooks to prevent infinite loops
-export const useWoodMeshRefs = () => useWoodAnimationStore(state => state.woodMeshRefs)
+export const useMeshRefs = () => useWoodAnimationStore(state => state.woodMeshRefs)
 
 export const useWoodAnimationState = () => useWoodAnimationStore(
   useShallow(state => ({ 
@@ -92,15 +100,15 @@ export const useWoodAnimationState = () => useWoodAnimationStore(
 )
 
 // Individual action selectors to prevent re-renders
-export const useRegisterWoodMesh = () => useWoodAnimationStore(state => state.registerWoodMesh)
-export const useAnimateWoodMeshes = () => useWoodAnimationStore(state => state.animateWoodMeshes)
-export const useResetWoodAnimation = () => useWoodAnimationStore(state => state.resetAnimation)
+export const useRegisterMesh = () => useWoodAnimationStore(state => state.registerMesh)
+export const useAnimateMeshes = () => useWoodAnimationStore(state => state.animateMeshes)
+export const useResetAnimation = () => useWoodAnimationStore(state => state.resetAnimation)
 
 // Combined actions hook using useShallow for proper comparison
 export const useWoodAnimationActions = () => useWoodAnimationStore(
   useShallow(state => ({
-    registerWoodMesh: state.registerWoodMesh,
-    animateWoodMeshes: state.animateWoodMeshes,
+    registerMesh: state.registerMesh,
+    animateMeshes: state.animateMeshes,
     resetAnimation: state.resetAnimation
   }))
 ) 

@@ -8,7 +8,7 @@ import { useHoverAnimation } from "@/hooks/hovering/use-hover-animation"
 import { useChairRotation } from "@/hooks/use-chair-rotation"
 import { ThreeEvent } from '@react-three/fiber'
 import { useEffect, useRef } from "react"
-import { useRegisterWoodMesh } from "@/stores/useWoodAnimationStore"
+import { useRegisterMesh } from "@/stores/useMeshesAnimationStore"
 
 // Define proper event handler types
 type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void
@@ -39,7 +39,7 @@ const InteractiveMeshWrapperComponent = ({
   onMeshRef?: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
 }) => {
   const meshRef = useRef<THREE.Mesh>(null)
-  const registerWoodMesh = useRegisterWoodMesh()
+  const registerMesh = useRegisterMesh()
 
   useEffect(() => {
     if (config.name === 'Executive_office_chair_raycaster' && onMeshRef) {
@@ -49,12 +49,12 @@ const InteractiveMeshWrapperComponent = ({
 
   // Register wood meshes for animation
   useEffect(() => {
-    if (config.name.includes('wood') && meshRef.current) {
-      registerWoodMesh(config.name, meshRef)
+    if (!config.name.includes('inside_screen001_popup') && meshRef.current) {
+      registerMesh(config.name, meshRef)
       // Initially hide wood meshes - they will be animated in
       meshRef.current.scale.set(0, 0, 0)
     }
-  }, [config.name, registerWoodMesh])
+  }, [config.name, registerMesh])
 
   useEffect(() => {
     if (meshRef.current && config.name === 'Executive_office_chair_raycaster') {

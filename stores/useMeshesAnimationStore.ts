@@ -75,8 +75,8 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
               x: 1,
               y: 1, 
               z: 1,
-              duration: 0.6,
-              ease: "back.out(1.7)",
+              duration: 0.3,
+              ease: "back.out(1.1)",
             }, index * 0.3) // Stagger each animation by 0.3 seconds
           }
         })

@@ -46,8 +46,8 @@ export const useRoomUtils = (
       'plant': plantMaterial,
       // Hide the screen mesh since it will be replaced with iframe
       'inside_screen_popup': new THREE.MeshBasicMaterial({ 
-        transparent: true, 
-        opacity: 0,
+        color: 0x000000,
+        opacity: 1,
         depthWrite: false 
       }),
       'inside_screen001_popup': screen001VideoMaterial || loadingMaterial,

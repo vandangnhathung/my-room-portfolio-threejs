@@ -21,11 +21,16 @@ interface WoodAnimationStore {
 }
 
 const WOOD_ANIMATION_ORDER = [
-  'camera_raycaster', 'Executive_office_chair_raycaster', 
+  'guitar_raycaster',
+  'Executive_office_chair_raycaster', 
   'Executive_office_chair_raycaster001',
-  'guitar_raycaster', 'player_button_raycaster', 'headphone_raycaster', 
-  'cup_coaster_raycaster', 'lamp_raycaster', 'vinyl_record_player_raycaster',
-   'misc_things004_raycaster', 'misc_things009_raycaster', 'inside_screen_popup', 'inside_screen001_popup',
+  'vinyl_record_player_raycaster',
+  'player_button_raycaster',
+  'lamp_raycaster', 
+  'camera_raycaster', 
+  'headphone_raycaster', 
+  'cup_coaster_raycaster', 
+  'misc_things004_raycaster', 'misc_things009_raycaster', 'inside_screen_popup',
   'wood_1', 'wood_1001', 'wood_2', 'wood_4', 'wood_3']
 
 export const useWoodAnimationStore = create<WoodAnimationStore>()(

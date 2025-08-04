@@ -46,5 +46,7 @@ export const meshConfig: MeshConfig[] = [
     { name: 'misc_things004_raycaster', position: [6.875, 6.893, -4.456], scale: 1, isInteractive: true },
     { name: 'misc_things009_raycaster', position: [6.875, 6.893, -3.91], scale: 1, isInteractive: true },
     { name: 'inside_screen_popup', position: [5.367, 6.449, -0.059], scale: 1, isInteractive: true },
-    { name: 'inside_screen001_popup', position: [5.418, 6.41, 3.295], scale: 1, isInteractive: true }
+    { name: 'inside_screen001_popup', position: [5.418, 6.41, 3.295], scale: 1, isInteractive: true },
+    { name: 'github', position: [6.926, 6.456, -2.569], rotation: [Math.PI / 2, 0, Math.PI / 2], scale: 1, isInteractive: true, material: 'info_set' },
+    { name: 'linkedin', position: [6.887, 6.459, -1.565], rotation: [Math.PI / 2, -0.129, Math.PI / 2], scale: 1, isInteractive: true, material: 'info_set' }
 ]

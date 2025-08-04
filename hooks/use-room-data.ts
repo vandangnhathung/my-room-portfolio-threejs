@@ -49,6 +49,12 @@ const createMeshClickHandlers = (
       if (openWoodMeshPopup) {
         openWoodMeshPopup('wood_4')
       }
+    },
+    'github': () => {
+      window.open('https://github.com/vandangnhathung', '_blank')
+    },
+    'linkedin': () => { 
+      window.open('https://www.linkedin.com/in/h%C6%B0ng-v%C4%83n-%C4%91%E1%BA%B7ng-nh%E1%BA%ADt-7804ab218/', '_blank')
     }
   }
   

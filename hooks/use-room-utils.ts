@@ -32,7 +32,7 @@ export const useRoomUtils = (
   const manager = useLoadingManagerContext()
 
   // Materials
-  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial } = useRoomMaterials(materialPaths || {})
+  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial, infoSetMaterial } = useRoomMaterials(materialPaths || {})
   const { screenVideoMaterial, screen001VideoMaterial } = useVideoMaterials()
   
   // Loading spinner texture
@@ -56,7 +56,8 @@ export const useRoomUtils = (
       'screen_chair': screenChairMaterial || loadingMaterial,
       'fifth_texture_set': fifthTextureSetMaterial || loadingMaterial,
       'window': windowMaterial || loadingMaterial,
-      'world': worldMaterial || loadingMaterial
+      'world': worldMaterial || loadingMaterial,
+      'info_set': infoSetMaterial || loadingMaterial
     }
     
     // If a specific material type is provided, use it
@@ -65,7 +66,7 @@ export const useRoomUtils = (
     }
     
     return materialMap[meshName] || raycasterObjectMaterial
-  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial])
+  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial, infoSetMaterial])
 
   // Mesh configuration
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {
@@ -102,6 +103,7 @@ export const useRoomUtils = (
     screen001VideoMaterial,
     loadingMaterial,
     worldMaterial,
+    infoSetMaterial,
     getMaterial,
     
     // Configurations

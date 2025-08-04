@@ -30,6 +30,7 @@ const WOOD_ANIMATION_ORDER = [
   'camera_raycaster', 
   'headphone_raycaster', 
   'cup_coaster_raycaster', 
+  'github', 'linkedin',
   'misc_things004_raycaster', 'misc_things009_raycaster', 'inside_screen_popup',
   'wood_1', 'wood_1001', 'wood_2', 'wood_4', 'wood_3']
 
@@ -44,8 +45,6 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
       const newMap = new Map(woodMeshRefs)
       newMap.set(name, ref)
       set({ woodMeshRefs: newMap })
-
-      console.log('woodMeshRefs', woodMeshRefs)
     },
     
     animateMeshes: async () => {
@@ -74,7 +73,6 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
         
         // Animate wood meshes in order with staggered timing
         WOOD_ANIMATION_ORDER.forEach((meshName, index) => {
-          console.log('meshName', meshName)
           const meshRef = woodMeshRefs.get(meshName)
           if (meshRef?.current) {
             if (meshName.includes('wood_')) {

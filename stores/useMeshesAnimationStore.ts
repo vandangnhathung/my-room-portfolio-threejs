@@ -74,15 +74,26 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
         
         // Animate wood meshes in order with staggered timing
         WOOD_ANIMATION_ORDER.forEach((meshName, index) => {
+          console.log('meshName', meshName)
           const meshRef = woodMeshRefs.get(meshName)
           if (meshRef?.current) {
-            timeline.to(meshRef.current.scale, {
-              x: 1,
-              y: 1, 
-              z: 1,
-              duration: 0.5,
-              ease: "back.out(1.7)",
-            }, index * 0.05) // Stagger each animation by 0.3 seconds
+            if (meshName.includes('wood_')) {
+              timeline.to(meshRef.current.scale, {
+                x: 1,
+                y: 1, 
+                z: 1,
+                duration: 0.5,
+                ease: "back.out(1.7)",
+              }, 1.05 + ((index - 13) * 0.5)) // Wood starts at 1.05s, stagger by 0.3s
+            } else {
+              timeline.to(meshRef.current.scale, {
+                x: 1,
+                y: 1, 
+                z: 1,
+                duration: 0.5,
+                ease: "back.out(1.7)",
+              }, index * 0.05) // Stagger each animation by 0.3 seconds
+            }
           }
         })
       })

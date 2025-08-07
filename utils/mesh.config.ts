@@ -31,7 +31,7 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Room005', position: [-4.428, 3.42, 3.318], scale: 1, isInteractive: false, material: 'fifth_texture_set' },
     { name: 'screen', position: [5.367, 6.449, -0.059], scale: 1, isInteractive: false, material: 'screen_chair' },
     { name: 'screen001', position: [5.418, 6.41, 3.295], scale: 1, isInteractive: false, material: 'screen_chair' },
-    { name: 'world', position: [-9.87, 52.122, -13.898], scale: 1, isInteractive: false, material: 'world' },
+    { name: 'world', position: [1.355, 0.875, -0.818], scale: 1, isInteractive: false, material: 'world' },
 
     // Interactive meshes
     { name: 'Executive_office_chair_raycaster001', position: [2.425, 2.203, 1.635], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true, material: 'screen_chair' },

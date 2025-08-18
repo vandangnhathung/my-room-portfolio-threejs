@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { PopupConfig, usePopupFinishCloseAnimation } from '@/stores/usePopupStore'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 interface PopupContainerProps {
   isOpen: boolean
@@ -23,7 +24,6 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
   const contentRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
-  const footerRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef<HTMLDivElement>(null)
   
   const [shouldRender, setShouldRender] = useState(false)
@@ -46,6 +46,12 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         if (config?.afterOpen) {
           setTimeout(() => config.afterOpen?.(), 50)
         }
+        // Ensure ScrollTrigger recalculates after popup open animation
+        setTimeout(() => {
+          try {
+            ScrollTrigger.refresh()
+          } catch {}
+        }, 0)
       }
     })
 
@@ -63,9 +69,6 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
     }
     if (bodyRef.current) {
       gsap.set(bodyRef.current, { y: 20, opacity: 0 })
-    }
-    if (footerRef.current) {
-      gsap.set(footerRef.current, { y: 20, opacity: 0 })
     }
 
     // Animate in sequence
@@ -94,12 +97,6 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
       duration: 0.4,
       ease: "power3.out"
     }, "-=0.25")
-    .to(footerRef.current, {
-      y: 0,
-      opacity: 1,
-      duration: 0.4,
-      ease: "power3.out"
-    }, "-=0.2")
 
     timelineRef.current = tl
   }
@@ -126,19 +123,13 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
       })
 
       // Animate out with more pronounced effects and better timing
-      tl.to([footerRef.current, bodyRef.current], {
+      tl.to([bodyRef.current], {
         y: 30,
         opacity: 0,
         duration: 0.4,
         ease: "power2.in",
         stagger: 0.1
       })
-      .to(headerRef.current, {
-        y: -30,
-        opacity: 0,
-        duration: 0.4,
-        ease: "power2.in"
-      }, "-=0.3")
       .to(contentRef.current, {
         scale: 0.8,
         y: 50,
@@ -246,7 +237,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       style={{ 
         zIndex: 999999,
         pointerEvents: (isOpen || isAnimating) ? 'auto' : 'none'
@@ -254,10 +245,15 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
     >
       <div
         ref={contentRef}
-        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-xl shadow-2xl"
+        className="relative w-screen h-screen overflow-y-scroll bg-white"
+        data-lenis-prevent
+        data-lenis-prevent-wheel
+        data-lenis-prevent-touch
         style={{
           transformOrigin: 'center center',
-          pointerEvents: isLoading ? 'none' : 'auto'
+          pointerEvents: isLoading ? 'none' : 'auto',
+          // WebkitOverflowScrolling: 'touch',
+          // overscrollBehavior: 'contain'
         }}
       >
         {/* Loading Overlay with GSAP Animation */}
@@ -281,7 +277,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         {/* Header with brown/tan styling */}
         <div 
           ref={headerRef}
-          className="flex items-center justify-between p-6 bg-amber-900 text-white border-b border-amber-800 rounded-t-xl"
+          className="flex items-center justify-between p-6 bg-amber-900 text-white border-b border-amber-800"
         >
           <h2 className="text-2xl font-bold text-white">
             {config.title || 'Popup'}
@@ -327,7 +323,8 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         {/* Content with white background */}
         <div 
           ref={bodyRef}
-          className="p-6 overflow-y-auto max-h-[calc(90vh-180px)] bg-white text-gray-800"
+          className="p-6 bg-black text-gray-800"
+          id="popup-content"
         >
           {config.content || (
             <div className="text-center py-8">
@@ -341,37 +338,6 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
               <p className="text-gray-600 text-lg">No content provided</p>
             </div>
           )}
-        </div>
-
-        {/* Footer with light beige/tan background like status section */}
-        <div 
-          ref={footerRef}
-          className="flex justify-end space-x-3 p-6 border-t border-gray-200 bg-amber-50 rounded-b-xl"
-        >
-          <button
-            onClick={onClose}
-            className="px-6 py-2.5 rounded-lg border border-amber-300 text-amber-800 bg-white hover:bg-amber-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 font-medium"
-            onMouseEnter={(e) => {
-              gsap.to(e.currentTarget, {
-                scale: 1.05,
-                y: -2,
-                boxShadow: "0 4px 12px rgba(180, 83, 9, 0.15)",
-                duration: 0.2,
-                ease: "power2.out"
-              })
-            }}
-            onMouseLeave={(e) => {
-              gsap.to(e.currentTarget, {
-                scale: 1,
-                y: 0,
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                duration: 0.2,
-                ease: "power2.out"
-              })
-            }}
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

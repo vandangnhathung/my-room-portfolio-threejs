@@ -13,6 +13,7 @@ interface MaterialPaths {
   world?: string
   myWork?: string
   infoSet?: string
+  table?: string
 }
 
 export const useRoomMaterials = (materialPaths: MaterialPaths) => {
@@ -93,7 +94,15 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
     generateMipmaps: false
   })
 
+  const tableMaterial = useOptimizedTexture({
+    path: materialPaths?.table || '/textures/room/table.webp',
+    colorSpace: THREE.SRGBColorSpace,
+    flipY: false,
+    generateMipmaps: false
+  })
+
   return { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial,
      plantMaterial, devicesOnTableMaterial, screenChairMaterial,
-      fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial, infoSetMaterial } 
+      fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial,
+       infoSetMaterial, tableMaterial } 
 } 

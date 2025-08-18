@@ -31,7 +31,8 @@ export const meshConfig: MeshConfig[] = [
     { name: 'Room005', position: [-4.428, 3.42, 3.318], scale: 1, isInteractive: false, material: 'fifth_texture_set' },
     { name: 'screen', position: [5.367, 6.449, -0.059], scale: 1, isInteractive: false, material: 'screen_chair' },
     { name: 'screen001', position: [5.418, 6.41, 3.295], scale: 1, isInteractive: false, material: 'screen_chair' },
-    { name: 'world', position: [1.355, 0.875, -0.818], scale: 1, isInteractive: false, material: 'world' },
+    { name: 'world', position: [1.355, -4.009, -0.818], scale: 1, isInteractive: false, material: 'world' },
+    { name: 'short-table', position: [1.048, 2.267, -4.481], rotation:[0, 0.512, 0.432], scale: -0.164, isInteractive: false, material: 'table' },
 
     // Interactive meshes
     { name: 'Executive_office_chair_raycaster001', position: [2.425, 2.203, 1.635], rotation: [-Math.PI, 1.516, -Math.PI], scale: 1, isInteractive: true, material: 'screen_chair' },
@@ -48,5 +49,6 @@ export const meshConfig: MeshConfig[] = [
     { name: 'inside_screen_popup', position: [5.367, 6.449, -0.059], scale: 1, isInteractive: true },
     { name: 'inside_screen001_popup', position: [5.418, 6.41, 3.295], scale: 1, isInteractive: true },
     { name: 'github', position: [6.926, 6.456, -2.569], rotation: [Math.PI / 2, 0, Math.PI / 2], scale: 1, isInteractive: true, material: 'info_set' },
-    { name: 'linkedin', position: [6.887, 6.459, -1.565], rotation: [Math.PI / 2, -0.129, Math.PI / 2], scale: 1, isInteractive: true, material: 'info_set' }
+    { name: 'linkedin', position: [6.887, 6.459, -1.565], rotation: [Math.PI / 2, -0.129, Math.PI / 2], scale: 1, isInteractive: true, material: 'info_set' },
+    { name: 'Succulent_plant', position: [-0.426, 4.09, -3.161], scale: 6.963, isInteractive: false, material: 'table' },
 ]

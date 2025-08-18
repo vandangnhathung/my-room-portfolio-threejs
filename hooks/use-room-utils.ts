@@ -32,7 +32,10 @@ export const useRoomUtils = (
   const manager = useLoadingManagerContext()
 
   // Materials
-  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial, plantMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial, infoSetMaterial } = useRoomMaterials(materialPaths || {})
+  const { woodMaterial, fixedObjectMaterial, raycasterObjectMaterial,
+     plantMaterial, devicesOnTableMaterial, screenChairMaterial,
+      fifthTextureSetMaterial, windowMaterial, worldMaterial,
+       myWorkMaterial, infoSetMaterial, tableMaterial   } = useRoomMaterials(materialPaths || {})
   const { screenVideoMaterial, screen001VideoMaterial } = useVideoMaterials()
   
   // Loading spinner texture
@@ -57,7 +60,8 @@ export const useRoomUtils = (
       'fifth_texture_set': fifthTextureSetMaterial || loadingMaterial,
       'window': windowMaterial || loadingMaterial,
       'world': worldMaterial || loadingMaterial,
-      'info_set': infoSetMaterial || loadingMaterial
+      'info_set': infoSetMaterial || loadingMaterial,
+      'table': tableMaterial || loadingMaterial,
     }
     
     // If a specific material type is provided, use it
@@ -66,7 +70,12 @@ export const useRoomUtils = (
     }
     
     return materialMap[meshName] || raycasterObjectMaterial
-  }, [woodMaterial, fixedObjectMaterial, plantMaterial, raycasterObjectMaterial, screen001VideoMaterial, loadingMaterial, devicesOnTableMaterial, screenChairMaterial, fifthTextureSetMaterial, windowMaterial, worldMaterial, myWorkMaterial, infoSetMaterial])
+  }, [woodMaterial, fixedObjectMaterial, plantMaterial,
+     raycasterObjectMaterial, screen001VideoMaterial,
+      loadingMaterial, devicesOnTableMaterial,
+       screenChairMaterial, fifthTextureSetMaterial, 
+       windowMaterial, worldMaterial, myWorkMaterial, 
+       infoSetMaterial, tableMaterial])
 
   // Mesh configuration
   const { interactiveMeshConfigs, staticMeshConfigs } = useMemo(() => {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useCameraStore } from '@/stores/useCameraStore'
 
 interface IframePreloaderProps {
@@ -7,6 +7,11 @@ interface IframePreloaderProps {
   preloadDistance?: number
   enablePredictivePreloading?: boolean
 }
+
+const isIOSDevice = () =>
+  typeof window !== 'undefined' &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
 
 export const IframePreloader: React.FC<IframePreloaderProps> = ({
   src,
@@ -18,15 +23,17 @@ export const IframePreloader: React.FC<IframePreloaderProps> = ({
   const hiddenIframeRef = useRef<HTMLIFrameElement>(null)
   const { isCameraFocused } = useCameraStore()
 
-  // Predictive preloading based on camera focus
-  useEffect(() => {
-    if (!enablePredictivePreloading || isPreloaded) return
+  // Detect iOS once
+  const isIOS = useMemo(() => isIOSDevice(), [])
 
-    // If camera is focused, it might indicate user interest in the iframe
+  // Predictive preloading based on camera focus (skip on iOS)
+  useEffect(() => {
+    if (isIOS) return
+    if (!enablePredictivePreloading || isPreloaded) return
     if (isCameraFocused) {
       startPreload()
     }
-  }, [isCameraFocused, enablePredictivePreloading, isPreloaded])
+  }, [isIOS, isCameraFocused, enablePredictivePreloading, isPreloaded])
 
   const startPreload = () => {
     if (isPreloaded || preloadStartTime) return
@@ -52,19 +59,35 @@ export const IframePreloader: React.FC<IframePreloaderProps> = ({
       timestamp: new Date().toISOString()
     })
 
+    // Actively release resources
+    if (hiddenIframeRef.current) {
+      try { hiddenIframeRef.current.src = 'about:blank' } catch {}
+    }
+
     onPreloadComplete?.()
   }
 
   const handlePreloadError = () => {
     console.warn('⚠️ Iframe preload failed:', src)
-    // Don't mark as failed, just log the warning
     // The main iframe will handle its own loading
   }
 
+  // Cleanup on unmount – release hidden iframe memory
+  useEffect(() => {
+    return () => {
+      if (hiddenIframeRef.current) {
+        try { hiddenIframeRef.current.src = 'about:blank' } catch {}
+      }
+    }
+  }, [])
+
+  // Don't render the hidden preloader on iOS at all
+  if (isIOS) return null
+
   return (
     <div style={{ display: 'none' }}>
-      {/* Hidden iframe for preloading - only render when preloading starts */}
-      {preloadStartTime && (
+      {/* Hidden iframe for preloading - only render while preloading */}
+      {preloadStartTime && !isPreloaded && (
         <iframe
           ref={hiddenIframeRef}
           src={src}
@@ -75,4 +98,4 @@ export const IframePreloader: React.FC<IframePreloaderProps> = ({
       )}
     </div>
   )
-} 
+}

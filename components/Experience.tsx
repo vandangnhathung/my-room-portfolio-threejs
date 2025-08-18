@@ -13,7 +13,7 @@ import { useSetPointer } from '../stores/usePointerStore'
 import { useSimpleResponsive } from '../hooks/use-simple-responsive'
 import * as React from "react"
 
-export const Experience: React.FC = () => {
+const ExperienceComponent: React.FC = () => {
   const orbitControlsRef = useRef<{
     target: { x: number; y: number; z: number },
     enabled: boolean,
@@ -114,3 +114,5 @@ export const Experience: React.FC = () => {
     </>
   );
 };
+
+export const Experience = React.memo(ExperienceComponent)

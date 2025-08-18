@@ -19,7 +19,7 @@ interface SceneProps {
   disablePointerRef: React.RefObject<(() => void) | null>
 }    
 
-const Scene = ({ orbitControlsRef, disablePointerRef }: SceneProps) => {
+const SceneComponent = ({ orbitControlsRef, disablePointerRef }: SceneProps) => {
      
      const groupRef = useRef<THREE.Group>(null)
      const groupRotationRef = useRef<number>(0)
@@ -88,4 +88,6 @@ const Scene = ({ orbitControlsRef, disablePointerRef }: SceneProps) => {
   )
 }
 
-export default Scene
+export default React.memo(SceneComponent, (prev, next) => {
+  return prev.orbitControlsRef === next.orbitControlsRef && prev.disablePointerRef === next.disablePointerRef
+})

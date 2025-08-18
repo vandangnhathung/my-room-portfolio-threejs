@@ -3,15 +3,13 @@
 import React, { useState } from 'react'
 import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
-import { HoverMessage } from '@/components/HoverMessage'
-import { useMessageState } from '@/stores/useHoverStore'
+import { HoverMessageConnected } from '@/components/HoverMessageConnected'
 import { useCameraStore } from '@/stores/useCameraStore'
 import { IframePreloader } from '@/components/IframePreloader'
 import { PopupProvider } from '@/components/PopupProvider'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
-  const messageState = useMessageState()
   const { isCameraFocused, resetCamera } = useCameraStore()
   const handleLoadingComplete = () => {
     setShowUI(true)
@@ -46,7 +44,7 @@ export default function HomePage() {
         {showUI && (
           <>
             <div className="absolute inset-0 pointer-events-none">
-              <HoverMessage messageState={messageState} />
+              <HoverMessageConnected />
             </div>
             
             <div

@@ -26,6 +26,7 @@ export interface LoadingSystemProps {
   children: React.ReactNode;
   customMessages?: Partial<LoadingMessages>;
   theme?: ThemeType;
+  isDev?: boolean;
 }
 
 export type LoadingPhase = 'initializing' | 'loading' | 'ready' | 'entering' | 'complete';
@@ -388,7 +389,8 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   onComplete,
   children,
   customMessages = {},
-  theme = 'cozy'
+  theme = 'cozy',
+  isDev = false
 }) => {
   const { manager, state: loadingState, reset } = useLoadingManager();
   const animateMeshes = useAnimateMeshes();
@@ -429,24 +431,47 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
   const { phase: loadingPhase, text: loadingText, isEnterEnabled } = loadingInfo;
 
   const handleLoadingComplete = useCallback(async () => {
-    // First complete the loading overlay exit
-    onComplete();
-    
-    // Then trigger wood mesh animations after a short delay
-    setTimeout(async () => {
-      try {
-        await animateMeshes();
-        console.log('Wood mesh animations completed in order: wood_1, wood_1001, wood_2, wood_3, wood_4');
-      } catch (error) {
-        console.error('Error animating wood meshes:', error);
-      }
-    }, 500); // 500ms delay to ensure the scene is fully rendered
-  }, [onComplete, animateMeshes]);
+    if (isDev) {
+      // In dev mode: complete loading immediately, then animate meshes
+      onComplete();
+      
+      // Trigger wood mesh animations after a short delay
+      setTimeout(async () => {
+        try {
+          await animateMeshes();
+          console.log('Wood mesh animations completed in order: wood_1, wood_1001, wood_2, wood_3, wood_4');
+        } catch (error) {
+          console.error('Error animating wood meshes:', error);
+        }
+      }, 500);
+    } else {
+      // Production mode: complete loading overlay exit, then animate meshes
+      onComplete();
+      
+      // Then trigger wood mesh animations after a short delay
+      setTimeout(async () => {
+        try {
+          await animateMeshes();
+          console.log('Wood mesh animations completed in order: wood_1, wood_1001, wood_2, wood_3, wood_4');
+        } catch (error) {
+          console.error('Error animating wood meshes:', error);
+        }
+      }, 500);
+    }
+  }, [onComplete, animateMeshes, isDev]);
 
   // Reset loading state when component unmounts
   useEffect(() => {
     return () => reset();
   }, [reset]);
+
+  // If in dev mode, skip loading and immediately complete
+  useEffect(() => {
+    if (isDev) {
+      // Trigger completion immediately in dev mode
+      handleLoadingComplete();
+    }
+  }, [isDev, handleLoadingComplete]);
 
   return (
     <LoadingManagerContext.Provider value={manager}>
@@ -479,16 +504,18 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
           </React.Suspense>
         </Canvas>
 
-        {/* Loading Overlay */}
-        <LoadingOverlay
-          theme={themes[theme]}
-          themeType={theme}
-          loadingPhase={loadingPhase}
-          loadingText={loadingText}
-          isEnterEnabled={isEnterEnabled}
-          onEnterClick={handleLoadingComplete}
-          loadingState={loadingState}
-        />
+        {/* Loading Overlay - only show when not in dev mode */}
+        {!isDev && (
+          <LoadingOverlay
+            theme={themes[theme]}
+            themeType={theme}
+            loadingPhase={loadingPhase}
+            loadingText={loadingText}
+            isEnterEnabled={isEnterEnabled}
+            onEnterClick={handleLoadingComplete}
+            loadingState={loadingState}
+          />
+        )}
       </div>
     </LoadingManagerContext.Provider>
   );

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { PopupConfig, usePopupFinishCloseAnimation } from '@/stores/usePopupStore'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 interface PopupContainerProps {
   isOpen: boolean
@@ -46,12 +45,6 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         if (config?.afterOpen) {
           setTimeout(() => config.afterOpen?.(), 50)
         }
-        // Ensure ScrollTrigger recalculates after popup open animation
-        setTimeout(() => {
-          try {
-            ScrollTrigger.refresh()
-          } catch {}
-        }, 0)
       }
     })
 
@@ -326,7 +319,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
           className="p-6 bg-black text-gray-800"
           id="popup-content"
         >
-          {config.content || (
+          {/* {config.content || (
             <div className="text-center py-8">
               <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-700">
@@ -337,7 +330,8 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
               </div>
               <p className="text-gray-600 text-lg">No content provided</p>
             </div>
-          )}
+          )} */}
+          {config.content}
         </div>
       </div>
     </div>

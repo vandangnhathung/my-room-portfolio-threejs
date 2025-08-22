@@ -26,7 +26,9 @@ export default function HomePage() {
         
         <LoadingSystem
           onComplete={handleLoadingComplete}
-          theme="cozy">
+          theme="cozy"
+          isDev={true}
+        >
           <Experience />
         </LoadingSystem>
 

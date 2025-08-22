@@ -31,7 +31,7 @@ const WOOD_ANIMATION_ORDER = [
   'headphone_raycaster', 
   'cup_coaster_raycaster', 
   'github', 'linkedin',
-  'misc_things004_raycaster', 'misc_things009_raycaster', 'inside_screen_popup',
+  'misc_things004_raycaster', 'misc_things009_raycaster',
   'wood_1', 'wood_1001', 'wood_2', 'wood_4', 'wood_3']
 
 export const useWoodAnimationStore = create<WoodAnimationStore>()(

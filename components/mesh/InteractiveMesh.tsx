@@ -49,7 +49,7 @@ const InteractiveMeshWrapperComponent = ({
 
   // Register wood meshes for animation
   useEffect(() => {
-    if (!config.name.includes('inside_screen001_popup') && meshRef.current) {
+    if (!config.name.includes('inside_screen001_popup') && !config.name.includes('inside_screen_popup') && meshRef.current) {
       registerMesh(config.name, meshRef)
       // Initially hide wood meshes - they will be animated in
       meshRef.current.scale.set(0, 0, 0)

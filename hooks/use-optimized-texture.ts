@@ -3,14 +3,14 @@ import * as THREE from "three"
 import { TextureConfig } from "@/types/type"
 import { useLoadingManagerContext } from '@/components/LoadingSystem';
 
-export const useOptimizedTexture = (config: TextureConfig): THREE.MeshStandardMaterial => {
+export const useOptimizedTexture = (config: TextureConfig & { transparent?: boolean }): THREE.MeshStandardMaterial => {
   const manager = useLoadingManagerContext();
   const textureRef = useRef<THREE.Texture | null>(null);
   const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
   
   return useMemo(() => {
     // Create a cache key for this texture configuration
-    const cacheKey = `${config.path}-${config.colorSpace}-${config.flipY}-${config.generateMipmaps}`;
+    const cacheKey = `${config.path}-${config.colorSpace}-${config.flipY}-${config.generateMipmaps}-${config.transparent}`;
     
     // If we already have a material for this exact configuration, return it
     if (materialRef.current && materialRef.current.userData.cacheKey === cacheKey) {
@@ -31,11 +31,15 @@ export const useOptimizedTexture = (config: TextureConfig): THREE.MeshStandardMa
     textureRef.current.magFilter = THREE.NearestFilter;
     textureRef.current.generateMipmaps = config.generateMipmaps;
     
-    // Create new material with the texture
-    const material = new THREE.MeshStandardMaterial({ map: textureRef.current });
+    // Create new material with the texture and transparency support
+    const material = new THREE.MeshStandardMaterial({ 
+      map: textureRef.current,
+      transparent: config.transparent || false,
+      opacity: 1
+    });
     material.userData.cacheKey = cacheKey;
     
     materialRef.current = material;
     return material;
-  }, [config.path, config.colorSpace, config.flipY, config.generateMipmaps, manager]);
+  }, [config.path, config.colorSpace, config.flipY, config.generateMipmaps, config.transparent, manager]);
 }

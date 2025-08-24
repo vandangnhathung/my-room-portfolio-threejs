@@ -10,12 +10,16 @@ interface WoodAnimationStore {
   // Mesh references
   woodMeshRefs: Map<string, React.RefObject<THREE.Mesh | null>>
   
+  // Main group reference for animation
+  mainGroupRef: React.RefObject<THREE.Group | null>
+  
   // Animation state
   isAnimating: boolean
   animationCompleted: boolean
   
   // Actions
   registerMesh: (name: string, ref: React.RefObject<THREE.Mesh | null>) => void
+  setMainGroupRef: (ref: React.RefObject<THREE.Group | null>) => void
   animateMeshes: () => Promise<void>
   resetAnimation: () => void
 }
@@ -37,6 +41,7 @@ const WOOD_ANIMATION_ORDER = [
 export const useWoodAnimationStore = create<WoodAnimationStore>()(
   subscribeWithSelector((set, get) => ({
     woodMeshRefs: new Map(),
+    mainGroupRef: { current: null },
     isAnimating: false,
     animationCompleted: false,
     
@@ -45,6 +50,15 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
       const newMap = new Map(woodMeshRefs)
       newMap.set(name, ref)
       set({ woodMeshRefs: newMap })
+    },
+    
+    setMainGroupRef: (ref: React.RefObject<THREE.Group | null>) => {
+      console.log('Store: Setting main group ref:', ref)
+      console.log('Store: Ref current value:', ref?.current)
+      if (ref?.current) {
+        console.log('Store: Ref position:', ref.current.position)
+      }
+      set({ mainGroupRef: ref })
     },
     
     animateMeshes: async () => {
@@ -105,6 +119,8 @@ export const useWoodAnimationStore = create<WoodAnimationStore>()(
 
 // Individual selector hooks to prevent infinite loops
 export const useMeshRefs = () => useWoodAnimationStore(state => state.woodMeshRefs)
+
+export const useMainGroupRef = () => useWoodAnimationStore(state => state.mainGroupRef)
 
 export const useWoodAnimationState = () => useWoodAnimationStore(
   useShallow(state => ({ 

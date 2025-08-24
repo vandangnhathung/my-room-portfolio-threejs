@@ -190,6 +190,8 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
     }
   }, [isLoading])
 
+  console.log('scrollable')
+
   // Handle outside click
   useEffect(() => {
     if (!isOpen) return
@@ -316,7 +318,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         {/* Content with white background */}
         <div 
           ref={bodyRef}
-          className="p-6 bg-black text-gray-800"
+          className="p-6 bg-black text-gray-800 h-full overflow-y-auto"
           id="popup-content"
         >
           {/* {config.content || (

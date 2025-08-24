@@ -82,8 +82,11 @@ const SceneComponent = ({ orbitControlsRef, disablePointerRef }: SceneProps) => 
      useFrame(animationCallback)
 
   return (
-    <group ref={groupRef}>
-      <MyRoom orbitControlsRef={orbitControlsRef} disablePointerRef={disablePointerRef} />
+    <group ref={groupRef} position={[0, 0, 0]}>
+      <MyRoom 
+        orbitControlsRef={orbitControlsRef} 
+        disablePointerRef={disablePointerRef}
+      />
     </group>
   )
 }

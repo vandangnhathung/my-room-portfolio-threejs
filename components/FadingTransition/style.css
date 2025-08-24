@@ -1,6 +1,9 @@
  .mwg_effect037 .pin-height {
      height:500vh;
  }
+ .mwg_effect037 .text {
+    color: #fff;
+ }
  .mwg_effect037 .container {
      width: 100%;
      height: 100vh;

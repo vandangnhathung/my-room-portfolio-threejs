@@ -475,7 +475,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
 
   return (
     <LoadingManagerContext.Provider value={manager}>
-      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div className="canvas-container" style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Canvas with 3D Scene */}
         <Canvas
           style={{ width: '100%', height: '100%' }}

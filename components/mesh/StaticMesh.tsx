@@ -13,30 +13,30 @@ export const StaticMesh: React.FC<{
   const meshRef = useRef<THREE.Mesh>(null)
   const registerMesh = useRegisterMesh()
   
- 
-
   const geometry = nodes[config.name as keyof typeof nodes]?.geometry
   const material = getMaterial(config.name, config.material)
 
-
-  // Register wood meshes for animation
+  // Register ALL meshes for potential animation, not just wood ones
   useEffect(() => {
-     // Add safety checks for nodes
-    if (!nodes) {
-      console.warn(`Nodes object is undefined for mesh: ${config.name}`)
-      return
-    }
+     if (!nodes) {
+       console.warn(`Nodes object is undefined for mesh: ${config.name}`)
+       return
+     }
 
-    if (!geometry) {
-      console.warn(`Geometry not found for mesh: ${config.name}`)
-      return
-    }
+     if (!geometry) {
+       console.warn(`Geometry not found for mesh: ${config.name}`)
+       return
+     }
 
-    if (config.name.includes('wood') && meshRef.current) {
-      registerMesh(config.name, meshRef)
-      // Initially hide wood meshes - they will be animated in
-      meshRef.current.scale.set(0, 0, 0)
-    }
+     // Register all meshes, not just wood ones
+     if (meshRef.current) {
+       registerMesh(config.name, meshRef)
+       
+       // Only hide wood meshes initially
+       if (config.name.includes('wood')) {
+         meshRef.current.scale.set(0, 0, 0)
+       }
+     }
   }, [config.name, registerMesh, geometry, nodes])
 
   return (

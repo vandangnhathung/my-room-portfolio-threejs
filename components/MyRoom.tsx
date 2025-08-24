@@ -13,6 +13,8 @@ import PointCursor from "./PointCursor/PointCursor"
 import { useCameraStore } from '@/stores/useCameraStore'
 import { useThree } from "@react-three/fiber"
 import { useWoodMeshPopup } from '@/hooks/use-wood-mesh-popup'
+import { useWoodAnimationStore } from '@/stores/useMeshesAnimationStore'
+import { AxesHelper } from "three"
 
 // Error boundary for render components
 const RenderComponentsComponent = ({
@@ -103,9 +105,17 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
     openWoodMeshPopup
   )
 
+  // Set the main group ref in the store when it becomes available
+  const setMainGroupRef = React.useCallback((node: THREE.Group | null) => {
+    if (node) {
+      console.log('MyRoom: Setting main group ref in store:', node)
+      useWoodAnimationStore.getState().setMainGroupRef({ current: node })
+    }
+  }, [])
+
   return (
     <Suspense >
-      <group dispose={null}>
+      <group dispose={null} ref={setMainGroupRef} position={[0, 0, 0]}>
         <group name="Scene">
           <RenderComponents 
             focusOnScreen={memoizedFocusOnScreen}
@@ -121,11 +131,14 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
           /> */}
         </group>
         {/* Axes Helper at iframe position */}
-        <group position={[5.267, 6.165, -0.079]}
+        {/* <group position={[5.267, 6.165, -0.079]}
           rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
         >
-          {/* <primitive object={new AxesHelper(2)} /> */}
-        </group>
+          <primitive object={new AxesHelper(2)} />
+        </group> */}
+
+        <primitive object={new AxesHelper(2)} position={[0, 0, 0]} scale={[2]}/>
+
       </group>
     </Suspense>
   )

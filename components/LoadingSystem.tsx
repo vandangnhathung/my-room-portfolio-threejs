@@ -8,6 +8,7 @@ import { useLoadingManager, LoadingManagerState } from '@/hooks/use-loading-mana
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { useAnimateMeshes } from '@/stores/useMeshesAnimationStore';
+import ToggleThemeButton from './ToggleThemeButton/ToggleThemeButton';
 
 // Context for sharing LoadingManager
 const LoadingManagerContext = createContext<THREE.LoadingManager | null>(null);
@@ -478,7 +479,7 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
       <div className="canvas-container" style={{ width: '100%', height: '100%', position: 'relative' }}>
         {/* Canvas with 3D Scene */}
         <Canvas
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}
           dpr={[1, 2]} // Responsive pixel ratio
           camera={{ 
             fov: 45, // Will be overridden by responsive camera hook
@@ -503,6 +504,8 @@ export const LoadingSystem: React.FC<LoadingSystemProps> = ({
             {children}
           </React.Suspense>
         </Canvas>
+
+        <ToggleThemeButton />
 
         {/* Loading Overlay - only show when not in dev mode */}
         {!isDev && (

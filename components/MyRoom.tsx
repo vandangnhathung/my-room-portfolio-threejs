@@ -1,20 +1,19 @@
 'use client'
 
-import { useRoomData } from "@/hooks/use-room-data"
-import { useGLTF } from "@react-three/drei"
-import { Suspense, useRef, useCallback } from "react"
-import * as React from "react"
-import { useMediaQuery } from "react-responsive"
-import * as THREE from "three"
+import React, { useRef, useCallback, useMemo, Suspense } from 'react'
+import { useThree } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
+import { useMediaQuery } from 'react-responsive'
+import { useCameraStore } from '../stores/useCameraStore'
+import { useRoomData } from '../hooks/use-room-data'
+import { useWoodMeshPopup } from '../hooks/use-wood-mesh-popup'
+import { useWoodAnimationStore } from '../stores/useMeshesAnimationStore'
+import * as THREE from 'three'
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
 import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
-import { useCameraStore } from '@/stores/useCameraStore'
-import { useThree } from "@react-three/fiber"
-import { useWoodMeshPopup } from '@/hooks/use-wood-mesh-popup'
-import { useWoodAnimationStore } from '@/stores/useMeshesAnimationStore'
-import { AxesHelper } from "three"
+import AnimatedRectAreaLights from './AnimatedRectAreaLights'
 
 // Error boundary for render components
 const RenderComponentsComponent = ({
@@ -113,6 +112,9 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
     }
   }, [])
 
+  // Memoize the AxesHelper to prevent recreation on every render
+  const axesHelper = useMemo(() => new THREE.AxesHelper(2), [])
+
   return (
     <Suspense >
       <group dispose={null} ref={setMainGroupRef} position={[0, 0, 0]}>
@@ -130,14 +132,11 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
             isCameraFocused={isCameraFocused}
           /> */}
         </group>
-        {/* Axes Helper at iframe position */}
-        {/* <group position={[5.267, 6.165, -0.079]}
-          rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
-        >
-          <primitive object={new AxesHelper(2)} />
-        </group> */}
+        
+        {/* Animated RectAreaLights with ordered animation */}
+        <AnimatedRectAreaLights/>
 
-        <primitive object={new AxesHelper(2)} position={[0, 0, 0]} scale={[2]}/>
+        <primitive object={axesHelper} position={[0, 0, 0]} scale={[2]}/>
 
       </group>
     </Suspense>

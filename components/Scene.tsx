@@ -1,9 +1,10 @@
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useCallback, useMemo } from 'react'
 import { MyRoom } from './MyRoom'
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three'
 import { useCameraStore } from '../stores/useCameraStore'
 import { usePointerX, useSetPointerDisabled } from '../stores/usePointerStore'
+import LightingSystem from './LightingSystem'
 
 interface SceneProps {
   orbitControlsRef: React.RefObject<{ 
@@ -19,7 +20,7 @@ interface SceneProps {
   disablePointerRef: React.RefObject<(() => void) | null>
 }    
 
-const SceneComponent = ({ orbitControlsRef, disablePointerRef }: SceneProps) => {
+const SceneComponent = React.memo(({ orbitControlsRef, disablePointerRef }: SceneProps) => {
      
      const groupRef = useRef<THREE.Group>(null)
      const groupRotationRef = useRef<number>(0)
@@ -32,17 +33,17 @@ const SceneComponent = ({ orbitControlsRef, disablePointerRef }: SceneProps) => 
      const { isCameraFocused, setPointerDisableCallback } = useCameraStore()
 
      // Create disable function and assign to ref and store
-     React.useEffect(() => {
-       const disableFunction = () => {
-         isPointerDisabled.current = true
-         setDisabled(true)
-         // Reset group rotation to 0 when focusing on screen
-         if (groupRef.current) {
-           groupRef.current.rotation.y = 0
-           groupRotationRef.current = 0
-         }
+     const disableFunction = useCallback(() => {
+       isPointerDisabled.current = true
+       setDisabled(true)
+       // Reset group rotation to 0 when focusing on screen
+       if (groupRef.current) {
+         groupRef.current.rotation.y = 0
+         groupRotationRef.current = 0
        }
-       
+     }, [setDisabled])
+     
+     React.useEffect(() => {
        if (disablePointerRef.current) {
          disablePointerRef.current = disableFunction
        }
@@ -53,7 +54,7 @@ const SceneComponent = ({ orbitControlsRef, disablePointerRef }: SceneProps) => 
        return () => {
          setPointerDisableCallback(null)
        }
-     }, [disablePointerRef, setPointerDisableCallback, setDisabled])
+     }, [disablePointerRef, setPointerDisableCallback, disableFunction, setDisabled])
 
      // Re-enable pointer when camera focus is reset
      React.useEffect(() => {
@@ -81,16 +82,24 @@ const SceneComponent = ({ orbitControlsRef, disablePointerRef }: SceneProps) => 
 
      useFrame(animationCallback)
 
-  return (
-    <group ref={groupRef} position={[0, 0, 0]}>
-      <MyRoom 
-        orbitControlsRef={orbitControlsRef} 
-        disablePointerRef={disablePointerRef}
-      />
-    </group>
-  )
-}
+     // Memoize the group to prevent unnecessary re-renders
+     const groupElement = useMemo(() => (
+       <group ref={groupRef} position={[0, 0, 0]}>
+         <MyRoom 
+           orbitControlsRef={orbitControlsRef} 
+           disablePointerRef={disablePointerRef}
+         />
+       </group>
+     ), [orbitControlsRef, disablePointerRef])
 
-export default React.memo(SceneComponent, (prev, next) => {
-  return prev.orbitControlsRef === next.orbitControlsRef && prev.disablePointerRef === next.disablePointerRef
+  return (
+    <>
+      <LightingSystem />
+      {groupElement}
+    </>
+  )
 })
+
+SceneComponent.displayName = 'SceneComponent'
+
+export default SceneComponent

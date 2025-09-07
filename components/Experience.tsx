@@ -79,13 +79,6 @@ const ExperienceComponent: React.FC = () => {
       <Suspense fallback={null}>
         <color attach="background" args={['#000000']} />
 
-        <Environment 
-            preset="apartment" 
-            blur={0.8} 
-            environmentIntensity={1.3}
-            background={false}
-        />
-          
         <OrbitControls 
           ref={orbitControlsRef as React.RefObject<OrbitControlsImpl>}
           target={roomConfig?.cameraConfig.target}

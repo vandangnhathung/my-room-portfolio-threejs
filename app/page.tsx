@@ -5,9 +5,9 @@ import { LoadingSystem } from '@/components/LoadingSystem'
 import { Experience } from '@/components/Experience'
 import { HoverMessageConnected } from '@/components/HoverMessageConnected'
 import { useCameraStore } from '@/stores/useCameraStore'
-import { IframePreloader } from '@/components/IframePreloader'
 import { PopupProvider } from '@/components/PopupProvider'
 import ScrollArea from '@/components/ScrollArea'
+import LightingGUI from '@/components/LightingGUI'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
@@ -44,6 +44,8 @@ export default function HomePage() {
               <div className="absolute inset-0 pointer-events-none">
                 <HoverMessageConnected />
               </div>
+              
+              {/* <LightingGUI /> */}
               
               <div
                 className='absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm z-50 animate-fade-in-up'

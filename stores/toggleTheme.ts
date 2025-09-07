@@ -25,24 +25,24 @@ interface ToggleThemeStore {
 
 const defaultLighting: LightingConfig = {
   sunLight: {
-    color: { r: 1, g: 1, b: 1 },
+    color: { r: 1, g: 0.85, b: 0.6 }, // Much warmer golden sunlight
     intensity: 3
   },
   ambientLight: {
-    color: { r: 1, g: 1, b: 1 },
-    intensity: 1
+    color: { r: 0.95, g: 0.9, b: 0.8 }, // Very warm ambient glow
+    intensity: 2
   }
 }
 
 const themeConfigs: Record<ThemeType, LightingConfig> = {
   light: {
     sunLight: {
-      color: { r: 1, g: 1, b: 1 },
+      color: { r: 1, g: 0.85, b: 0.6 }, // Much warmer golden sunlight
       intensity: 3
     },
     ambientLight: {
-      color: { r: 1, g: 1, b: 1 },
-      intensity: 1
+      color: { r: 0.95, g: 0.9, b: 0.8 }, // Very warm ambient glow
+      intensity: 2
     }
   },
   dark: {
@@ -61,7 +61,7 @@ export const useToggleThemeStore = create<ToggleThemeStore>()(
   subscribeWithSelector((set, get) => ({
     currentTheme: 'light',
     isDarkMode: false,
-    lightingConfig: defaultLighting,
+    lightingConfig: themeConfigs.light, // Use themeConfigs instead of defaultLighting
     
     toggleTheme: () => set((state) => {
       const newTheme = state.currentTheme === 'light' ? 'dark' : 'light'

@@ -2,6 +2,7 @@ import { useToggleThemeStore } from "@/stores/toggleTheme"
 import React, { useRef, useEffect, useCallback } from "react"
 import * as THREE from "three"
 import { gsap } from "gsap"
+import { useFrame } from "@react-three/fiber"
 
 interface AnimatedRectAreaLightsProps {
   onLightsOff?: () => void
@@ -12,7 +13,14 @@ const AnimatedRectAreaLights: React.FC<AnimatedRectAreaLightsProps> = React.memo
   const { currentTheme } = useToggleThemeStore()
   const light1Ref = useRef<THREE.RectAreaLight>(null)
   const light2Ref = useRef<THREE.RectAreaLight>(null)
+  const light3Ref = useRef<THREE.PointLight>(null)
   const previousThemeRef = useRef(currentTheme)
+
+  // Helper refs
+  const helper3Ref = useRef<THREE.PointLightHelper>(null)
+
+  // Add a target ref
+  const targetRef = useRef<THREE.Object3D>(null)
 
   // Callback to notify when lights are fully off
   const handleLightsOff = useCallback(() => {
@@ -21,22 +29,42 @@ const AnimatedRectAreaLights: React.FC<AnimatedRectAreaLightsProps> = React.memo
     }
   }, [onLightsOff])
 
+  // Update helpers when lights change
+  // useEffect(() => {
+  //   if (helper3Ref.current && light3Ref.current) {
+  //     helper3Ref.current.update()
+  //   }
+  // }, [currentTheme])
+
+  // // Add useFrame to continuously update the helper
+  // useFrame(() => {
+  //   if (helper3Ref.current && light3Ref.current) {
+  //     helper3Ref.current.update()
+  //   }
+  // })
+
   useEffect(() => {
     if (previousThemeRef.current !== currentTheme) {
       if (currentTheme === 'dark') {
         // Animate lights in order when switching to dark
-        const timeline = gsap.timeline()
+        const timeline = gsap.timeline({delay:0.8})
         
         // First light (screen area)
         timeline.to(light1Ref.current, {
-          intensity: 2,
+          intensity: 10,
           duration: 0.8,
           ease: "power2.out"
         })
         
         // Second light (window area) with delay
         timeline.to(light2Ref.current, {
-          intensity: 6,
+          intensity: 10,
+          duration: 0.8,
+          ease: "power2.out"
+        }, "-=0.4") // Start 0.4s before first light finishes
+
+        timeline.to(light3Ref.current, {
+          intensity: 2,
           duration: 0.8,
           ease: "power2.out"
         }, "-=0.4") // Start 0.4s before first light finishes
@@ -54,6 +82,11 @@ const AnimatedRectAreaLights: React.FC<AnimatedRectAreaLightsProps> = React.memo
           ease: "power2.in"
         })
         .to(light2Ref.current, {
+          intensity: 0,
+          duration: 0.6,
+          ease: "power2.in"
+        }, "-=0.3") // Start 0.3s before first light finishes
+        .to(light3Ref.current, {
           intensity: 0,
           duration: 0.6,
           ease: "power2.in"
@@ -78,15 +111,37 @@ const AnimatedRectAreaLights: React.FC<AnimatedRectAreaLightsProps> = React.memo
       />
 
       {/* Second RectAreaLight - Window area */}
-      <rectAreaLight
+      <pointLight
         ref={light2Ref}
-        position={[7.23, 9.789, -8.33]}
+        position={[3.23, 9.789, -8.33]}
         rotation={[0, 0, 0]}
-        width={3}
-        height={8}
         intensity={currentTheme === 'dark' ? 0 : 0} // Start at 0, will be animated
         color="#f5ca92"
+        decay={1}
       />
+
+
+      <spotLight
+        ref={light3Ref}
+        castShadow
+        target={targetRef.current || undefined}
+        angle={Math.PI * 0.3}
+        position={[-0.505, 8, 3.918]} 
+        decay={1}
+        penumbra={0.25} 
+        intensity={0} 
+        distance={100} 
+      />
+
+      {/* Target object for spot light */}
+      <object3D ref={targetRef} position={[-0.505, 5.016, 3.918]} />
+      
+      {/* {light3Ref.current && (
+        <primitive 
+          ref={helper3Ref}
+          object={new THREE.SpotLightHelper(light3Ref.current)}
+        />
+      )} */}
     </>
   )
 })

@@ -11,9 +11,9 @@ import { useWoodAnimationStore } from '../stores/useMeshesAnimationStore'
 import * as THREE from 'three'
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
-import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
 import AnimatedRectAreaLights from './AnimatedRectAreaLights'
+import { OptimizedIframeScreen } from './OptimizedIframeScreen'
 
 // Error boundary for render components
 const RenderComponentsComponent = ({
@@ -113,7 +113,7 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
   }, [])
 
   // Memoize the AxesHelper to prevent recreation on every render
-  const axesHelper = useMemo(() => new THREE.AxesHelper(2), [])
+  // const axesHelper = useMemo(() => new THREE.AxesHelper(20), [])
 
   return (
     <Suspense >
@@ -135,9 +135,18 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
         
         {/* Animated RectAreaLights with ordered animation */}
         <AnimatedRectAreaLights/>
+   {/* Axes Helper at iframe position */}
+        {/* <group position={[5.267, 6.165, -0.079]}
+          rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
+        >
+          <primitive object={new AxesHelper(2)} />
+        </group> */}
 
-        <primitive object={axesHelper} position={[0, 0, 0]} scale={[2]}/>
 
+        {/* <group position={[0, 3, 0]}
+        >
+          <primitive object={new AxesHelper(2)} scale={10}/>
+        </group> */}
       </group>
     </Suspense>
   )

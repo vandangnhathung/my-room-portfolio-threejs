@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useCallback } from 'react'
-import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useToggleThemeStore } from '@/stores/toggleTheme'
 import { gsap } from 'gsap'
@@ -10,6 +9,7 @@ const LightingSystem: React.FC = React.memo(() => {
   const sunLightRef = useRef<THREE.DirectionalLight>(null)
   const ambientLightRef = useRef<THREE.AmbientLight>(null)
   const previousThemeRef = useRef(currentTheme)
+  const isInitializedRef = useRef(false)
   
   // Optimized theme switching with GSAP animations
   const updateLighting = useCallback((newConfig: typeof lightingConfig) => {
@@ -26,13 +26,13 @@ const LightingSystem: React.FC = React.memo(() => {
       r: newConfig.sunLight.color.r,
       g: newConfig.sunLight.color.g,
       b: newConfig.sunLight.color.b,
-      duration: 0.5, // Reduced from 1s to 0.5s
+      duration: 0.5,
       ease: "power2.out"
     })
     
     gsap.to(sunLightRef.current, {
       intensity: newConfig.sunLight.intensity,
-      duration: 0.5,
+      duration: 1,
       ease: "power2.out"
     })
     
@@ -47,14 +47,34 @@ const LightingSystem: React.FC = React.memo(() => {
     
     gsap.to(ambientLightRef.current, {
       intensity: newConfig.ambientLight.intensity,
-      duration: 0.5,
+      duration: 1,
       ease: "power2.out"
     })
   }, [])
   
-  // Only update lighting when theme actually changes
+  // Initialize lighting on first render and update on theme changes
   useEffect(() => {
-    if (previousThemeRef.current !== currentTheme) {
+    if (!isInitializedRef.current) {
+      // First render - set initial values without animation
+      if (sunLightRef.current && ambientLightRef.current) {
+        sunLightRef.current.color.setRGB(
+          lightingConfig.sunLight.color.r,
+          lightingConfig.sunLight.color.g,
+          lightingConfig.sunLight.color.b
+        )
+        sunLightRef.current.intensity = lightingConfig.sunLight.intensity
+        
+        ambientLightRef.current.color.setRGB(
+          lightingConfig.ambientLight.color.r,
+          lightingConfig.ambientLight.color.g,
+          lightingConfig.ambientLight.color.b
+        )
+        ambientLightRef.current.intensity = lightingConfig.ambientLight.intensity
+        
+        isInitializedRef.current = true
+      }
+    } else if (previousThemeRef.current !== currentTheme) {
+      // Theme change - animate to new values
       updateLighting(lightingConfig)
       previousThemeRef.current = currentTheme
     }
@@ -66,9 +86,10 @@ const LightingSystem: React.FC = React.memo(() => {
       <directionalLight
         ref={sunLightRef}
         position={[-1.5, 7, 3]}
-        intensity={lightingConfig.sunLight.intensity}
+        intensity={1} // Default intensity, will be set by animation
+        color="#ffffff" // Default white color, will be set by animation
         castShadow
-        shadow-mapSize={[1024, 1024]} // Reduced from 2048x2048 for performance
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-far={20}
         shadow-normalBias={0.05}
       />
@@ -76,7 +97,8 @@ const LightingSystem: React.FC = React.memo(() => {
       {/* Ambient Light */}
       <ambientLight
         ref={ambientLightRef}
-        intensity={lightingConfig.ambientLight.intensity}
+        intensity={1} // Default intensity, will be set by animation
+        color="#ffffff" // Default white color, will be set by animation
       />
     </>
   )

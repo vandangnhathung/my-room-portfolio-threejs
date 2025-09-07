@@ -48,7 +48,6 @@ export const StaticMesh: React.FC<{
       position={config.position}
       rotation={config.rotation}
       scale={config.scale}
-      castShadow
       receiveShadow
     />
   )

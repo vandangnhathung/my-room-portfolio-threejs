@@ -37,17 +37,17 @@ const createMeshClickHandlers = (
     // Wood mesh click handlers - open popups
     'wood_2': () => {
       if (openWoodMeshPopup) {
-        openWoodMeshPopup('wood_2')
+        window.open('https://vandangnhathung.github.io/lofi-ver-2/', '_blank')
       }
     },
     'wood_3': () => {
       if (openWoodMeshPopup) {
-        openWoodMeshPopup('wood_3')
+        window.open('https://vandangnhathung.github.io/lofi-ver-2/', '_blank')
       }
     },
     'wood_4': () => {
       if (openWoodMeshPopup) {
-        openWoodMeshPopup('wood_4')
+        window.open('https://vandangnhathung.github.io/lofi-ver-2/', '_blank')
       }
     },
     'github': () => {

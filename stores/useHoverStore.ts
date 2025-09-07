@@ -104,23 +104,62 @@ export const useHoverStore = create<HoverStore>()(
       updateMessagePosition: throttledUpdatePosition,
       cleanup,
       
-      createHoverHandlers: (meshName: string) => ({
-        onPointerEnter: (event: ThreeEvent<PointerEvent>) => {
-          set({ hoveredMesh: meshName })
-          const { showMessage } = get()
-          showMessage(meshName, event.clientX, event.clientY)
-        },
-        onPointerLeave: () => {
-          set({ hoveredMesh: null })
-          const { hideMessage } = get()
-          hideMessage()
-        },
-        onPointerMove: (event: ThreeEvent<PointerEvent>) => {
-          const { updateMessagePosition } = get()
-          updateMessagePosition(event.clientX, event.clientY)
-        },
-        style: { cursor: 'pointer' }
-      })
+      createHoverHandlers: (meshName: string) => {
+        // Helper function to get canvas-relative coordinates (iOS fix)
+        const getCanvasRelativeCoordinates = (event: ThreeEvent<PointerEvent>) => {
+          const canvas = document.querySelector('canvas')
+          if (!canvas) return { x: 0, y: 0 }
+          
+          const rect = canvas.getBoundingClientRect()
+          
+          // Handle both pointer events and touch events for iOS compatibility
+          let clientX = 0
+          let clientY = 0
+          
+          if (event.clientX !== undefined && event.clientY !== undefined) {
+            // Pointer event
+            clientX = event.clientX
+            clientY = event.clientY
+          } else if (event.nativeEvent) {
+            // Touch event or other native event
+            const nativeEvent = event.nativeEvent as any
+            if (nativeEvent.touches && nativeEvent.touches.length > 0) {
+              // Touch event
+              clientX = nativeEvent.touches[0].clientX
+              clientY = nativeEvent.touches[0].clientY
+            } else if (nativeEvent.clientX !== undefined) {
+              // Fallback to native event coordinates
+              clientX = nativeEvent.clientX
+              clientY = nativeEvent.clientY
+            }
+          }
+          
+          return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+          }
+        }
+
+        return {
+          onPointerEnter: (event: ThreeEvent<PointerEvent>) => {
+            set({ hoveredMesh: meshName })
+            const { showMessage } = get()
+            const { x, y } = getCanvasRelativeCoordinates(event)
+            showMessage(meshName, x, y)
+          },
+          onPointerLeave: () => {
+            set({ hoveredMesh: null })
+            const { hideMessage } = get()
+            hideMessage()
+          },
+          onPointerMove: (event: ThreeEvent<PointerEvent>) => {
+            const { updateMessagePosition } = get()
+            const { x, y } = getCanvasRelativeCoordinates(event)
+            updateMessagePosition(x, y)
+          },
+          style: { cursor: 'pointer' }
+        }
+      }
     }
   })
 )

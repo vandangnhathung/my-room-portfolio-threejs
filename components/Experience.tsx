@@ -1,7 +1,7 @@
 'use client'
 
 import { OrbitControls } from "@react-three/drei";
-import { Suspense, useRef, useEffect } from "react";
+import { Suspense, useRef, useEffect, useMemo } from "react";
 import { TOUCH } from 'three'
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import Scene from "./Scene";
@@ -62,16 +62,59 @@ const ExperienceComponent: React.FC = () => {
 
   const disablePointerRef = useRef<(() => void) | null>(null)
   
-  // Simple pointer move handler - back to original working version
+  // iOS detection utility
+  const isIOSDevice = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  }, [])
+
+  // iOS-optimized pointer and touch move handler with canvas-relative coordinates
   useEffect(() => {
+    const getCanvasRelativeCoordinates = (clientX: number, clientY: number) => {
+      const canvas = document.querySelector('canvas')
+      if (!canvas) return { x: 0, y: 0 }
+      
+      const rect = canvas.getBoundingClientRect()
+      
+      // Calculate canvas-relative coordinates (CRITICAL for iOS)
+      const x = ((clientX - rect.left) / rect.width) * 2 - 1
+      const y = -((clientY - rect.top) / rect.height) * 2 + 1
+      
+      return { x, y }
+    }
+
     const onPointerMove = (e: PointerEvent) => {
-      // Use optimized store setter
-      const x = (e.clientX / window.innerWidth) * 2 - 1
-      const y = -(e.clientY / window.innerHeight) * 2 + 1
+      const { x, y } = getCanvasRelativeCoordinates(e.clientX, e.clientY)
       setPointer(x, y)
     }
+
+    // iOS-specific touch event handling
+    const onTouchMove = (e: TouchEvent) => {
+      if (isIOSDevice) {
+        e.preventDefault() // Prevent scrolling on iOS
+      }
+      if (e.touches.length > 0) {
+        const touch = e.touches[0]
+        const { x, y } = getCanvasRelativeCoordinates(touch.clientX, touch.clientY)
+        setPointer(x, y)
+      }
+    }
+
+    // Add both pointer and touch events for maximum compatibility
     window.addEventListener('pointermove', onPointerMove)
-    return () => window.removeEventListener('pointermove', onPointerMove)
+    
+    // Only add touch events on iOS devices for better performance
+    if (isIOSDevice) {
+      window.addEventListener('touchmove', onTouchMove, { passive: false })
+    }
+    
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      if (isIOSDevice) {
+        window.removeEventListener('touchmove', onTouchMove)
+      }
+    }
   }, [setPointer])
 
   return (

@@ -52,24 +52,57 @@ export const useHoverMessage = () => {
     }))
   }, [])
 
+  // Helper function to get canvas-relative coordinates (iOS fix)
+  const getCanvasRelativeCoordinates = useCallback((event: ThreeEvent<PointerEvent>) => {
+    const canvas = document.querySelector('canvas')
+    if (!canvas) return { x: 0, y: 0 }
+    
+    const rect = canvas.getBoundingClientRect()
+    
+    // Handle both pointer events and touch events for iOS compatibility
+    let clientX = 0
+    let clientY = 0
+    
+    if (event.clientX !== undefined && event.clientY !== undefined) {
+      // Pointer event
+      clientX = event.clientX
+      clientY = event.clientY
+    } else if (event.nativeEvent) {
+      // Touch event or other native event
+      const nativeEvent = event.nativeEvent as any
+      if (nativeEvent.touches && nativeEvent.touches.length > 0) {
+        // Touch event
+        clientX = nativeEvent.touches[0].clientX
+        clientY = nativeEvent.touches[0].clientY
+      } else if (nativeEvent.clientX !== undefined) {
+        // Fallback to native event coordinates
+        clientX = nativeEvent.clientX
+        clientY = nativeEvent.clientY
+      }
+    }
+    
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    }
+  }, [])
+
   const createHoverHandlers = useCallback((meshName: string): HoverHandlers => ({
     onPointerEnter: (event: ThreeEvent<PointerEvent>) => {
-      const mouseX = event.clientX || event.nativeEvent?.clientX || 0
-      const mouseY = event.clientY || event.nativeEvent?.clientY || 0
-      showMessage(meshName, mouseX, mouseY)
+      const { x, y } = getCanvasRelativeCoordinates(event)
+      showMessage(meshName, x, y)
     },
     onPointerLeave: () => {
       hideMessage()
     },
     onPointerMove: (event: ThreeEvent<PointerEvent>) => {
       if (messageState.isVisible) {
-        const mouseX = event.clientX || event.nativeEvent?.clientX || 0
-        const mouseY = event.clientY || event.nativeEvent?.clientY || 0
-        updatePosition(mouseX, mouseY)
+        const { x, y } = getCanvasRelativeCoordinates(event)
+        updatePosition(x, y)
       }
     },
     style: { cursor: 'pointer' }
-  }), [messageState.isVisible, showMessage, hideMessage, updatePosition])
+  }), [messageState.isVisible, showMessage, hideMessage, updatePosition, getCanvasRelativeCoordinates])
 
   return {
     messageState,

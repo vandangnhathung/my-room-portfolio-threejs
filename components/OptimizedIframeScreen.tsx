@@ -23,7 +23,7 @@ interface ErrorStateProps {
 
 // Styles
 const styles = {
-  container: {
+  container: (isIOSDevice: boolean) => ({
     width: "1380px",
     height: "724px",
     position: 'relative' as const,
@@ -33,9 +33,19 @@ const styles = {
     willChange: 'transform',
     backfaceVisibility: 'hidden' as const,
     transformStyle: 'preserve-3d' as const,
-  },
+    // iOS-specific container fixes
+    ...(isIOSDevice && {
+      width: '100vw',
+      height: '100vh',
+      overflow: 'hidden',
+      position: 'fixed' as const,
+      top: 0,
+      left: 0,
+      zIndex: 9999,
+    })
+  }),
   
-  iframe: (isLoaded: boolean, isCameraFocused: boolean) => ({
+  iframe: (isLoaded: boolean, isCameraFocused: boolean, isIOSDevice: boolean) => ({
     width: '100%',
     height: '100%',
     border: 'none',
@@ -49,6 +59,21 @@ const styles = {
     backfaceVisibility: 'hidden' as const,
     WebkitBackfaceVisibility: 'hidden' as const,
     transformStyle: 'preserve-3d' as const,
+    // iOS Safari specific fixes
+    WebkitOverflowScrolling: 'touch' as const,
+    // Enhanced iOS fixes
+    ...(isIOSDevice && {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      width: '100% !important',
+      height: '100% !important',
+      minHeight: '100vh',
+      maxHeight: '100vh',
+      overflow: 'hidden',
+      WebkitUserSelect: 'none' as const,
+      WebkitTouchCallout: 'none' as const,
+    })
   }),
   
   loadingContainer: (isIOSDevice: boolean) => ({
@@ -142,19 +167,40 @@ const iOSStyles = `
     100% { transform: rotate(360deg); }
   }
   
+  /* iOS Safari specific fixes - Enhanced */
   @supports (-webkit-touch-callout: none) {
     .htmlScreen1 {
+      width: 100vw !important;
+      height: 100vh !important;
+      overflow: hidden !important;
       position: fixed !important;
-      top:-10%!important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 9999 !important;
     }
-
+    
     .htmlScreen1 iframe {
-      position: relative !important;
       width: 100% !important;
       height: 100% !important;
+      min-height: 100vh !important;
+      max-height: 100vh !important;
       -webkit-transform: scaleY(-1) !important;
       transform: scaleY(-1) !important;
       -webkit-overflow-scrolling: touch !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      overflow: hidden !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
+    }
+  }
+
+  /* iOS-specific viewport fixes */
+  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .htmlScreen1 {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
     }
   }
 `
@@ -193,18 +239,52 @@ const OptimizedIframeScreenComponent: React.FC<OptimizedIframeScreenProps> = ({
     onLoad?.()
   }, [onLoad])
 
+  // Memoize iOS detection to prevent re-computation
+  const iOSDevice = useMemo(() => isIOSDevice(), [])
+
   const handleIframeError = useCallback(() => {
     setHasError(true)
     setIsLoading(false)
-  }, [])
-
-  // Memoize iOS detection to prevent re-computation
-  const iOSDevice = useMemo(() => isIOSDevice(), [])
+    
+    // iOS fallback strategy
+    if (iOSDevice) {
+      console.log('iOS iframe error detected - attempting fallback')
+      // Force garbage collection hints for iOS
+      if (window.gc) window.gc()
+    }
+  }, [iOSDevice])
+  
+  // iOS performance monitoring
+  useEffect(() => {
+    if (iOSDevice) {
+      console.log('iOS device detected - using optimized rendering')
+      // Monitor for performance issues
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.entryType === 'measure') {
+            console.log('Performance:', entry.name, entry.duration)
+          }
+        }
+      })
+      observer.observe({ entryTypes: ['measure'] })
+      return () => observer.disconnect()
+    }
+  }, [iOSDevice])
+  
+  // iOS memory management
+  useEffect(() => {
+    return () => {
+      if (iOSDevice) {
+        // Force garbage collection hints
+        if (window.gc) window.gc()
+      }
+    }
+  }, [iOSDevice])
   
   // Memoize iframe styles to prevent re-renders
   const iframeStyles = useMemo(() => {
-    return styles.iframe(isLoaded, isCameraFocused)
-  }, [isLoaded, isCameraFocused])
+    return styles.iframe(isLoaded, isCameraFocused, iOSDevice)
+  }, [isLoaded, isCameraFocused, iOSDevice])
 
   // Early return if not visible
   if (!isVisible) {
@@ -221,7 +301,7 @@ const OptimizedIframeScreenComponent: React.FC<OptimizedIframeScreenProps> = ({
       wrapperClass="htmlScreen1"
       zIndexRange={[10, 0]}
     >
-      <div ref={containerRef} style={styles.container}>
+      <div ref={containerRef} style={styles.container(iOSDevice)}>
         {/* Loading State */}
         {isLoading && <LoadingSpinner isIOSDevice={iOSDevice} />}
 
@@ -239,6 +319,12 @@ const OptimizedIframeScreenComponent: React.FC<OptimizedIframeScreenProps> = ({
           allow="autoplay; encrypted-media; fullscreen; clipboard-write; camera; microphone; geolocation"
           onLoad={handleIframeLoad}
           onError={handleIframeError}
+          // iOS-specific attributes
+          {...(iOSDevice && {
+            allowFullScreen: true,
+            webkitallowfullscreen: 'true',
+            mozallowfullscreen: 'true',
+          })}
         />
       </div>
 

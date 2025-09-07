@@ -1,18 +1,19 @@
 'use client'
 
-import { useRoomData } from "@/hooks/use-room-data"
-import { useGLTF } from "@react-three/drei"
-import { Suspense, useRef, useCallback } from "react"
-import * as React from "react"
-import { useMediaQuery } from "react-responsive"
-import * as THREE from "three"
+import React, { useRef, useCallback, Suspense } from 'react'
+import { useThree } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
+import { useMediaQuery } from 'react-responsive'
+import { useCameraStore } from '../stores/useCameraStore'
+import { useRoomData } from '../hooks/use-room-data'
+import { useWoodMeshPopup } from '../hooks/use-wood-mesh-popup'
+import { useWoodAnimationStore } from '../stores/useMeshesAnimationStore'
+import * as THREE from 'three'
 import { RenderStaticMeshes } from "./RenderMesh/RenderStaticMeshes"
 import { RenderInteractiveMeshes } from "./RenderMesh/RenderInteractiveMeshes"
-import { OptimizedIframeScreen } from "./OptimizedIframeScreen"
 import PointCursor from "./PointCursor/PointCursor"
-import { useCameraStore } from '@/stores/useCameraStore'
-import { useThree } from "@react-three/fiber"
-import { useWoodMeshPopup } from '@/hooks/use-wood-mesh-popup'
+import AnimatedRectAreaLights from './AnimatedRectAreaLights'
+import { OptimizedIframeScreen } from './OptimizedIframeScreen'
 
 // Error boundary for render components
 const RenderComponentsComponent = ({
@@ -103,9 +104,20 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
     openWoodMeshPopup
   )
 
+  // Set the main group ref in the store when it becomes available
+  const setMainGroupRef = React.useCallback((node: THREE.Group | null) => {
+    if (node) {
+      console.log('MyRoom: Setting main group ref in store:', node)
+      useWoodAnimationStore.getState().setMainGroupRef({ current: node })
+    }
+  }, [])
+
+  // Memoize the AxesHelper to prevent recreation on every render
+  // const axesHelper = useMemo(() => new THREE.AxesHelper(20), [])
+
   return (
     <Suspense >
-      <group dispose={null}>
+      <group dispose={null} ref={setMainGroupRef} position={[0, 0, 0]}>
         <group name="Scene">
           <RenderComponents 
             focusOnScreen={memoizedFocusOnScreen}
@@ -113,19 +125,28 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
             disablePointerRef={disablePointerRef}
           />
           {/* Optimized iframe with immediate loading */}
-          {/* <OptimizedIframeScreen 
+          <OptimizedIframeScreen 
             src="https://vandangnhathung.github.io/lofi-ver-2/"
             position={[5.287, 6.719, -0.05]}
             rotation={[192 * (Math.PI / 180), 73 * (Math.PI / 180), -11.5 * (Math.PI / 180)]}
             isCameraFocused={isCameraFocused}
-          /> */}
+          />
         </group>
+        
+        {/* Animated RectAreaLights with ordered animation */}
+        <AnimatedRectAreaLights/>
         {/* Axes Helper at iframe position */}
-        <group position={[5.267, 6.165, -0.079]}
+        {/* <group position={[5.267, 6.165, -0.079]}
           rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
         >
-          {/* <primitive object={new AxesHelper(2)} /> */}
-        </group>
+          <primitive object={new AxesHelper(2)} />
+        </group> */}
+
+
+        {/* <group position={[0, 3, 0]}
+        >
+          <primitive object={new AxesHelper(2)} scale={10}/>
+        </group> */}
       </group>
     </Suspense>
   )

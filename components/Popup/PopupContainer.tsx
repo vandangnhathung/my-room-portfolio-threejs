@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { PopupConfig, usePopupFinishCloseAnimation } from '@/stores/usePopupStore'
 import { gsap } from 'gsap'
 
@@ -30,7 +30,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
   const finishCloseAnimation = usePopupFinishCloseAnimation()
 
   // GSAP Animation Functions
-  const animateIn = () => {
+  const animateIn = useCallback(() => {
     if (!overlayRef.current || !contentRef.current) return
 
     // Kill any existing animations
@@ -92,9 +92,9 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
     }, "-=0.25")
 
     timelineRef.current = tl
-  }
+  }, [config])
 
-  const animateOut = () => {
+  const animateOut = useCallback(() => {
     return new Promise<void>((resolve) => {
       if (!overlayRef.current || !contentRef.current) {
         resolve()
@@ -139,7 +139,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
 
       timelineRef.current = tl
     })
-  }
+  }, [finishCloseAnimation])
 
   // Handle animation states
   useEffect(() => {
@@ -167,7 +167,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         timelineRef.current.kill()
       }
     }
-  }, [isOpen, config, isAnimating, shouldRender])
+  }, [isOpen, config, isAnimating, shouldRender, animateIn, animateOut])
 
   // Loading animation
   useEffect(() => {
@@ -189,6 +189,8 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
       })
     }
   }, [isLoading])
+
+  // console.log('scrollable')
 
   // Handle outside click
   useEffect(() => {
@@ -316,7 +318,7 @@ export const PopupContainer: React.FC<PopupContainerProps> = ({
         {/* Content with white background */}
         <div 
           ref={bodyRef}
-          className="p-6 bg-black text-gray-800"
+          className="p-6 bg-black text-gray-800 h-full overflow-y-auto"
           id="popup-content"
         >
           {/* {config.content || (

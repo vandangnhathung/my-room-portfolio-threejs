@@ -77,7 +77,8 @@ export const useRoomMaterials = (materialPaths: MaterialPaths) => {
     path: materialPaths?.world || '/textures/room/World.webp',
     colorSpace: THREE.SRGBColorSpace,
     flipY: false,
-    generateMipmaps: false
+    generateMipmaps: false,
+    transparent: true // Enable transparency for opacity changes
   })
 
   const myWorkMaterial = useOptimizedTexture({

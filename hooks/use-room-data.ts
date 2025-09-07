@@ -35,19 +35,24 @@ const createMeshClickHandlers = (
       console.log('Screen001 clicked!', currentTarget)
     },
     // Wood mesh click handlers - open popups
-    'wood_2': () => {
-      if (openWoodMeshPopup) {
-        openWoodMeshPopup('wood_2')
-      }
-    },
+    // my work
     'wood_3': () => {
       if (openWoodMeshPopup) {
-        openWoodMeshPopup('wood_3')
+      window.open('https://www.linkedin.com/in/h%C6%B0ng-v%C4%83n-%C4%91%E1%BA%B7ng-nh%E1%BA%ADt-7804ab218/', '_blank')
       }
     },
+
+    // about
+    'wood_2': () => {
+      if (openWoodMeshPopup) {
+        window.open('https://www.linkedin.com/in/h%C6%B0ng-v%C4%83n-%C4%91%E1%BA%B7ng-nh%E1%BA%ADt-7804ab218/', '_blank')
+      }
+    },
+
+    // contact
     'wood_4': () => {
       if (openWoodMeshPopup) {
-        openWoodMeshPopup('wood_4')
+        window.open('mailto:vandangnhathung@gmail.com', '_blank')
       }
     },
     'github': () => {

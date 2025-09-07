@@ -89,7 +89,7 @@ const LightingGUI: React.FC = () => {
         guiRef.current = null
       }
     }
-  }, []) // Only run once on mount
+  }, [lightingConfig.ambientLight, lightingConfig.sunLight, updateLighting])
 
   return (
     <div className="fixed z-50 top-4 right-4">

@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import type { RootState } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -39,6 +39,16 @@ export const useChairRotation = (meshName: string, initialSpeed: number = 0.7) =
   }, [meshName]) // Only recreate if meshName changes
 
   useFrame(animationCallback)
+
+  // Add cleanup effect
+  useEffect(() => {
+    return () => {
+      // Reset any ongoing animations
+      timeRef.current = 0
+      speedRef.current = initialSpeed
+      targetSpeedRef.current = initialSpeed
+    }
+  }, [meshName, initialSpeed])
 
   // Functions to control speed - now just update target values
   const increaseSpeed = useCallback(() => {

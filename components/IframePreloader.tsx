@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useCameraStore } from '@/stores/useCameraStore'
 
 interface IframePreloaderProps {
@@ -26,16 +26,7 @@ export const IframePreloader: React.FC<IframePreloaderProps> = ({
   // Detect iOS once
   const isIOS = useMemo(() => isIOSDevice(), [])
 
-  // Predictive preloading based on camera focus (skip on iOS)
-  useEffect(() => {
-    if (isIOS) return
-    if (!enablePredictivePreloading || isPreloaded) return
-    if (isCameraFocused) {
-      startPreload()
-    }
-  }, [isIOS, isCameraFocused, enablePredictivePreloading, isPreloaded])
-
-  const startPreload = () => {
+  const startPreload = useCallback(() => {
     if (isPreloaded || preloadStartTime) return
 
     setPreloadStartTime(performance.now())
@@ -45,7 +36,16 @@ export const IframePreloader: React.FC<IframePreloaderProps> = ({
     if (hiddenIframeRef.current) {
       hiddenIframeRef.current.src = src
     }
-  }
+  }, [isPreloaded, preloadStartTime, src])
+
+  // Predictive preloading based on camera focus (skip on iOS)
+  useEffect(() => {
+    if (isIOS) return
+    if (!enablePredictivePreloading || isPreloaded) return
+    if (isCameraFocused) {
+      startPreload()
+    }
+  }, [isIOS, isCameraFocused, enablePredictivePreloading, isPreloaded, startPreload])
 
   const handlePreloadComplete = () => {
     const endTime = performance.now()
@@ -75,8 +75,9 @@ export const IframePreloader: React.FC<IframePreloaderProps> = ({
   // Cleanup on unmount – release hidden iframe memory
   useEffect(() => {
     return () => {
-      if (hiddenIframeRef.current) {
-        try { hiddenIframeRef.current.src = 'about:blank' } catch {}
+      const iframe = hiddenIframeRef.current
+      if (iframe) {
+        try { iframe.src = 'about:blank' } catch {}
       }
     }
   }, [])

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
 import './style.css'
-import Lenis from 'lenis';
 import Image from 'next/image';
 
 const FadingTransition = () => {

@@ -6,8 +6,6 @@ import { Experience } from '@/components/Experience'
 import { HoverMessageConnected } from '@/components/HoverMessageConnected'
 import { useCameraStore } from '@/stores/useCameraStore'
 import { PopupProvider } from '@/components/PopupProvider'
-import ScrollArea from '@/components/ScrollArea'
-import LightingGUI from '@/components/LightingGUI'
 
 export default function HomePage() {
   const [showUI, setShowUI] = useState(false)
@@ -18,8 +16,7 @@ export default function HomePage() {
 
   return (
     <PopupProvider>
-      <main style={{ width: '100%', height: '300vh', position: 'relative' }}>
-        <ScrollArea>
+      <main style={{ width: '100%', height: '100vh', position: 'relative' }}>
           <LoadingSystem
             onComplete={handleLoadingComplete}
             theme="cozy"
@@ -54,7 +51,6 @@ export default function HomePage() {
               </div>
             </>
           )}
-        </ScrollArea>
       </main>
     </PopupProvider>
   )

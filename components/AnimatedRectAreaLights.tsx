@@ -2,7 +2,6 @@ import { useToggleThemeStore } from "@/stores/toggleTheme"
 import React, { useRef, useEffect, useCallback } from "react"
 import * as THREE from "three"
 import { gsap } from "gsap"
-import { useFrame } from "@react-three/fiber"
 
 interface AnimatedRectAreaLightsProps {
   onLightsOff?: () => void
@@ -17,7 +16,7 @@ const AnimatedRectAreaLights: React.FC<AnimatedRectAreaLightsProps> = React.memo
   const previousThemeRef = useRef(currentTheme)
 
   // Helper refs
-  const helper3Ref = useRef<THREE.PointLightHelper>(null)
+  // const helper3Ref = useRef<THREE.PointLightHelper>(null)
 
   // Add a target ref
   const targetRef = useRef<THREE.Object3D>(null)
@@ -49,26 +48,29 @@ const AnimatedRectAreaLights: React.FC<AnimatedRectAreaLightsProps> = React.memo
         // Animate lights in order when switching to dark
         const timeline = gsap.timeline({delay:0.8})
         
-        // First light (screen area)
-        timeline.to(light1Ref.current, {
-          intensity: 10,
-          duration: 0.8,
-          ease: "power2.out"
-        })
-        
-        // Second light (window area) with delay
-        timeline.to(light2Ref.current, {
-          intensity: 10,
-          duration: 0.8,
-          ease: "power2.out"
-        }, "-=0.4") // Start 0.4s before first light finishes
+
+        // First light (window area)
 
         timeline.to(light3Ref.current, {
           intensity: 2,
           duration: 0.8,
           ease: "power2.out"
-        }, "-=0.4") // Start 0.4s before first light finishes
+        }) 
         
+        // Second light (screen area) with delay
+        timeline.to(light1Ref.current, {
+          intensity: 10,
+          duration: 0.8,
+          ease: "power2.out"
+        }) 
+
+        
+        timeline.to(light2Ref.current, {
+          intensity: 10,
+          duration: 0.8,
+          ease: "power2.out"
+        }) 
+
       } else {
         // Turn off lights when switching to light theme - FIRST
         const timeline = gsap.timeline({

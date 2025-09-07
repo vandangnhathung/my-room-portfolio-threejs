@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useCallback, useMemo, Suspense } from 'react'
+import React, { useRef, useCallback, Suspense } from 'react'
 import { useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { useMediaQuery } from 'react-responsive'
@@ -125,17 +125,17 @@ function MyRoomComponent({ orbitControlsRef, disablePointerRef }: MyRoomProps) {
             disablePointerRef={disablePointerRef}
           />
           {/* Optimized iframe with immediate loading */}
-          {/* <OptimizedIframeScreen 
+          <OptimizedIframeScreen 
             src="https://vandangnhathung.github.io/lofi-ver-2/"
             position={[5.287, 6.719, -0.05]}
             rotation={[192 * (Math.PI / 180), 73 * (Math.PI / 180), -11.5 * (Math.PI / 180)]}
             isCameraFocused={isCameraFocused}
-          /> */}
+          />
         </group>
         
         {/* Animated RectAreaLights with ordered animation */}
         <AnimatedRectAreaLights/>
-   {/* Axes Helper at iframe position */}
+        {/* Axes Helper at iframe position */}
         {/* <group position={[5.267, 6.165, -0.079]}
           rotation={[192 * (Math.PI / 180), 75 * (Math.PI / 180), -12 * (Math.PI / 180)]}
         >

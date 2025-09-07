@@ -1,6 +1,6 @@
 'use client'
 
-import { Environment, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { Suspense, useRef, useEffect } from "react";
 import { TOUCH } from 'three'
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
